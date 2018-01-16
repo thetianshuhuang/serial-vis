@@ -1,4 +1,5 @@
 import pygame
+import math
 
 
 # graphics class
@@ -31,13 +32,18 @@ class graphics:
         self.colors = colors
         self.scale = settings["scale"]
         self.offset = settings["offset"]
+        self.line_width = settings["line_width"]
+        self.font = settings["font"]
 
         # user defined functions
         self.user_functions = user_functions
 
         # set up graphics
+        self.frame_limit = settings["frame_limit"]
         pygame.init()
-        screen = pygame.display.set_mode(settings["window_size"])
+        pygame.font.init()
+        self.screen = pygame.display.set_mode(settings["window_size"])
+        self.clock = pygame.time.Clock()
 
 
     #   --------------------------------
@@ -46,6 +52,9 @@ class graphics:
     #
     #   --------------------------------
     def execute_buffer(self,mode):
+
+        # clear the pygame buffer
+        self.screen.fill(self.colors["background"])
 
         # in live mode
         if(mode == 1):
@@ -73,6 +82,11 @@ class graphics:
         # clear buffer
         self.current_buffer = []
 
+        # display pygame buffer
+        pygame.display.flip()
+        # limit framerate
+        self.clock.tick(self.frame_limit)
+
 
     #   --------------------------------
     #
@@ -91,23 +105,89 @@ class graphics:
 
     #   --------------------------------
     #
+    #   draw functions
+    #
+    #   --------------------------------
+
+    def definecolor(self,instruction):
+        # first, attempt to overwrite an existing definition
+        try:
+            self.colors[instruction[1]] = instruction[2]
+        except:
+            self.colors.append({instruciton[1]:instruction[2]}) 
+
+    def setscale(self,instruction):
+        self.scale = instruction[1]
+
+    def setoffset(self,instruction):
+        self.offset = instruction[1]
+
+    def drawline(self,instruction):
+        pygame.draw.line(screen,
+            self.colors[instruction[3]],
+            (instruction[1][0]*self.scale+self.offset[0],
+                instruction[1][1]*self.scale+self.offset[1]),
+            (instruction[2][0]*self.scale+self.offset[0],
+                instruction[2][1]*self.scale+self.offset[1]),
+            self.line_width)
+
+    def drawlinep(self,instruction):
+        pygame.draw.line(screen,
+            self.colors[instruction[3]],
+            instruction[1],
+            instruction[2],
+            self.line_width)
+
+    def drawcircle(self,instruction):
+        pygame.draw.circle(screen,
+            self.colors[instruction[3]],
+            (instruction[1][0]*self.scale+self.offset[0],
+                instruction[1][1]*self.scale+self.offset[1]),
+            instruction[2]*self.scale,
+            self.line_width)
+
+    def drawray(self,instruction):
+        pygame.draw.line(screen,
+            self.colors[instruction[4]],
+            (instruction[1][0]*self.scale+self.offset[0],
+                instruction[1][1]*self.scale+self.offset[1]),
+            ((instruction[1][0] + instruction[3]*math.cos(instruction[2]))
+                *self.scale+self.offset[0],
+            (instruction[1][1] + instruction[3]*math.sin(instruction[2]))
+                *self.scale+self.offset[1]),
+            self.line_width)
+
+    def text(self,instruction):
+        # create font
+        textfont = pygame.font.SysFont(self.font, instruction[3])
+        # create surface
+        textframe = textfont.render(instruction[1], False, 
+            self.colors[instruction[4]])
+        # merge surface
+        self.screen.blit(frametext,
+            instruction[2][0]*self.scale+self.offset[0],
+            instruction[2][1]*self.scale+self.offset[1])
+
+
+    #   --------------------------------
+    #
     #   draw the instruction buffer
     #
     #   --------------------------------
-    def draw_buffer(target_buffer):
+    def draw_buffer(self,target_buffer):
 
         for instruction in target_buffer:
 
-            # run default functions
-            # todo
-
-            # run user functions
-            self.user_functions(instruction)
+            try:
+                # run default functions
+                drawmethod = getattr(self,instruction[0])
+                drawmethod(instruction)
+            except:
+                # run user functions
+                self.user_functions(instruction)
 
             # todo:
             # save the buffer to the buffer history
-
-
 
 
     #   --------------------------------
@@ -144,7 +224,7 @@ class graphics:
     #   change the current frame (with protection of course)
     #
     #   --------------------------------
-    def change_frame(index):
+    def change_frame(self,index):
         # change the current frame index
         self.current_frame += index
         if(self.current_frame > self.store_frames):

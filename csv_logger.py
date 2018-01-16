@@ -4,6 +4,7 @@ import time
 # csv logging class
 class csv_logger:
 
+
     #   --------------------------------
     #
     #   initialization
@@ -18,6 +19,7 @@ class csv_logger:
 
         # open the output file
         self.log_output_file = open(self.log_output_name,'w')
+
 
     #   --------------------------------
     #

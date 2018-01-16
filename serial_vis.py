@@ -61,10 +61,14 @@ class serial_device:
                          "scale":1.0,
                          "offset":(0,0),
                          "store_frames":100,
-                         "frame_limit":120}
+                         "frame_limit":60,
+                         "line_width":2,
+                         "font":"arial"}
 
-        # initialize color dictionary
-        self.colors = {"black": (0,0,0), "white": (255,255,255)}
+        # initialize color dictionary; default background color is white
+        self.colors = {"black": (0,0,0), 
+                       "white": (255,255,255), 
+                       "background": (255,255,255)}
 
         # default command dictionary
         self.commands = {
@@ -171,6 +175,8 @@ class serial_device:
              instruction[0] == "logstart" or 
              instruction[0] == "logend"):
             self.log.log_data(instruction)
+        elif(instruction[0] == "echo"):
+            print(instruction[1])
 
         # otherwise, add it to the current buffer
         else:
