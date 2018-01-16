@@ -51,8 +51,7 @@ def process_args(raw_arguments,commands):
         try:
             argument_type = commands[opcode][n-1]
         except:
-            print("Error: unrecognized opcode")
-            print(opcode)
+            print("ERROR - unrecognized opcode: " + opcode)
             argument_type = "ERR"
 
         # single argument types:

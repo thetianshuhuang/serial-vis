@@ -2,10 +2,10 @@ import pygame
 import serial
 from serial_parse import *
 from csv_logger.py import *
+from graphics import *
 
-# command scheme:
-# OPCODE:argument:argument:arrayarg,arrayarg,arrayarg:argument
 
+# main serial device class
 class serial_device:
 
     #   --------------------------------
@@ -13,10 +13,14 @@ class serial_device:
 	#	Initialization
 	#
     #   --------------------------------
-	def __init__(self, path, baudrate, window_size):
+	def __init__(self, path, baudrate):
 		
+
+        #
+        # system initializations:
+        #
+
 		counter = 0
-		
 		# open serial interface
 		while(1): 
 
@@ -34,48 +38,30 @@ class serial_device:
             pygame.time.wait(200)
             counter += 1
 
-
-        #
-        # system initializations:
-        #
-
-        # set up graphics
-		pygame.init()
-		screen = pygame.display.set_mode(window_size)
-
-        # initialize draw buffer
-        self.current_buffer = []
-
-        # initialize frame history for oscilloscope-like functions
-        self.frame_queue = []
-        self.frame_queue_end = 0
-
         # program state information
         self.exit = False
         self.mode = 1
-        self.current_frame = 0
-        self.force_redraw = False
 
         #
         # user modifiable defaults:
         #
 
         # controls
-        self.key_pause = pygame.K_SPACE
-        self.key_forward = pygame.K_PERIOD
-        self.key_superforward = pygame.K_LEFTBRACKET
-        self.key_backward = pygame.K_COMMA
-        self.key_superbackward = pygame.K_RIGHTBRACKET
-
-        # frame memory
-        self.store_frames = 100
+        self.controls = {"pause":pygame.K_SPACE,
+                         "forward":pygame.K_PERIOD,
+                         "superforward":pygame.K_LEFTBRACKET,
+                         "backward":pygame.K_COMMA,
+                         "superbackward":pygame.K_RIGHTBRACKET}
 
         # log file name
         self.log_output_name = "serial_log.csv"
 
-        # default scale
-        self.scale = 1
-        self.offset = (0,0)
+        # default graphics settings
+        self.settings = {"window_size":(800,600),
+                         "scale":1.0,
+                         "offset":(0,0),
+                         "store_frames":100,
+                         "frame_limit":120}
 
         # initialize color dictionary
         self.colors = {"black": (0,0,0), "white": (255,255,255)}
@@ -123,6 +109,12 @@ class serial_device:
         # after giving the user a chance to change the output name.
         self.log = csv_logger(self.log_output_name)
 
+        # create the draw buffer object
+        self.graphics = graphics(self.controls,
+                                 self.colors,
+                                 self.settings,
+                                 self.user_functions)
+
     #   --------------------------------
     #
     #   load user definitions (dummy function)
@@ -138,68 +130,6 @@ class serial_device:
 
     #   --------------------------------
     #
-    #   get launchpad uart output
-    #
-    #   --------------------------------
-    def get_line(self):
-        return(self.device.readline().strip())
-
-
-    #   --------------------------------
-    #
-    #   execute the instruction buffer
-    #
-    #   --------------------------------
-    def execute_buffer(self):
-
-        # in live mode
-        if(self.mode == 1):
-            self.draw_buffer(self.current_buffer)
-
-        # in pause mode, and a redraw has been requested
-        elif(self.mode == -1 and self.force_redraw == True):
-            
-            # todo: find buffer
-            self.draw_buffer(self.asdf)
-
-            # acknowledge receipt of the redraw request.
-            self.force_redraw = False
-
-        # add the buffer to memory
-        if(len(self.frame_queue) < self.store_frames):
-            self.frame_queue.append(current_buffer)
-        elif(self.frame_queue_end <= self.store_frames):
-            self.frame_queue[frame_queue_end] = current_buffer
-            frame_queue_end += 1
-        else:
-            self.frame_queue[0] = current_buffer
-            frame_queue_end = 0
-
-        # clear buffer
-        self.current_buffer = []
-
-
-    #   --------------------------------
-    #
-    #   draw the instruction buffer
-    #
-    #   --------------------------------
-    def draw_buffer(target_buffer):
-
-        for instruction in target_buffer:
-
-            # run functions
-            # todo
-
-            # run default functions
-            if(self.user_functions(self,instruction) == False)
-                
-                # print out the unrecognized opcode to the console for debugging.
-                print("ERROR: unrecognized opcode: " + instruction[0])
-
-
-    #   --------------------------------
-    #
     #   load user definitions (dummy function)
     #
     #   --------------------------------
@@ -209,46 +139,11 @@ class serial_device:
 
     #   --------------------------------
     #
-    #   check for keyboard input
+    #   get launchpad uart output
     #
     #   --------------------------------
-    def check_input(self):
-
-        for event in pygame.event.get():
-
-            # check for exit command
-            if event.type == pygame.QUIT:
-                self.exit = True
-
-            # go through controls
-            if event.type == pygame.KEYDOWN:
-                if event.key == self.key_pause:
-                    self.mode = -self.mode
-                elif event.key == self.key_forward:
-                    self.change_frame(1)
-                elif event.key == self.key_superforward:
-                    self.change_frame(10)
-                elif event.key == self.key_backward:
-                    self.change_frame(-1)
-                elif event.key == self.key_superforward:
-                    self.change_frame(-10)
-
-
-    #   --------------------------------
-    #
-    #   change the current frame (with protection of course)
-    #
-    #   --------------------------------
-    def change_frame(index):
-        # change the current frame index
-        self.current_frame += index
-        if(self.current_frame > self.store_frames):
-            self.current_frame = 100
-        elif(self.current_frames < -self.store_frames):
-            self.current_frame = -100
-
-        # force a redraw to reflect the change in frame.
-        self.force_redraw = True
+    def get_line(self):
+        return(self.device.readline().strip())
 
 
     #   --------------------------------
@@ -263,15 +158,15 @@ class serial_device:
             self.log.closefile()
             exit()
 
-        # check for keyboard input
-        self.check_input()
-
         # get an instruction
-        instruction = self.parse_line(self.get_line())
+        instruction = process_args(parse_line(self.get_line()),self.commands)
+
+        # check for keyboard input
+        self.mode = self.graphics.check_input(self.mode)
 
         # if it's a control instruction:
         if(instruction[0] == "draw"):
-            self.execute_buffer()
+            self.graphics.execute_buffer(self.mode)
         elif(instruction[0] == "log" or 
              instruction[0] == "logstart" or 
              instruction[0] == "logend"):
@@ -279,4 +174,8 @@ class serial_device:
 
         # otherwise, add it to the current buffer
         else:
-            self.current_buffer.append(instruction)
+            self.graphics.add_to_buffer(instruction)
+
+        # check for unsatisfied frame change request
+        if(self.mode == 1):
+            self.graphics.check_pause_update()
