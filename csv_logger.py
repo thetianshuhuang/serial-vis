@@ -7,10 +7,20 @@ class csv_logger:
 
     #   --------------------------------
     #
+    #   Attributes
+    #
+    #   --------------------------------
+    settings = {"log_output_name": "serial_log.csv"}
+
+    #   --------------------------------
+    #
     #   initialization
     #
     #   --------------------------------
-	def __init__(self,log_output_name)
+	def __init__(self,settings)
+
+        # update user settings
+        self.settings.update(settings)
 
 		# set up caching information
 		self.logblock_in_progress = False
@@ -18,7 +28,7 @@ class csv_logger:
         self.logcache_time = "0"
 
         # open the output file
-        self.log_output_file = open(self.log_output_name,'w')
+        self.log_output_file = open(self.settings["log_output_name"],'w')
 
 
     #   --------------------------------

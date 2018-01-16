@@ -1,9 +1,9 @@
 import pygame
 import math
+import graphics_window.py
 
-
-# graphics class
-class graphics:
+# graphics management class
+class graphics(graphics_window.graphics_window):
 
 
     #   --------------------------------
@@ -13,11 +13,6 @@ class graphics:
     #   --------------------------------
 	def __init__(self,controls,colors,settings,user_functions):
         
-        # program state information
-        self.mode = 1
-        self.current_frame = 0
-        self.force_redraw = False
-
 		# main draw buffer
 		self.current_buffer = []
 
@@ -25,21 +20,25 @@ class graphics:
 		self.frame_queue = []
         self.frame_queue_end = 0
 
-        self.store_frames = store_frames
         self.controls = controls
 
-        # draw settings
-        self.colors = colors
-        self.scale = settings["scale"]
-        self.offset = settings["offset"]
-        self.line_width = settings["line_width"]
-        self.font = settings["font"]
+
+        # update settings
+        self.colors.update(colors)
+        self.settings.update(settings)
+        self.controls.update(controls)
+
+        self.scale = self.settings["scale"]
+        self.offset = self.settings["offset"]
+        self.line_width = self.settings["line_width"]
+        self.font = self.settings["font"]
+        self.store_frames = self.settings["store_frames"]
+        self.frame_limit = self.settings["frame_limit"]
 
         # user defined functions
         self.user_functions = user_functions
 
         # set up graphics
-        self.frame_limit = settings["frame_limit"]
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode(settings["window_size"])
@@ -105,72 +104,6 @@ class graphics:
 
     #   --------------------------------
     #
-    #   draw functions
-    #
-    #   --------------------------------
-
-    def definecolor(self,instruction):
-        # first, attempt to overwrite an existing definition
-        try:
-            self.colors[instruction[1]] = instruction[2]
-        except:
-            self.colors.append({instruciton[1]:instruction[2]}) 
-
-    def setscale(self,instruction):
-        self.scale = instruction[1]
-
-    def setoffset(self,instruction):
-        self.offset = instruction[1]
-
-    def drawline(self,instruction):
-        pygame.draw.line(screen,
-            self.colors[instruction[3]],
-            (instruction[1][0]*self.scale+self.offset[0],
-                instruction[1][1]*self.scale+self.offset[1]),
-            (instruction[2][0]*self.scale+self.offset[0],
-                instruction[2][1]*self.scale+self.offset[1]),
-            self.line_width)
-
-    def drawlinep(self,instruction):
-        pygame.draw.line(screen,
-            self.colors[instruction[3]],
-            instruction[1],
-            instruction[2],
-            self.line_width)
-
-    def drawcircle(self,instruction):
-        pygame.draw.circle(screen,
-            self.colors[instruction[3]],
-            (instruction[1][0]*self.scale+self.offset[0],
-                instruction[1][1]*self.scale+self.offset[1]),
-            instruction[2]*self.scale,
-            self.line_width)
-
-    def drawray(self,instruction):
-        pygame.draw.line(screen,
-            self.colors[instruction[4]],
-            (instruction[1][0]*self.scale+self.offset[0],
-                instruction[1][1]*self.scale+self.offset[1]),
-            ((instruction[1][0] + instruction[3]*math.cos(instruction[2]))
-                *self.scale+self.offset[0],
-            (instruction[1][1] + instruction[3]*math.sin(instruction[2]))
-                *self.scale+self.offset[1]),
-            self.line_width)
-
-    def text(self,instruction):
-        # create font
-        textfont = pygame.font.SysFont(self.font, instruction[3])
-        # create surface
-        textframe = textfont.render(instruction[1], False, 
-            self.colors[instruction[4]])
-        # merge surface
-        self.screen.blit(frametext,
-            instruction[2][0]*self.scale+self.offset[0],
-            instruction[2][1]*self.scale+self.offset[1])
-
-
-    #   --------------------------------
-    #
     #   draw the instruction buffer
     #
     #   --------------------------------
@@ -188,35 +121,6 @@ class graphics:
 
             # todo:
             # save the buffer to the buffer history
-
-
-    #   --------------------------------
-    #
-    #   check for keyboard input
-    #
-    #   --------------------------------
-    def check_input(self, mode):
-
-        for event in pygame.event.get():
-
-            # check for exit command
-            if event.type == pygame.QUIT:
-                self.exit = True
-
-            # go through controls
-            if event.type == pygame.KEYDOWN:
-                if event.key == self.controls["pause"]:
-                    mode = -mode
-                elif event.key == self.controls["forward"]:
-                    self.change_frame(1)
-                elif event.key == self.controls["superforward"]:
-                    self.change_frame(10)
-                elif event.key == self.controls["backward"]:
-                    self.change_frame(-1)
-                elif event.key == self.controls["superforward"]:
-                    self.change_frame(-10)
-
-        return(mode)
 
 
     #   --------------------------------
