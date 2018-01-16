@@ -17,7 +17,7 @@ class serial_device:
 		counter = 0
 		
 		# open serial interface
-		while(1):
+		while(1): 
 
 			try:
     	        self.device = serial.Serial(path,baudrate,timeout=1)
@@ -69,6 +69,9 @@ class serial_device:
         # frame memory
         self.store_frames = 100
 
+        # log file name
+        self.log_output_name = "serial_log.csv"
+
         # default scale
         self.scale = 1
         self.offset = (0,0)
@@ -79,7 +82,7 @@ class serial_device:
         # default command dictionary
         self.commands = {
             # str name, int r, int g, int b
-            "definecolor":["s","d","d","d"],
+            "definecolor":["s","dd"],
             # float scale
             "setscale":["f"],
             # int xoffset, in yoffset
@@ -109,6 +112,9 @@ class serial_device:
         # add user-defined commands, colors, scales, etc
         self.register_user_commands()
         self.register_user_settings()
+
+        # open log file after giving the user a chance to rename the output.
+        self.log_output_file = open(self.log_output_name,w)
 
 
     #   --------------------------------
@@ -148,7 +154,7 @@ class serial_device:
         elif(self.mode == -1 and self.force_redraw == True):
             
             # todo: find buffer
-            self.draw_buffer(self.???)
+            self.draw_buffer(self.asdf)
 
             # acknowledge receipt of the redraw request.
             self.force_redraw = False
@@ -177,6 +183,7 @@ class serial_device:
         for instruction in target_buffer:
 
             # run functions
+            # todo
 
             # run default functions
             if(self.user_functions(self,instruction) == False)
@@ -244,7 +251,8 @@ class serial_device:
     #   --------------------------------
     def log_data(self,instruction):
 
-        # todo: some sort of python read/write. goes into a csv.
+        writeline = instruction[1] + "," + instruction[2] + "\n"
+        self.log_output_file.write(writeline)
 
 
     #   --------------------------------
@@ -253,6 +261,11 @@ class serial_device:
     #
     #   --------------------------------
     def update(self):
+
+        # exit cleanly.
+        if(self.exit == True):
+            self.log_output_file.close()
+            exit()
 
         # check for keyboard input
         self.check_input()

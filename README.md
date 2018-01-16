@@ -1,6 +1,7 @@
 # serial-vis
+A serial-driven visual display script. This is intended to be used for data logging and debugging of complex embedded systems where visual outputs are critical to interpreting sensor output.
 
-## Commands:
+## Commands
 
 ### Control Commands:
 - draw: execute current draw buffer
@@ -52,4 +53,20 @@ echo:%s
 ```
 
 
+## Class attributes
 
+### Controls:
+- key_pause
+- key_forward
+- key_superforward
+- key_backward
+- key_superbackward
+
+### Visual:
+- scale
+- offset
+
+### Functional:
+- colors
+- commands
+- store_frames
