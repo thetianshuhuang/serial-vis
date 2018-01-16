@@ -6,23 +6,16 @@ class my_serial_device(serial_device):
 	# register commands here
 	def register_user_commands(self):
 
-		pass 
+		# example function prototype
+		self.commands.update{"exampleuserfunction":"s"}
 
 	# register user settings here
 	def register_user_settings(self):
 		
+		# should update self.log_settings, self.graphics_settings
 		pass
 
-	# program serial-callable user functions here
-	def user_functions(self,instruction):
-
-		if(instruction[0] = "example_opcode"):
-			pass
-			# perform operation
-			return(True)
-
-		else:
-			return(False)
+	# todo: pass user functions to graphics class
 
 
 # create object

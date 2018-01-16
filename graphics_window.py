@@ -52,7 +52,6 @@ class graphics_window:
     #   draw functions
     #
     #   --------------------------------
-
     def definecolor(self,instruction):
         # first, attempt to overwrite an existing definition
         try:

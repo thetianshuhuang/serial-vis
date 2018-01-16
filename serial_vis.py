@@ -34,8 +34,12 @@ class serial_device:
     # color overrides
     colors = {}
 
-    # user commands
+    # user commands (function prototypes)
     commands = {}
+
+    # user functions (actual function objects)
+    # todo
+    user_functions = []
 
 
     #   --------------------------------
@@ -91,21 +95,10 @@ class serial_device:
     #
     #   --------------------------------
 
-    # should update self.commands
     def register_user_commands(self):
         pass
 
-    # should update self.graphics_settings, self.log_settings
     def register_user_settings(self):
-        pass
-
-
-    #   --------------------------------
-    #
-    #   load user definitions (dummy function)
-    #
-    #   --------------------------------
-    def user_functions(self,instruction):
         pass
 
 

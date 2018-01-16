@@ -36,6 +36,7 @@ class graphics(graphics_window.graphics_window):
         self.frame_limit = self.settings["frame_limit"]
 
         # user defined functions
+        # todo
         self.user_functions = user_functions
 
         # set up graphics
@@ -117,6 +118,7 @@ class graphics(graphics_window.graphics_window):
                 drawmethod(instruction)
             except:
                 # run user functions
+                # todo
                 self.user_functions(instruction)
 
             # todo:
