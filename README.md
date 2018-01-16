@@ -23,6 +23,10 @@ will write
 <timestamp>,data2,115
 ```
 to the output csv.
+- echo: output text directly to the python console.
+```
+echo:%s
+```
 
 ### Drawing Commands:
 - definecolor: define a color in RGB, with each value 0 to 255.
@@ -39,7 +43,7 @@ setoffset:%d,%d
 ```
 - drawline: draw a line from one coordinate to the other at the given color.
 ```
-drawline:%f,%f:%f%f:%s
+drawline:%f,%f:%f,%f:%s
 ```
 - drawlinep: draw a line from one pixel location to another at the given color.
 ```
@@ -49,9 +53,9 @@ drawlinep:%d,%d:%d,%d:%s
 ```
 drawcircle:%f,%f:%f:%s
 ```
-- drawray: draw a ray at the given color. This is a separate function from drawing lines so that trig functions solely used for cosmetic reasons can be offloaded from the target system. The tuple forms the start coordinate, and the third float specifies the angle, in radians.
+- drawray: draw a ray at the given color. This is a separate function from drawing lines so that trig functions solely used for cosmetic reasons can be offloaded from the target system. The tuple forms the start coordinate, the third float specifies the angle, in radians, and the fourth float specifies the length.
 ```
-drawray:%f,%f:%f:%s
+drawray:%f,%f:%f:%f:%s
 ```
 - text: display text on the screen at a given coordinate, size, and color.
 ```
@@ -60,10 +64,6 @@ text:%s:%f,%f:%d:%s
 - textp: dislay text, except using fixed pixel locations.
 ```
 text:%s:%d,%d:%d:%s
-```
-- echo: output text directly to the python console.
-```
-echo:%s
 ```
 
 

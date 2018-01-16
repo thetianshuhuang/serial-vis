@@ -1,7 +1,7 @@
-import time
 import pygame
 import serial
 from serial_parse import *
+from csv_logger.py import *
 
 # command scheme:
 # OPCODE:argument:argument:arrayarg,arrayarg,arrayarg:argument
@@ -55,9 +55,6 @@ class serial_device:
         self.mode = 1
         self.current_frame = 0
         self.force_redraw = False
-        self.logblock_in_progress = False
-        self.logcache = []
-        self.logcache_time = "0"
 
         #
         # user modifiable defaults:
@@ -85,41 +82,46 @@ class serial_device:
 
         # default command dictionary
         self.commands = {
-            # str name, int r, int g, int b
-            "definecolor":["s","dd"],
-            # float scale
-            "setscale":["f"],
-            # int xoffset, in yoffset
-            "setoffset":["d","d"],
-            # float x_1, float y_1, float x_2, float y_2, str color
-            "drawline":["f","f","f","f","s"],
-            # float x, float y, float r, str color
-            "drawcircle":["f","f","f","s"],
-            # float x, float y, float r, float theta, str color
-            "drawray":["f","f","f","f","s"],
-            # float x, float y, str label, str color
-            "text":["f","f","s","s"],
-            # str message
+            # control commands:
+            # draw
+            "draw":[],
+            # log: label, datastring
+            "log":["s","s"],
+            # start log block
+            "logstart":[],
+            # end log block
+            "logend":[],
+            # print to console
             "echo":["s"],
-            # float message with multiple parts
-            "echol":["l","_"],
-            # clear screen
-            "clrscrn":[],
-            # start drawing
-            "start":[],
-            # stop drawing
-            "stop":[],
-            # draw current buffer
-            "draw":[]
+
+            # drawing commands:
+            # define color: name, (r,g,b)
+            "definecolor":["s","dd"],
+            # set scale: ratio
+            "setscale":["f"],
+            # set offset: (x,y)
+            "setoffset":["dd"],
+            # draw line: (x_1,y_1),(x_2,y_2),color
+            "drawline":["ff","ff","s"],
+            # draw line (pixel mode): (x_1,y_1),(x_2,y_2),color
+            "drawlinep":["dd","dd","s"],
+            # draw circle: (x,y),r,color
+            "drawcircle":["ff","f","s"],
+            # draw ray: (x,y),angle,radius,color
+            "drawray":["ff","f","f","s"],
+            # draw text: text,(x,y),size,color
+            "text":["s","ff","d","s"],
+            # draw text (pixel mode): text,(x,y),size,color
+            "textp":["s","dd","d","s"],
         }
 
         # add user-defined commands, colors, scales, etc
         self.register_user_commands()
         self.register_user_settings()
 
-        # open log file after giving the user a chance to rename the output.
-        self.log_output_file = open(self.log_output_name,w)
-
+        # create the log file object 
+        # after giving the user a chance to change the output name.
+        self.log = csv_logger(self.log_output_name)
 
     #   --------------------------------
     #
@@ -251,56 +253,6 @@ class serial_device:
 
     #   --------------------------------
     #
-    #   log data given in a log opcode.
-    #
-    #   --------------------------------
-    def log_data(self,instruction):
-
-        # logstart opcode is called
-        if(instruction[0] == "logstart"):
-            # set flag
-            self.logblock_in_progress == True
-            # record start time
-            self.logcache_time = str(time.time())
-            # clear cache
-            self.logcache = []
-
-        # logend opcode is called, 
-        elif(instruction[0] == "logend"):
-            # clear flag
-            self.logblock_in_progress == False
-            
-            # write each entry
-            for datatype in self.logcache:
-                self.log_output_file.write(self.logcache_time)
-                for entry in datatype:
-                    self.log_output_file.write(",",entry)
-                self.write("\n")
-
-        # if a log block is in progress:
-        elif(self.logblock_in_progress == True):
-
-            # see if it matches an existing entry in the cache
-            match = False
-            for datatype in self.logcache:
-                # match -> insert
-                if(instruction[1] == datatype[0]):
-                    datatype.append(instruction[2])
-                    match = True
-            # no match -> create new entry
-            if(match == False):
-                self.logcache.append([instruction[1],instruction[2]])
-
-        # no log block in progress => log normally.
-        elif(self.logblock_in_progress == False):
-            timestamp = str(time.time())
-
-            writeline = timestamp + "," + instruction[1] + "," + instruction[2] + "\n"
-            self.log_output_file.write(writeline)
-
-
-    #   --------------------------------
-    #
     #   execute program update
     #
     #   --------------------------------
@@ -308,7 +260,7 @@ class serial_device:
 
         # exit cleanly.
         if(self.exit == True):
-            self.log_output_file.close()
+            self.log.closefile()
             exit()
 
         # check for keyboard input
@@ -323,7 +275,7 @@ class serial_device:
         elif(instruction[0] == "log" or 
              instruction[0] == "logstart" or 
              instruction[0] == "logend"):
-            self.log_data(instruction)
+            self.log.log_data(instruction)
 
         # otherwise, add it to the current buffer
         else:
