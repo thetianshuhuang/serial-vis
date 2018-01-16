@@ -1,3 +1,4 @@
+import time
 import pygame
 import serial
 from serial_parse import *
@@ -54,6 +55,9 @@ class serial_device:
         self.mode = 1
         self.current_frame = 0
         self.force_redraw = False
+        self.logblock_in_progress = False
+        self.logcache = []
+        self.logcache_time = "0"
 
         #
         # user modifiable defaults:
@@ -187,8 +191,9 @@ class serial_device:
 
             # run default functions
             if(self.user_functions(self,instruction) == False)
-                # error routine goes here
-                pass
+                
+                # print out the unrecognized opcode to the console for debugging.
+                print("ERROR: unrecognized opcode: " + instruction[0])
 
 
     #   --------------------------------
@@ -251,8 +256,47 @@ class serial_device:
     #   --------------------------------
     def log_data(self,instruction):
 
-        writeline = instruction[1] + "," + instruction[2] + "\n"
-        self.log_output_file.write(writeline)
+        # logstart opcode is called
+        if(instruction[0] == "logstart"):
+            # set flag
+            self.logblock_in_progress == True
+            # record start time
+            self.logcache_time = str(time.time())
+            # clear cache
+            self.logcache = []
+
+        # logend opcode is called, 
+        elif(instruction[0] == "logend"):
+            # clear flag
+            self.logblock_in_progress == False
+            
+            # write each entry
+            for datatype in self.logcache:
+                self.log_output_file.write(self.logcache_time)
+                for entry in datatype:
+                    self.log_output_file.write(",",entry)
+                self.write("\n")
+
+        # if a log block is in progress:
+        elif(self.logblock_in_progress == True):
+
+            # see if it matches an existing entry in the cache
+            match = False
+            for datatype in self.logcache:
+                # match -> insert
+                if(instruction[1] == datatype[0]):
+                    datatype.append(instruction[2])
+                    match = True
+            # no match -> create new entry
+            if(match == False):
+                self.logcache.append([instruction[1],instruction[2]])
+
+        # no log block in progress => log normally.
+        elif(self.logblock_in_progress == False):
+            timestamp = str(time.time())
+
+            writeline = timestamp + "," + instruction[1] + "," + instruction[2] + "\n"
+            self.log_output_file.write(writeline)
 
 
     #   --------------------------------
@@ -276,7 +320,9 @@ class serial_device:
         # if it's a control instruction:
         if(instruction[0] == "draw"):
             self.execute_buffer()
-        elif(instruction[0] == "log"):
+        elif(instruction[0] == "log" or 
+             instruction[0] == "logstart" or 
+             instruction[0] == "logend"):
             self.log_data(instruction)
 
         # otherwise, add it to the current buffer

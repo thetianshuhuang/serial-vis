@@ -5,10 +5,24 @@ A serial-driven visual display script. This is intended to be used for data logg
 
 ### Control Commands:
 - draw: execute current draw buffer
-- log: log the following string. A label and value should be provided. A timestamp will be automatically inserted.
+- log: log the following string. A label and value should be provided. A timestamp (epoch time) will be automatically inserted.
 ```
 log:label:datastring
 ```
+- logstart, logend: start a block where data with the same label will be combined into one row. For example,
+```
+logstart
+log:data1:100
+log:data2:115
+log:data1:106
+logend
+```
+will write
+```
+<timestamp>,data1,100,106
+<timestamp>,data2,115
+```
+to the output csv.
 
 ### Drawing Commands:
 - definecolor: define a color in RGB, with each value 0 to 255.
@@ -67,6 +81,7 @@ echo:%s
 - offset
 
 ### Functional:
+- log_output_name
 - colors
 - commands
 - store_frames
