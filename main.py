@@ -1,9 +1,9 @@
-from serial_vis import *
+from src import serial_vis
 
 
 # user vector graphics
 # can have any name, as long as it is correctly referenced by my_serial_device
-class user_vector_graphics(default_vector_graphics):
+class user_vector_graphics(serial_vis.default_vector_graphics):
 
     def exampleusercommand(self, instruction):
         print("Example user command: " + instruction[1])
@@ -12,7 +12,7 @@ class user_vector_graphics(default_vector_graphics):
 
 
 # extend the serial_device class to add user definitions.
-class my_serial_vis(serial_vis):
+class my_serial_vis(serial_vis.serial_vis):
 
     # graphics command registration
     user_commands = {"exampleusercommand": "s"}
@@ -22,8 +22,9 @@ class my_serial_vis(serial_vis):
     settings = {}
 
     def process_user_events(self, events):
-    	pass
-    	# this function gets called to process events.
+        pass
+        # this function gets called to process events.
+
 
 # create object
 # **kwargs can also be used to update settings
