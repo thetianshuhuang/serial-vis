@@ -3,7 +3,7 @@
 # contains default graphics commands for serial_vis
 
 import math
-from .vector_graphics_window import *
+from vector_graphics_window import *
 
 
 # class adding default draw functions

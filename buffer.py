@@ -73,14 +73,7 @@ class buffer_db:
 
     #   Adds a new frame_buffer object to the frame_buffers.
     #   If adv_frame=False is passed, the current_view is not advanced.
-    def new_buffer(self, frame_buffer, *kwargs):
-
-        # adv_frame=False is passed in kwargs
-        # don't advance the frame.
-        if("adv_frame" in kwargs and not kwargs["adv_frame"]):
-            pass
-        else:
-            self.view_buffer += 1
+    def new_buffer(self, frame_buffer):
 
         # add new item if the current forward limit hasn't been exceeded
         # use the buffer ID as a key
@@ -111,10 +104,16 @@ class buffer_db:
     def get_buffer(self, index, *kwargs):
 
         if("relative" in kwargs and kwargs["relative"]):
+
+            # check for index out of range
+            if(self.index > self.settings["max_size_foraward"]):
+                self.index = self.settings["max_size_forward"]
+            elif(-self.index < self.settings["max_size_backward"]):
+                self.index = -self.settings["max_size_backward"]
             return(self.frame_buffers[self.view_buffer + index])
 
         else:
-            return((index, self.frame_buffers[index]))
+            return(self.frame_buffers[index])
 
     #   --------------------------------
     #
@@ -123,12 +122,19 @@ class buffer_db:
     #   --------------------------------
 
     #   sets the current view ID
+    #   kwargs: absolute= set buffer absolutely
+    #           relative= set buffer relative to input_buffer
     #   returns the frame_buffer at that ID (can be safely ignored)
-    def set_current_view(self, buffer_id):
+    def set_current_view(self, **kwargs):
 
-        self.view_buffer = buffer_id
+        if "absolute" in kwargs:
+            self.view_buffer = kwargs["absolue"]
+        elif "relative" in kwargs:
+            self.view_buffer = kwargs["relative"] + self.input_buffer
+        else:
+            self.view_buffer = self.input_buffer - 1
 
-        return(self.frame_buffers[buffer_id])
+        return(self.frame_buffers[self.view_buffer])
 
     #   --------------------------------
     #

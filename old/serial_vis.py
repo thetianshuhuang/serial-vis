@@ -8,7 +8,6 @@ from graphics import *
 # main serial device class
 class serial_device:
 
-
     #   --------------------------------
     #
     #   Attributes
@@ -43,30 +42,30 @@ class serial_device:
 
 
     #   --------------------------------
-	#
-	#	Initialization
-	#
+    #
+    #   Initialization
+    #
     #   --------------------------------
-	def __init__(self, path, baudrate):
-		
+    def __init__(self, path, baudrate):
+        
 
         #
         # system initializations:
         #
 
-		counter = 0
-		# open serial interface
-		while(1): 
+        counter = 0
+        # open serial interface
+        while(1): 
 
-			try:
-    	        self.device = serial.Serial(path,baudrate,timeout=1)
-        	    print("Launchpad connected: "+path)
-            	break
+            try:
+                self.device = serial.Serial(path,baudrate,timeout=1)
+                print("Launchpad connected: "+path)
+                break
 
-        	except:
-        		# Limit the message to one every two seconds
-        		if(counter % 10 == 0):
-	            	print("No launchpad found.")
+            except:
+                # Limit the message to one every two seconds
+                if(counter % 10 == 0):
+                    print("No launchpad found.")
 
             # wait 200ms before trying again
             pygame.time.wait(200)

@@ -1,6 +1,17 @@
-# serial command parsing class
-class parser:
+# serial_parser.py
+# serial command interpretation class
 
+
+# serial parser class
+
+# methods:
+# __init__              - takes commands
+#                       - a dictionary containing command bindings
+# process_command       - fully processes a command
+#                       - from string into correctly typed array
+# parse_line            - separate string into arguments
+# process_args          - convert arguments into correct types
+class parser:
 
     #   --------------------------------
     #
@@ -48,16 +59,15 @@ class parser:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(commands):
+    def __init__(self, commands):
         self.commands.update(commands)
 
-
     #   --------------------------------
     #
-    #   full package of parsing and processing 
+    #   full package of parsing and processing
     #
     #   --------------------------------
-    def process_command(code_line):
+    def process_command(self, code_line):
         return self.process_args(self.parse_line(code_line))
 
     #   --------------------------------
@@ -65,12 +75,12 @@ class parser:
     #   parse command into opcode and arguments
     #
     #   --------------------------------
-    def parse_line(code_line):
-        
+    def parse_line(self, code_line):
+
         # intialize args as an empty array
         arguments = []
-        
-        # if a colon is not found, then the opcode has no args       
+
+        # if a colon is not found, then the opcode has no args
         opcode_end = code_line.find(":")
         if(opcode_end == -1):
             arguments.append(code_line)
@@ -79,98 +89,82 @@ class parser:
         else:
             arguments.append(code_line[0:opcode_end])
             previous_arg_end = opcode_end
-            current_arg_end = code_line.find(":",opcode_end + 1)
-            
+            current_arg_end = code_line.find(":", opcode_end + 1)
+
             # then separate the arguments
             while(current_arg_end != -1):
-                arguments.append(code_line[previous_arg_end+1:
-                                           current_arg_end])
+                arguments.append(
+                    code_line[previous_arg_end + 1: current_arg_end])
                 previous_arg_end = current_arg_end
-                current_arg_end = code_line.find(":",current_arg_end + 1)
-                
-            arguments.append(code_line[previous_arg_end+1:len(code_line)])
+                current_arg_end = code_line.find(":", current_arg_end + 1)
+
+            arguments.append(code_line[previous_arg_end + 1: len(code_line)])
 
         return(arguments)
-
 
     #   --------------------------------
     #
     #   process arguments into an array
     #
     #   --------------------------------
-    def process_args(raw_arguments):
+    def process_args(self, raw_arguments):
 
         arguments = []
         opcode = raw_arguments[0]
         arguments.append(raw_arguments[0])
 
         n = 1
-        while(n<len(raw_arguments)):
+        while(n < len(raw_arguments)):
 
             try:
-                argument_type = self.commands[opcode][n-1]
-            except:
-                print("ERROR - unrecognized opcode: " + opcode)
+                # n-1 indexed since the opcode isn't included in self.commands
+                argument_type = self.commands[opcode][n - 1]
+            except IndexError:
+                print("Error: insufficient arguments")
                 argument_type = "ERR"
 
-            # single argument types:
-            # integer type
+            # single argument type
             if(argument_type == "d"):
-                try:
-                    arguments.append(int(raw_arguments[n]))
-                except:
-                    arguments.append(0)
-            # string type
+                arguments.append(self.to_int(raw_arguments[n]))
             elif(argument_type == "s"):
                 arguments.append(raw_arguments[n])
-            # float type
             elif(argument_type == "f"):
-                try:
-                    arguments.append(float(raw_arguments[n]))
-                except:
-                    arguments.append(0)
-            # long type
+                arguments.append(self.to_float(raw_arguments[n]))
             elif(argument_type == "l"):
-                try:
-                    arguments.append(int(raw_arguments[n])*10000 +
-                                     int(raw_arguments[n+1]))
-                except:
-                    arguments.append(0)
+                arguments.append(
+                    self.to_long(raw_arguments[n], raw_arguments[n + 1]))
 
-            # array argument types:
+            # array argument type
             elif(len(argument_type) == 2):
                 # separate array elements first
                 argument_array_raw = []
                 previous_arg_end = 0
+                current_arg_end = 0
                 while(current_arg_end != -1):
-                    current_arg_end = raw_arguments[n].find(",",previous_arg_end)
+                    current_arg_end = raw_arguments[n].find(
+                        ",", previous_arg_end)
                     if(current_arg_end != -1):
-                        argument_array_raw.append(raw_arguments[n][previous_arg_end:current_arg_end]) 
+                        argument_array_raw.append(
+                            raw_arguments[n]
+                            [previous_arg_end: current_arg_end])
                         previous_arg_end = current_arg_end + 1
                     else:
-                        argument_array_raw.append(raw_arguments[n][previous_arg_end:])
+                        argument_array_raw.append(
+                            raw_arguments[n][previous_arg_end:])
 
                 # parse each element in the array
                 argument_array = []
                 for element in argument_array_raw:
-                    if(argument_type) == "dd":
-                        try:
-                            argument_array.append(int(element))
-                        except:
-                            argument_array.append(0)
-                    elif(argument_type) == "ss":
-                        argument_array.append(element)
-                    elif(argument_type) == "ff":
-                        try:
-                            argument_array.append(float(element))
-                        except:
-                            argument_array.append(0)
-                    elif(argument_type) == "ll":
-                        try:
-                            argument_array.append(int(raw_arguments[n])*1000 +
-                                                  int(raw_arguments[n+1]))
-                        except:
-                            argument_array.append(0)
+                    if(argument_type == "dd"):
+                        argument_array.append(self.to_int(raw_arguments[n]))
+                    elif(argument_type == "ss"):
+                        argument_array.append(raw_arguments[n])
+                    elif(argument_type == "ff"):
+                        argument_array.append(self.to_float(raw_arguments[n]))
+                    elif(argument_type == "ll"):
+                        argument_array.append(
+                            self.to_long(
+                                raw_arguments[n], raw_arguments[n + 1]))
 
                 # finally, append the array to the arguments
                 arguments.append(argument_array)
@@ -185,3 +179,25 @@ class parser:
             n += 1
 
         return(arguments)
+
+    #   --------------------------------
+    #
+    #   argument conversion routines
+    #
+    #   --------------------------------
+    def to_int(self, string):
+        try:
+            return(int(string))
+        except ValueError:
+            return(0)
+        return(0)
+
+    def to_float(self, string):
+        try:
+            return(float(string))
+        except ValueError:
+            return(0.0)
+        return(0.0)
+
+    def to_long(self, big_string, small_string):
+        return(self.to_int(big_string) * 10000 + self.to_int(small_string))

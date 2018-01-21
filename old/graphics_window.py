@@ -5,13 +5,11 @@ import math
 # graphics draw methods. No control flow here.
 class graphics_window:
 
-
     #   --------------------------------
     #
     #   Attributes
     #
     #   --------------------------------
-
     # graphics state information
     current_frame = 0
     force_redraw = False

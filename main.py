@@ -1,6 +1,8 @@
-from serial_vis.py import *
+from serial_vis import *
 
 
+# user vector graphics
+# can have any name, as long as it is correctly referenced by my_serial_device
 class user_vector_graphics(default_vector_graphics):
 
     def exampleusercommand(self, instruction):
@@ -17,13 +19,12 @@ class my_serial_vis(serial_vis):
     graphics_class = user_vector_graphics
 
     # settings
-    graphics_settings = {}
-    log_settings = {}
-    serial_settings = {}
+    settings = {}
 
 
 # create object
-my_serial_device = my_serial_device("/dev/lm4f", 115200)
+# **kwargs can also be used to update settings
+my_serial_device = my_serial_vis("/dev/lm4f", baudrate=115200)
 
 # that's it!
 while(1):
