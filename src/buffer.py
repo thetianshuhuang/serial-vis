@@ -79,8 +79,12 @@ class buffer_db:
         # use the buffer ID as a key
         if(self.input_buffer <
            self.view_buffer + self.settings["max_size_forward"]):
+            # assign a frame id if not already assigned.
+            if(frame_buffer.frame_id == -1):
+                frame_buffer.frame_id = self.input_buffer
+            # update frame buffers
             self.frame_buffers.update(
-                {self.input_buffer, frame_buffer})
+                {self.input_buffer: frame_buffer})
 
         # scan for old frame buffers and delete them
         for element in self.frame_buffers.keys():
@@ -106,10 +110,10 @@ class buffer_db:
         if("relative" in kwargs and kwargs["relative"]):
 
             # check for index out of range
-            if(self.index > self.settings["max_size_foraward"]):
-                self.index = self.settings["max_size_forward"]
-            elif(-self.index < self.settings["max_size_backward"]):
-                self.index = -self.settings["max_size_backward"]
+            if(index > self.settings["max_size_foraward"]):
+                index = self.settings["max_size_forward"]
+            elif(-index < self.settings["max_size_backward"]):
+                index = -self.settings["max_size_backward"]
             return(self.frame_buffers[self.view_buffer + index])
 
         else:

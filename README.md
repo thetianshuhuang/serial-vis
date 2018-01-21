@@ -173,14 +173,36 @@ class my_serial_vis(serial_vis):
 ### Classes and methods:
 
 #### serial_vis:
+- update(): Full update method.
+- process_events(events): Apply keyboard commands.
+- process_user_events(events): Empty method. Overwrite this to create user-defined keyboard commands.
+- user_commands: Format for user-defined commands
+- graphics_class: Graphics methods to be used.
+- is_live: Pause or play mode
+- display_buffer_id: Current frame being displayed
 
 #### serial_vis.serial_device:
+- str get_line(): read a line from the serial output. Returns the line without the newline character.
+- close(): close the serial interface cleanly.
+- write(line): write the line to serial.
 
 #### serial_vis.csv_log:
+- log_data(instruction): log the data encoded in the input instruction
+- close_file(): close the output csv cleanly.
 
 #### serial_vis.graphics_window:
+- current_buffer_id: most recently rendered frame
+- update_screen(frame_buffer): draw the input frame_buffer. Will not draw if the provided frame_buffer is the same as the previously drawn frame buffer.
+- check_events(): go through settings["events"] and return any events (keypresses). Returns a tuple containing (keys pressed, keys pressed this cyckle)
+- close_window(): close pygame window cleanly
 
 #### serial_vis.buffer_db:
+- new_buffer(frame_buffer): register a frame buffer. If the id is -1 (not assigned), it will be automatically created.
+- get_buffer(index, relative=): get the frame with id index; if relative=True, index is added to self.view_buffer.
+- set_current_view(absolute= or relative=): set the current logical view. If absolute=id is given, this is set absolutely; if relative=id, the logical view is set relative to id + self.view_buffer.
+- get_buffer_info(): returns (view_buffer, input_buffer).
 
 #### serial_vis.current_buffer:
+- frame_id: ID of the frame stored by the buffer. frame_id = -1 if the id has not yet been assigned.
+- instructions: instructions in the frame buffer.
 

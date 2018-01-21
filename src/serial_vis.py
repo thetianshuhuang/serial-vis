@@ -75,6 +75,9 @@ class serial_vis:
             else:
                 self.buffer_db.new_buffer(self.current_buffer)
 
+            # create new frame buffer
+            self.current_buffer = frame_buffer()
+
         # log instructions
         elif(instruction[0] == "log" or
              instruction[0] == "logstart" or

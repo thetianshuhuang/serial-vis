@@ -130,7 +130,7 @@ class vector_graphics_window:
                 # set previous state
                 self.events_previous[event_key] = False
 
-        return(current_events_hold, current_events_press)
+        return((current_events_hold, current_events_press))
 
     #   --------------------------------
     #
