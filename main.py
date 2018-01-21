@@ -21,6 +21,9 @@ class my_serial_vis(serial_vis):
     # settings
     settings = {}
 
+    def process_user_events(self, events):
+    	pass
+    	# this function gets called to process events.
 
 # create object
 # **kwargs can also be used to update settings

@@ -113,21 +113,21 @@ class serial_vis:
             exit()
 
         # press key events:
-        if pygame.K_SPACE in events_press:
+        if "pause" in events_press:
             self.is_live = not self.is_live
             if(self.is_live):
                 self.display_buffer_id = 0
 
-        if pygame.K_PERIOD in events_press:
+        if "fwd" in events_press:
             self.display_buffer_id += 1
 
-        if pygame.K_LEFTBRACKET in events_press:
+        if "fwdplus" in events_press:
             self.display_buffer_id += 10
 
-        if pygame.K_COMMA in events_press:
+        if "back" in events_press:
             self.display_buffer_id += -1
 
-        if pygame.K_RIGHTBRACKET in events_press:
+        if "backplus" in events_press:
             self.display_buffer_id += -10
 
     #   --------------------------------

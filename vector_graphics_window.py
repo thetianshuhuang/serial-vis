@@ -120,10 +120,10 @@ class vector_graphics_window:
         for event_key in self.settings["events"]:
             if event_key in pygame.event.get():
                 # key pressed -> is being held
-                current_events_hold += event_key
-                # previously key is not pressed -> begin keypress
+                current_events_hold += self.settings["events"][event_key]
+                # previously key is not pressed -> begin keypresspas
                 if(not self.events_previous[event_key]):
-                    current_events_press += event_key
+                    current_events_press += self.settings["events"][event_key]
                 # set previous state
                 self.events_previous[event_key] = True
             else:
