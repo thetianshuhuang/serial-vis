@@ -8,7 +8,6 @@ from graphics import *
 # main serial device class
 class serial_device:
 
-
     #   --------------------------------
     #
     #   Attributes

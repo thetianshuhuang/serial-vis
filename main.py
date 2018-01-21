@@ -17,13 +17,11 @@ class my_serial_vis(serial_vis):
     graphics_class = user_vector_graphics
 
     # settings
-    graphics_settings = {}
-    log_settings = {}
-    serial_settings = {}
+    settings = {}
 
 
 # create object
-my_serial_device = my_serial_device("/dev/lm4f", 115200)
+my_serial_device = my_serial_device("/dev/lm4f", baudrate=115200)
 
 # that's it!
 while(1):
