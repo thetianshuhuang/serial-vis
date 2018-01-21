@@ -124,7 +124,7 @@ class serial_device:
             exit()
 
         # get an instruction
-        instruction = process_comamnd(self.get_line())
+        instruction = process_command(self.get_line())
 
         # check for keyboard input
         self.mode = self.graphics.check_input(self.mode)

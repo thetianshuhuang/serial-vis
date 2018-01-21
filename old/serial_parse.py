@@ -182,7 +182,7 @@ class parser:
             # error type, when the type doesn't match
             else:
                 arguments.append("ERR")
-                
+
             n += 1
-                
+
         return(arguments)

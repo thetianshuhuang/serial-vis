@@ -12,7 +12,7 @@ class graphics_window:
     #
     #   --------------------------------
 
-	# graphics state information
+    # graphics state information
     current_frame = 0
     force_redraw = False
 
@@ -23,14 +23,14 @@ class graphics_window:
 
     # graphics settings
     settings = {"window_size":(800,600),
-	            "scale":1.0,
-	            "offset":(0,0),
-	            "store_frames":100,
-	            "frame_limit":60,
-	            "line_width":2,
-	            "font":"arial"}
+                "scale":1.0,
+                "offset":(0,0),
+                "store_frames":100,
+                "frame_limit":60,
+                "line_width":2,
+                "font":"arial"}
 
-	# controls
+    # controls
     controls = {"pause":pygame.K_SPACE,
                 "forward":pygame.K_PERIOD,
                 "superforward":pygame.K_LEFTBRACKET,
@@ -43,35 +43,35 @@ class graphics_window:
     #   Initialization (dummy function; overwritten by graphics.py)
     #
     #   --------------------------------
-	def __init__():
-		pass
+    def __init__():
+        pass
 
 
-	#   --------------------------------
+    #   --------------------------------
     #
     #   draw functions
     #
     #   --------------------------------
-    def definecolor(self,instruction):
+    def definecolor(self, instruction):
         # first, attempt to overwrite an existing definition
         try:
             self.colors[instruction[1]] = instruction[2]
         except:
-            self.colors.append({instruciton[1]:instruction[2]}) 
+            self.colors.append({instruction[1]: instruction[2]})
 
-    def setscale(self,instruction):
+    def setscale(self, instruction):
         self.scale = instruction[1]
 
-    def setoffset(self,instruction):
+    def setoffset(self, instruction):
         self.offset = instruction[1]
 
-    def drawline(self,instruction):
+    def drawline(self, instruction):
         pygame.draw.line(screen,
             self.colors[instruction[3]],
-            (instruction[1][0]*self.scale+self.offset[0],
-                instruction[1][1]*self.scale+self.offset[1]),
+            (instruction[1][0] * self.scale+self.offset[0],
+             instruction[1][1]*self.scale+self.offset[1]),
             (instruction[2][0]*self.scale+self.offset[0],
-                instruction[2][1]*self.scale+self.offset[1]),
+             instruction[2][1]*self.scale+self.offset[1]),
             self.line_width)
 
     def drawlinep(self,instruction):
@@ -123,7 +123,7 @@ class graphics_window:
 
             # check for exit command
             if event.type == pygame.QUIT:
-            	# 0 mode is the exit state
+                # 0 mode is the exit state
                 mode = 0
 
             # go through controls

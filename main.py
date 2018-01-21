@@ -1,26 +1,30 @@
 from serial_vis.py import *
 
+
+class user_vector_graphics(default_vector_graphics):
+
+    def exampleusercommand(self, instruction):
+        print("Example user command: " + instruction[1])
+
+    # put user commands here
+
+
 # extend the serial_device class to add user definitions.
-class my_serial_device(serial_device):
+class my_serial_vis(serial_vis):
 
-	# register commands here
-	def register_user_commands(self):
+    # graphics command registration
+    user_commands = {"exampleusercommand": "s"}
+    graphics_class = user_vector_graphics
 
-		# example function prototype
-		self.commands.update{"exampleuserfunction":"s"}
-
-	# register user settings here
-	def register_user_settings(self):
-		
-		# should update self.log_settings, self.graphics_settings
-		pass
-
-	# todo: pass user functions to graphics class
+    # settings
+    graphics_settings = {}
+    log_settings = {}
+    serial_settings = {}
 
 
 # create object
-my_serial_device = my_serial_device("/dev/lm4f",115200)
+my_serial_device = my_serial_device("/dev/lm4f", 115200)
 
 # that's it!
 while(1):
-	my_serial_device.update()
+    my_serial_device.update()
