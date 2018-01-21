@@ -1,6 +1,5 @@
 # serial-vis
-A serial-driven visual display script. This is intended to be used for data logging and debugging of complex embedded systems where visual outputs are critical to interpreting sensor output.
-
+A serial-driven visual display script for data logging and debugging of complex embedded systems where visual outputs are critical to interpreting sensor output.
 
 ## Usage
 Create a main python script. This script needs the following parts:

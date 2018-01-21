@@ -1,14 +1,14 @@
+# example program using serial-vis.
+
 from src import serial_vis
 
 
 # user vector graphics
-# can have any name, as long as it is correctly referenced by my_serial_device
+# user commands go here
 class user_vector_graphics(serial_vis.default_vector_graphics):
 
     def exampleusercommand(self, instruction):
         print("Example user command: " + instruction[1])
-
-    # put user commands here
 
 
 # extend the serial_device class to add user definitions.
@@ -21,9 +21,9 @@ class my_serial_vis(serial_vis.serial_vis):
     # settings
     settings = {}
 
+    # user keyboard event processing
     def process_user_events(self, events):
         pass
-        # this function gets called to process events.
 
 
 # create object
