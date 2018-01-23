@@ -1,36 +1,28 @@
 # vector_graphics_window.py
+# vector graphics base class
 
 import pygame
 import collections
 import time
 
 
-# methods:
-# __init__              - takes **kwargs containing window settings
-# update_screen         - updates the screen with the input frame_buffer object
-# close_window          - cleanly close pygame
-# instruction_error     - display error function
-
 class vector_graphics_window:
-    """ Pygame window class; creates vector graphics rendering window
 
-    Attributes:
-        settings:
-            window_size - size of pygame window
-            scale - scale from raw units to pixels
-            offset - offset of origin from bottom left
-            frame_limit - max fps
-            line_width - width of drawn lines
-            font - pygame text font
-            events - events (keypresses) to be checked
-            colors - colors for drawing things
+    """
+    Pygame window class; creates vector graphics rendering window
+
+    Attributes
+    ----------
+    settings : dict
+        Contains window settings. Documented in README.md
+    current_buffer_id : int
+        current buffer being displayed. -1 = error.
+    events_previous : str[]
+        previously registered events
+    frame_times : float[]
+        log of the past settings["fps_smooth_size"] frames.
     """
 
-    #   --------------------------------
-    #
-    #   Attributes (default)
-    #
-    #   --------------------------------
     settings = {
         "window_size": (800, 600),
         "scale": 1.000,
@@ -68,6 +60,15 @@ class vector_graphics_window:
     #   --------------------------------
     def __init__(self, **kwargs):
 
+        """
+        Create a pygame graphics window.
+
+        Parameters
+        ----------
+        kwargs: dict
+            passed on to settings
+        """
+
         dict_merge(self.settings, kwargs)
 
         pygame.init()
@@ -85,6 +86,20 @@ class vector_graphics_window:
     #
     #   --------------------------------
     def update_screen(self, frame_buffer):
+
+        """
+        Update a screen with the given frame_buffer.
+
+        Parameters
+        ----------
+        frame_buffer: buffer.frame_buffer
+            instruction buffer to be displayed
+
+        Returns
+        -------
+        Bool
+            True if the update operation redrew the screen; False otherwise
+        """
 
         # return false if unsuccessful.
         if(frame_buffer.frame_id == self.current_buffer_id):
@@ -112,7 +127,7 @@ class vector_graphics_window:
             if(self.settings["show_frame_id"]):
                 self.show_frame_id()
             if(self.settings["show_fps"]):
-                self.show_fps(self.compute_fps)
+                self.show_fps()
 
             # display pygame buffer
             pygame.display.flip()
@@ -128,6 +143,10 @@ class vector_graphics_window:
     #
     #   --------------------------------
     def check_events(self):
+
+        """
+        Returns a list of the names of current events.
+        """
 
         current_events_hold = []
         current_events_press = []
@@ -153,6 +172,10 @@ class vector_graphics_window:
     #   --------------------------------
     def close_window(self):
 
+        """
+        Cleanly closes the pygame window.
+        """
+
         pygame.display.quit()
         pygame.quit()
 
@@ -163,6 +186,15 @@ class vector_graphics_window:
     #   --------------------------------
     def instruction_error(self, instruction):
 
+        """
+        Display an unrecognized opcode error.
+
+        Parameters
+        ----------
+        instruction: array following instruction form
+            instruction containing an opcode error
+        """
+
         print("Unrecognized Opcode: " + instruction[0])
 
     #   --------------------------------
@@ -171,12 +203,22 @@ class vector_graphics_window:
     #
     #   --------------------------------
     def show_frame_id(self):
+
+        """
+        Display the frame ID at the bottom left.
+        """
+
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
             self.current_buffer_id, False, self.colors["black"])
         self.screen.blit(textframe, 10, 10)
 
     def show_fps(self):
+
+        """
+        Display the current fps at the bottom.
+        """
+
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
             self.compute_fps(), False, self.colors["black"])
@@ -188,6 +230,16 @@ class vector_graphics_window:
     #
     #   --------------------------------
     def update_fps(self, instruction):
+
+        """
+        Check whether the instruction triggers an fps update.
+
+        Parameters
+        ----------
+        instruction: array following instruction form
+            instruction to be checked
+        """
+
         if(instruction[0] == self.settings["fps_count_keyword"]):
             self.frame_times.append(time.time())
             if(len(self.frame_times) > self.settings["frame_smooth_size"]):
@@ -198,7 +250,18 @@ class vector_graphics_window:
     #   Compute fps from the registry
     #
     #   --------------------------------
+
     def compute_fps(self):
+
+        """
+        Returns the current fps.
+
+        Returns
+        -------
+        float
+            fps, smoothed over settings["frame_smooth_size"] frames
+        """
+
         return(len(self.frame_times) /
                (self.frame_times[-1] - self.frame_times[0]))
 

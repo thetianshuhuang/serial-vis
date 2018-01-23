@@ -2,7 +2,6 @@
 
 from src import serial_vis
 
-
 # user vector graphics
 # user commands go here
 class user_vector_graphics(serial_vis.default_vector_graphics):
