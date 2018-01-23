@@ -2,6 +2,7 @@
 
 import pygame
 import collections
+import time
 
 
 # methods:
@@ -37,6 +38,10 @@ class vector_graphics_window:
         "frame_limit": 60,
         "line_width": 2,
         "font": "arial",
+        "show_frame_id": True,
+        "show_fps": True,
+        "fps_count_keyword": "draw",
+        "fps_smooth_size": 30,
         "events": {
             pygame.QUIT: "quit",
             pygame.K_SPACE: "pause",
@@ -54,6 +59,7 @@ class vector_graphics_window:
 
     current_buffer_id = -1
     events_previous = {}
+    frame_times = []
 
     #   --------------------------------
     #
@@ -102,11 +108,19 @@ class vector_graphics_window:
                 except AttributeError:
                     self.instruction_error(instruction)
 
-        # display pygame buffer
-        pygame.display.flip()
+            # show frame id and fps
+            if(self.settings["show_frame_id"]):
+                self.show_frame_id()
+            if(self.settings["show_fps"]):
+                self.show_fps(self.compute_fps)
 
-        # limit the fps
-        self.clock.tick(self.frame_limit)
+            # display pygame buffer
+            pygame.display.flip()
+
+            # limit the fps
+            self.clock.tick(self.frame_limit)
+
+            return(True)
 
     #   --------------------------------
     #
@@ -150,6 +164,43 @@ class vector_graphics_window:
     def instruction_error(self, instruction):
 
         print("Unrecognized Opcode: " + instruction[0])
+
+    #   --------------------------------
+    #
+    #   Display fps and frame id
+    #
+    #   --------------------------------
+    def show_frame_id(self):
+        textfont = pygame.font.SysFont(self.settings["font"], 12)
+        textframe = textfont.render(
+            self.current_buffer_id, False, self.colors["black"])
+        self.screen.blit(textframe, 10, 10)
+
+    def show_fps(self):
+        textfont = pygame.font.SysFont(self.settings["font"], 12)
+        textframe = textfont.render(
+            self.compute_fps(), False, self.colors["black"])
+        self.screen.blit(textframe, 10, self.settings["screen"] - 12)
+
+    #   --------------------------------
+    #
+    #   Check for update to fps registry
+    #
+    #   --------------------------------
+    def update_fps(self, instruction):
+        if(instruction[0] == self.settings["fps_count_keyword"]):
+            self.frame_times.append(time.time())
+            if(len(self.frame_times) > self.settings["frame_smooth_size"]):
+                del self.frame_times[0]
+
+    #   --------------------------------
+    #
+    #   Compute fps from the registry
+    #
+    #   --------------------------------
+    def compute_fps(self):
+        return(len(self.frame_times) /
+               (self.frame_times[-1] - self.frame_times[0]))
 
 
 #   --------------------------------

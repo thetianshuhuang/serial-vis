@@ -63,6 +63,9 @@ class serial_vis:
         # get instruction
         instruction = serial_device.process_command(serial_device.get_line())
 
+        # log command with window fps tracker
+        self.window.update_fps(instruction)
+
         # check for control instructions:
         if(instruction[0]) == "draw":
             # live => create new buffer

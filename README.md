@@ -103,6 +103,10 @@ textp:%s:%d,%d:%d:%s
 "frame_limit": 60,                      # max fps
 "line_width": 2,                        # width of drawn lines
 "font": "arial",                        # pygame text font
+"show_frame_id": True,                  # show id of current frame
+"show_fps": True,                       # show fps of redraw commands
+"fps_count_keyword": "draw",            # opcode to measure fps from
+"fps_smooth_size": 30,                  # number of frames to smooth the fps across
 "events": {                             # keys to be registered by the program
     pygame.QUIT: "quit",
     pygame.K_SPACE: "pause",
@@ -143,6 +147,7 @@ class user_vector_graphics(default_vector_graphics):
 Then, register the graphics class and command format with the main class:
 ```
 class my_serial_vis(serial_vis):
+
     user_commands = {"exampleusercommand": "s", "d"}
     graphics_class = user_vector_graphics
 ```
@@ -194,6 +199,10 @@ class my_serial_vis(serial_vis):
 - update_screen(frame_buffer): draw the input frame_buffer. Will not draw if the provided frame_buffer is the same as the previously drawn frame buffer.
 - check_events(): go through settings["events"] and return any events (keypresses). Returns a tuple containing (keys pressed, keys pressed this cyckle)
 - close_window(): close pygame window cleanly
+- show_frame_id(): display the frame ID at the bottom left
+- show_fps(): show the fps at the top left
+- update_fps(): check for an fps update trigger
+- compute_fps(): returns the current fps
 
 #### serial_vis.buffer_db:
 - new_buffer(frame_buffer): register a frame buffer. If the id is -1 (not assigned), it will be automatically created.
