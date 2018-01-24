@@ -133,6 +133,10 @@ textp:%s:%d,%d:%d:%s
 "max_size_backward": 100                # number of frames stored before the pause point
 ```
 
+### Parser:
+```
+"number_mode": "hex"                    # numerical format for serial communication. "hex" or "dec".
+```
 
 ## API
 

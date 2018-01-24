@@ -28,6 +28,8 @@ class parser:
         "draw": [],
         # log: label, datastring
         "log": ["s", "s"],
+        # logf: label, data (float)
+        "logf": ["f"],
         # start log block
         "logstart": [],
         # end log block
@@ -66,8 +68,9 @@ class parser:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, commands):
+    def __init__(self, commands, **kwargs):
         self.commands.update(commands)
+        self.settings.update(kwargs)
 
     #   --------------------------------
     #

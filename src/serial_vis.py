@@ -40,7 +40,7 @@ class serial_vis:
         # create serial device, serial parser, log, frame buffer db,
         # and graphics window
         self.serial_device = serial_device(path, **self.settings)
-        self.serial_parser = serial_parser(self.user_commands)
+        self.serial_parser = serial_parser(self.user_commands, **self.settings)
         self.csv_log = csv_log(**self.settings)
         self.graphics_window = self.graphics_class(**self.settings)
         self.buffer_db = self.buffer_db(**self.settings)
@@ -82,9 +82,7 @@ class serial_vis:
             self.current_buffer = frame_buffer()
 
         # log instructions
-        elif(instruction[0] == "log" or
-             instruction[0] == "logstart" or
-             instruction[0] == "logend"):
+        elif(instruction[0] in ["log", "logf", "logstart", "logend"]):
             self.csv_log.log_data(instruction)
 
         # print instruction
