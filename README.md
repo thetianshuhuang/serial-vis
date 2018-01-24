@@ -213,4 +213,3 @@ class my_serial_vis(serial_vis):
 #### serial_vis.current_buffer:
 - frame_id: ID of the frame stored by the buffer. frame_id = -1 if the id has not yet been assigned.
 - instructions: instructions in the frame buffer.
-

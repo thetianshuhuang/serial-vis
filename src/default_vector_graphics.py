@@ -68,7 +68,7 @@ class default_vector_graphics(vector_graphics_window):
 
     def text(self, instruction):
         # create font
-        textfont = pygame.font.SysFont(self.font, instruction[3])
+        textfont = pygame.font.SysFont(self.settings["font"], instruction[3])
         # create surface
         textframe = textfont.render(
             instruction[1], False, self.colors[instruction[4]])
