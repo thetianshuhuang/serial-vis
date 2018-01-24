@@ -1,6 +1,8 @@
 # serial_parser.py
 # serial command interpretation class
 
+import struct
+
 
 # serial parser class
 
@@ -52,6 +54,11 @@ class parser:
         "text": ["s", "ff", "d", "s"],
         # draw text (pixel mode): text,(x,y),size,color
         "textp": ["s", "dd", "d", "s"],
+    }
+
+    # settings
+    settings = {
+        "number_mode": "HEX",
     }
 
     #   --------------------------------
@@ -185,19 +192,39 @@ class parser:
     #   argument conversion routines
     #
     #   --------------------------------
+
+    # If number_mode == "dec", run normal python routines.
+    # If number_mode == "hex", run conversion routines in hexutil.py
+
     def to_int(self, string):
-        try:
-            return(int(string))
-        except ValueError:
+        if(self.settings["number_mode"] == "dec"):
+            try:
+                return(int(string))
+            except ValueError:
+                return(0)
             return(0)
+        elif(self.settings["number_mode"] == "hex"):
+            try:
+                return(int(string, 16))
+            except ValueError:
+                return(0)
         return(0)
 
     def to_float(self, string):
-        try:
-            return(float(string))
-        except ValueError:
+        if(self.settings["number_mode"] == "dec"):
+            try:
+                return(float(string))
+            except ValueError:
+                return(0.0)
             return(0.0)
-        return(0.0)
+        elif(self.settings["number_mode"] == "hex"):
+            try:
+                return(struct.updack('d', string.decode("hex")))
+            except TypeError:
+                return(0.0)
+        return(0)
 
+    # deprecated conversion for embedded systems that do not support long
+    # no longer used since hex conversion is now supported.
     def to_long(self, big_string, small_string):
         return(self.to_int(big_string) * 10000 + self.to_int(small_string))
