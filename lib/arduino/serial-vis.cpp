@@ -1,5 +1,6 @@
 // serial-vis specific API
 
+#include "serial-command.h"
 #include "serial-vis.h"
 
 // Function definitions at

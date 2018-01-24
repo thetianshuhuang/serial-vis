@@ -1,9 +1,8 @@
 // Generic Serial Command subroutines
 
 #include <stdarg.h>
-#include "serial-command.h"
 #include <Arduino.h>
-
+#include "serial-command.h"
 
 // print command
 void printCommand(const char* input) {
