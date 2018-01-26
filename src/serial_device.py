@@ -49,6 +49,10 @@ class serial_device:
                 self.device = serial.Serial(
                     path, self.settings["baudrate"], timeout=1)
                 print("Device connected: " + path)
+
+                # read one line to avoid passing incomplete lines
+                self.device.readline().strip()
+
                 break
 
             except serial.serialutil.SerialException:
@@ -82,6 +86,14 @@ class serial_device:
     #   --------------------------------
     def close(self):
         self.device.close()
+
+    #   --------------------------------
+    #
+    #   discard one line to avoid incomplete reading
+    #
+    #   --------------------------------
+    def discard_line(self):
+        self.device.readline().strip()
 
     #   --------------------------------
     #

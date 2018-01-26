@@ -18,6 +18,8 @@ class my_serial_vis(serial_vis):
 my_serial_device = my_serial_vis(device_mount_path, second_example_setting="example_value")
 ```
 
+## API: Arduino
+- /lib/arduino. Everything is stored under a class serialVis; methods have the same name as the commands below, except log is split into 'logs' for strings, and 'logf' for floats.
 
 ## Commands
 Commands should be written to the serial interface, and are read by the script.

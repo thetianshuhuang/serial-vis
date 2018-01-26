@@ -17,11 +17,11 @@ void serialVis::draw()
 // log commands
 void serialVis::logs(char * label, char * datastring)
 {
-	command(3, "log", "s", datastring);
+	command(4, "logs", "ss", label, datastring);
 }
 void serialVis::logf(char * label, double datadouble)
 {
-	command(3, "log", "F", datadouble);
+	command(4, "logf", "sF", label, datadouble);
 }
 void serialVis::logstart()
 {

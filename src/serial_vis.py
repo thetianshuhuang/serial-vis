@@ -6,13 +6,11 @@
 from buffer import *
 from default_vector_graphics import *
 from serial_device import *
+from serial_parser import *
 from csv_log import *
 
 
 # main serial_vis class
-
-#
-
 class serial_vis:
 
     #   --------------------------------
@@ -40,13 +38,16 @@ class serial_vis:
         # create serial device, serial parser, log, frame buffer db,
         # and graphics window
         self.serial_device = serial_device(path, **self.settings)
-        self.serial_parser = serial_parser(self.user_commands, **self.settings)
+        self.serial_parser = parser(self.user_commands, **self.settings)
         self.csv_log = csv_log(**self.settings)
         self.graphics_window = self.graphics_class(**self.settings)
-        self.buffer_db = self.buffer_db(**self.settings)
+        self.buffer_db = buffer_db(**self.settings)
 
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
+
+        # discard incomplete line
+        self.serial_device.discard_line()
 
     #   --------------------------------
     #
@@ -56,15 +57,16 @@ class serial_vis:
     def update(self):
 
         # process keyboard/mouse commands
-        window_events = self.graphics_window.check_input()
+        window_events = self.graphics_window.check_events()
         self.process_events(window_events)
         self.process_user_events(window_events)
 
         # get instruction
-        instruction = serial_device.process_command(serial_device.get_line())
+        instruction = self.serial_parser.process_command(
+            self.serial_device.get_line())
 
         # log command with window fps tracker
-        self.window.update_fps(instruction)
+        self.graphics_window.update_fps(instruction)
 
         # check for control instructions:
         if(instruction[0]) == "draw":
@@ -82,7 +84,7 @@ class serial_vis:
             self.current_buffer = frame_buffer()
 
         # log instructions
-        elif(instruction[0] in ["log", "logf", "logstart", "logend"]):
+        elif(instruction[0] in ["logs", "logf", "logstart", "logend"]):
             self.csv_log.log_data(instruction)
 
         # print instruction

@@ -78,7 +78,7 @@ class vector_graphics_window:
 
         # set up previous event states
         for key in self.settings["events"]:
-            self.events_previous.update({key}, False)
+            self.events_previous.update({key: False})
 
     #   --------------------------------
     #

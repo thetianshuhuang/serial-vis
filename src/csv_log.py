@@ -15,7 +15,7 @@ import time
 #               - [opcode, [data]]
 #               - where opcode can be "log", "logstart", or "logend"
 
-class csv_logger:
+class csv_log:
 
     #   --------------------------------
     #
@@ -79,7 +79,7 @@ class csv_logger:
                 self.log_output_file.write(self.logcache_time)
                 for entry in datatype:
                     self.log_output_file.write(",", entry)
-                self.write("\n")
+                self.log_output_file.write("\n")
 
         # if a log block is in progress:
         elif(self.logblock_in_progress):

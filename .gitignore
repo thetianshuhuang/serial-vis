@@ -1,3 +1,4 @@
 *.sublime-project
 *.sublime-workspace
 *.pyc
+serial_log.csv

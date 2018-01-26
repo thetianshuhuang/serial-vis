@@ -105,19 +105,24 @@ class buffer_db:
 
     #   takes in a buffer ID (optional: relative=True)
     #   returns ("id": absolute ID, "ops": frame_buffer)
-    def get_buffer(self, index, *kwargs):
+    def get_buffer(self, index, **kwargs):
 
+        # build buffer index
+        get_id = index
         if("relative" in kwargs and kwargs["relative"]):
+            get_id += self.view_buffer
 
-            # check for index out of range
-            if(index > self.settings["max_size_foraward"]):
-                index = self.settings["max_size_forward"]
-            elif(-index < self.settings["max_size_backward"]):
-                index = -self.settings["max_size_backward"]
-            return(self.frame_buffers[self.view_buffer + index])
+        # check for index out of bounds
+        if(get_id > self.view_buffer + self.settings["max_size_forward"]):
+            index = self.settings["max_size_forward"]
+        elif(get_id < self.view_buffer - self.settings["max_size_backward"]):
+            index = -self.settings["max_size_backward"]
 
+        # fetch the actual buffer
+        if(self.input_buffer == 0):
+            return(frame_buffer(frame_id=-1))
         else:
-            return(self.frame_buffers[index])
+            return(self.frame_buffers[get_id])
 
     #   --------------------------------
     #

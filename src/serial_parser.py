@@ -26,10 +26,10 @@ class parser:
         # control commands:
         # draw
         "draw": [],
-        # log: label, datastring
-        "log": ["s", "s"],
+        # logs: label, datastring
+        "logs": ["s", "s"],
         # logf: label, data (float)
-        "logf": ["f"],
+        "logf": ["s", "f"],
         # start log block
         "logstart": [],
         # end log block
@@ -60,7 +60,7 @@ class parser:
 
     # settings
     settings = {
-        "number_mode": "HEX",
+        "number_mode": "hex",
     }
 
     #   --------------------------------
@@ -222,7 +222,7 @@ class parser:
             return(0.0)
         elif(self.settings["number_mode"] == "hex"):
             try:
-                return(struct.updack('d', string.decode("hex")))
+                return(struct.unpack('d', string.decode("hex")))
             except TypeError:
                 return(0.0)
         return(0)
