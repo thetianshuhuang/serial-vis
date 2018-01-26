@@ -1,13 +1,20 @@
-#ifndef SERIAL_VIS_H
-#define SERIAL_VIS_H
+/*
+  Serial-command.h - Library for managing serial commands. Used by serial-vis.
+*/
 
-// Generic print command for easy 
-void printCommand(const char* input);
+#ifndef SERIAL_COMMAND_H
+#define SERIAL_COMMAND_H
 
-// Raw hex converter
-char* toHex(void * input, char* outstr);
+#include "Arduino.h"
+#include <stdarg.h>
 
-// Command handlerportability
-void commandHandler(int num_args, ...);
+class commandHandler
+{
+  public:
+    void command(int num_args, ...);
+  private:
+    void printCommand(const char * input);
+    char* toHex(void * input, int outsiz, char * outstr);
+};
 
 #endif
