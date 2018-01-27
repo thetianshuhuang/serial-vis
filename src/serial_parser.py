@@ -132,6 +132,9 @@ class parser:
             except IndexError:
                 print("Error: insufficient arguments")
                 argument_type = "ERR"
+            except KeyError:
+                print("Unrecognized opcode")
+                argument_type = "ERR"
 
             # single argument type
             if(argument_type == "d"):
@@ -222,7 +225,10 @@ class parser:
             return(0.0)
         elif(self.settings["number_mode"] == "hex"):
             try:
-                return(struct.unpack('d', string.decode("hex")))
+                if(len(string) == 8):
+                    return(struct.unpack('!f', string.decode("hex"))[0])
+                elif(len(string) == 16):
+                    return(struct.unpack('!d', string.decode("hex"))[0])
             except TypeError:
                 return(0.0)
         return(0)

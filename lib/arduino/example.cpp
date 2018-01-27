@@ -3,7 +3,7 @@
 #include "serial-vis.h"
 #include <stdlib.h>
 
-int counter;
+float counter;
 char outstr;
 serialVis sv;
 
@@ -16,15 +16,18 @@ int main() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   while(true){
-    counter += 100;
+    counter += 5;
 
-    char buffer[10];
-    itoa(counter, buffer, 10);
-    sv.logs("counter", buffer);
+    sv.drawcircle(300,400,counter,"black");
+    sv.draw();
 
+    if(counter >= 200) {
+      counter = 0;
+    }
+    
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
+    delay(250);
     digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
+    delay(250);
   }
 }

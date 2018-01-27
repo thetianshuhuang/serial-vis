@@ -133,7 +133,6 @@ class buffer_db:
     #   sets the current view ID
     #   kwargs: absolute= set buffer absolutely
     #           relative= set buffer relative to input_buffer
-    #   returns the frame_buffer at that ID (can be safely ignored)
     def set_current_view(self, **kwargs):
 
         if "absolute" in kwargs:
@@ -142,8 +141,6 @@ class buffer_db:
             self.view_buffer = kwargs["relative"] + self.input_buffer
         else:
             self.view_buffer = self.input_buffer - 1
-
-        return(self.frame_buffers[self.view_buffer])
 
     #   --------------------------------
     #

@@ -68,6 +68,8 @@ class serial_vis:
         # log command with window fps tracker
         self.graphics_window.update_fps(instruction)
 
+        print(instruction)
+
         # check for control instructions:
         if(instruction[0]) == "draw":
             # live => create new buffer

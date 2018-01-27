@@ -242,7 +242,7 @@ class vector_graphics_window:
 
         if(instruction[0] == self.settings["fps_count_keyword"]):
             self.frame_times.append(time.time())
-            if(len(self.frame_times) > self.settings["frame_smooth_size"]):
+            if(len(self.frame_times) > self.settings["fps_smooth_size"]):
                 del self.frame_times[0]
 
     #   --------------------------------
