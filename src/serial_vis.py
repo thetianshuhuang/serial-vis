@@ -8,6 +8,7 @@ from default_vector_graphics import *
 from serial_device import *
 from serial_parser import *
 from csv_log import *
+from dict_merge import *
 
 
 # main serial_vis class

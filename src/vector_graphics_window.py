@@ -4,6 +4,7 @@
 import pygame
 import collections
 import time
+from error_handler import *
 
 
 class vector_graphics_window:
@@ -79,6 +80,8 @@ class vector_graphics_window:
         for key in self.settings["events"]:
             self.events_previous.update({key: False})
 
+        self.error_handler = error_handler(**kwargs)
+
     #   --------------------------------
     #
     #   Update screen
@@ -120,7 +123,7 @@ class vector_graphics_window:
                 # raise AttributeError
                 # if the requested instruction doesn't exist.
                 except AttributeError:
-                    self.instruction_error(instruction)
+                    self.error_handler.raise_error(onf, instruction[0])
 
             # show frame id and fps
             if(self.settings["show_frame_id"]):
@@ -177,24 +180,6 @@ class vector_graphics_window:
 
         pygame.display.quit()
         pygame.quit()
-
-    #   --------------------------------
-    #
-    #   Display Error
-    #
-    #   --------------------------------
-    def instruction_error(self, instruction):
-
-        """
-        Display an unrecognized opcode error.
-
-        Parameters
-        ----------
-        instruction: array following instruction form
-            instruction containing an opcode error
-        """
-
-        print("Unrecognized Opcode: " + instruction[0])
 
     #   --------------------------------
     #

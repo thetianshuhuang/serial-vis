@@ -2,6 +2,7 @@
 # serial command interpretation class
 
 import struct
+from error_handler import *
 
 
 # serial parser class
@@ -72,6 +73,8 @@ class parser:
         self.commands.update(commands)
         self.settings.update(kwargs)
 
+        self.error_handler = error_handler(**kwargs)
+
     #   --------------------------------
     #
     #   full package of parsing and processing
@@ -135,14 +138,14 @@ class parser:
                 # n-1 indexed since the opcode isn't included in self.commands
                 argument_type = self.commands[opcode][n - 1]
             except IndexError:
-                print("Error: too many arguments")
+                self.error_handler("tma", opcode)
                 argument_type = "ERR"
             except KeyError:
-                print("Unrecognized Opcode")
+                self.error_handler("onr", opcode)
                 argument_type = "ERR"
             # protection against insufficient arguments
             if(n >= len(raw_arguments)):
-                print("Error: too many arguments")
+                self.error_handler("nea", opcode)
                 raw_arguments.append(0)
 
             # single argument type

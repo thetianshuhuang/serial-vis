@@ -31,7 +31,7 @@ class default_vector_graphics(vector_graphics_window):
         if(len(instruction[2] >= 3)):
             self.settings["colors"].update({instruction[1]: instruction[2]})
         else:
-            print("Error: too few arguments in color tuple")
+            self.error_handler.raise_error("tts", instruction[0])
 
     def setscale(self, instruction):
         self.settings["scale"] = instruction[1]
