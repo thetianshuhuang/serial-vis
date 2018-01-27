@@ -18,12 +18,17 @@ class serial_vis:
     #   Attributes
     #
     #   --------------------------------
-    settings = {}
+
+    user_settings = {}
     user_commands = {}
     graphics_class = default_vector_graphics
 
     is_live = True
     display_buffer_id = 0
+
+    settings = {
+        "quit_on_disconnect": True
+    }
 
     #   --------------------------------
     #
@@ -33,6 +38,7 @@ class serial_vis:
     def __init__(self, path, **kwargs):
 
         # update settings
+        dict_merge(self.settings, self.user_settings)
         dict_merge(self.settings, kwargs)
 
         # create serial device, serial parser, log, frame buffer db,
@@ -61,17 +67,23 @@ class serial_vis:
         self.process_events(window_events)
         self.process_user_events(window_events)
 
-        # get instruction
-        instruction = self.serial_parser.process_command(
-            self.serial_device.get_line())
+        # get line
+        line = self.serial_device.get_line()
+
+        # check for device disconnect
+        if(not line[1]):
+            if(self.settings["quit_on_disconnect"]):
+                self.quit_sv()
+
+        # parse instruction
+        instruction = self.serial_parser.process_command(line[0])
 
         # log command with window fps tracker
         self.graphics_window.update_fps(instruction)
 
-        print(instruction)
-
         # check for control instructions:
         if(instruction[0]) == "draw":
+
             # live => create new buffer
             # set the current view
             if(self.is_live):
@@ -114,11 +126,7 @@ class serial_vis:
 
         # hold key events:
         if pygame.QUIT in events_hold:
-            # call clean close methods
-            self.graphics_window.close_window()
-            self.csv_log.close_file()
-            self.serial_device.close()
-            exit()
+            self.quit_sv()
 
         # press key events:
         if "pause" in events_press:
@@ -137,6 +145,18 @@ class serial_vis:
 
         if "backplus" in events_press:
             self.display_buffer_id += -10
+
+    #   --------------------------------
+    #
+    #   quit
+    #
+    #   --------------------------------
+    def quit_sv(self):
+        # call clean close methods
+        self.graphics_window.close_window()
+        self.csv_log.close_file()
+        self.serial_device.close()
+        exit()
 
     #   --------------------------------
     #

@@ -18,7 +18,7 @@ class my_serial_vis(serial_vis.serial_vis):
     graphics_class = user_vector_graphics
 
     # settings
-    settings = {}
+    user_settings = {}
 
     # user keyboard event processing
     def process_user_events(self, events):

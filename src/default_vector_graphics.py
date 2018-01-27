@@ -16,8 +16,11 @@ class default_vector_graphics(vector_graphics_window):
     #
     #   --------------------------------
     def transform(self, coord):
-        return(coord[0] * self.settings["scale"] + self.settings["offset"][0],
-               coord[1] * self.settings["scale"] + self.settings["offset"][1])
+        return(
+            int(round(coord[0] * self.settings["scale"] +
+                      self.settings["offset"][0], 0)),
+            int(round(coord[1] * self.settings["scale"] +
+                      self.settings["offset"][1], 0)))
 
     #   --------------------------------
     #
@@ -25,7 +28,10 @@ class default_vector_graphics(vector_graphics_window):
     #
     #   --------------------------------
     def definecolor(self, instruction):
-        self.settings["colors"].update({instruction[1]: instruction[2]})
+        if(len(instruction[2] >= 3)):
+            self.settings["colors"].update({instruction[1]: instruction[2]})
+        else:
+            print("Error: too few arguments in color tuple")
 
     def setscale(self, instruction):
         self.settings["scale"] = instruction[1]
@@ -35,32 +41,37 @@ class default_vector_graphics(vector_graphics_window):
 
     def drawline(self, instruction):
         pygame.draw.line(
-            screen,
-            self.settings["colors"][instruction[3]],
+            self.screen,
+            self.get_color(instruction[3]),
             self.transform(instruction[1]),
             self.transform(instruction[2]),
             self.settings["line_width"])
 
     def drawlinep(self, instruction):
         pygame.draw.line(
-            screen,
-            self.settings["colors"][instruction[3]],
+            self.screen,
+            self.get_color(instruction[3]),
             instruction[1],
             instruction[2],
             self.settings["line_width"])
 
     def drawcircle(self, instruction):
+        # width greater than radius protection
+        radius = int(round(instruction[2] * self.settings["scale"]))
+        if(radius < self.settings["line_width"]):
+            radius = self.settings["line_width"] + 1
+
         pygame.draw.circle(
-            screen,
-            self.settings["colors"][instruction[3]],
+            self.screen,
+            self.get_color(instruction[3]),
             self.transform(instruction[1]),
-            instruction[2] * self.scale,
+            radius,
             self.settings["line_width"])
 
     def drawray(self, instruction):
         pygame.draw.line(
-            screen,
-            self.settings["colors"][instruction[4]],
+            self.screen,
+            self.get_color(instruction[4]),
             self.transform(instruction[1]),
             self.transform((instruction[1][0] + math.cos(instruction[2]),
                            instruction[1][1] + math.sin(instruction[2]))),

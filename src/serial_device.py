@@ -77,7 +77,11 @@ class serial_device:
     #
     #   --------------------------------
     def get_line(self):
-        return(self.device.readline().strip())
+        try:
+            return([self.device.readline().strip(), True])
+        except (OSError, serial.serialutil.SerialException):
+            print("Device disconnected.")
+            return(["", False])
 
     #   --------------------------------
     #

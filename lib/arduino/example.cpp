@@ -16,18 +16,15 @@ int main() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   while(true){
-    counter += 5;
+    counter += 1;
 
-    sv.drawcircle(300,400,counter,"black");
+    sv.drawcircle(400, 300, counter, "black");
     sv.draw();
 
     if(counter >= 200) {
       counter = 0;
     }
-    
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(250);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
+
+    delay(10);
   }
 }

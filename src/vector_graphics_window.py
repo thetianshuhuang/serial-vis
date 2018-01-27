@@ -68,7 +68,6 @@ class vector_graphics_window:
         kwargs: dict
             passed on to settings
         """
-
         dict_merge(self.settings, kwargs)
 
         pygame.init()
@@ -110,7 +109,7 @@ class vector_graphics_window:
             self.current_buffer_id = frame_buffer.frame_id
 
             # clear pygame buffer
-            self.screen.fill(self.colors["background"])
+            self.screen.fill(self.settings["colors"]["background"])
 
             for instruction in frame_buffer.instructions:
 
@@ -133,7 +132,7 @@ class vector_graphics_window:
             pygame.display.flip()
 
             # limit the fps
-            self.clock.tick(self.frame_limit)
+            self.clock.tick(self.settings["frame_limit"])
 
             return(True)
 
@@ -210,8 +209,10 @@ class vector_graphics_window:
 
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
-            self.current_buffer_id, False, self.colors["black"])
-        self.screen.blit(textframe, 10, 10)
+            str(self.current_buffer_id),
+            False,
+            self.settings["colors"]["black"])
+        self.screen.blit(textframe, (10, 10))
 
     def show_fps(self):
 
@@ -221,8 +222,10 @@ class vector_graphics_window:
 
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
-            self.compute_fps(), False, self.colors["black"])
-        self.screen.blit(textframe, 10, self.settings["screen"] - 12)
+            str(self.compute_fps()),
+            False,
+            self.settings["colors"]["black"])
+        self.screen.blit(textframe, (10, self.settings["window_size"][1] - 12))
 
     #   --------------------------------
     #
@@ -261,10 +264,22 @@ class vector_graphics_window:
         float
             fps, smoothed over settings["frame_smooth_size"] frames
         """
+        if(self.frame_times[-1] == self.frame_times[0]):
+            return(0)
 
         return(len(self.frame_times) /
                (self.frame_times[-1] - self.frame_times[0]))
 
+    #   --------------------------------
+    #
+    #   get color; safely retrieve color. defaults to black.
+    #
+    #   --------------------------------
+    def get_color(self, colorname):
+        try:
+            return(self.settings["colors"][colorname])
+        except KeyError:
+            return(self.settings["colors"]["black"])
 
 #   --------------------------------
 #

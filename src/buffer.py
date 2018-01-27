@@ -13,18 +13,15 @@ class frame_buffer:
 
     #   --------------------------------
     #
-    #   Attributes (default)
-    #
-    #   --------------------------------
-    frame_id = -1
-    instructions = []
-
-    #   --------------------------------
-    #
     #   Initialization
     #
     #   --------------------------------
     def __init__(self, **kwargs):
+
+        # attributes
+        self.frame_id = -1
+        self.instructions = []
+
         # add frame_id attribute if provided
         if("frame_id" in kwargs):
             self.frame_id = kwargs["frame_id"]
@@ -35,8 +32,7 @@ class frame_buffer:
     #
     #   --------------------------------
     def add_instruction(self, instruction):
-        self.instructions += instruction
-
+        self.instructions += [instruction]
 
 # class containing a collection of frame buffers,
 # along with related methods
@@ -72,7 +68,6 @@ class buffer_db:
     #   --------------------------------
 
     #   Adds a new frame_buffer object to the frame_buffers.
-    #   If adv_frame=False is passed, the current_view is not advanced.
     def new_buffer(self, frame_buffer):
 
         # add new item if the current forward limit hasn't been exceeded
@@ -91,11 +86,11 @@ class buffer_db:
             if(element < self.view_buffer - self.settings["max_size_forward"]):
                 del self.frame_buffers[element]
 
-        # return the buffer ID that just got created
-        return(self.input_buffer)
-
         # increment the current input buffer ID
         self.input_buffer += 1
+
+        # return the buffer ID that just got created
+        return(self.input_buffer)
 
     #   --------------------------------
     #

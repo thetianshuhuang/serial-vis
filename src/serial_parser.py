@@ -60,7 +60,7 @@ class parser:
 
     # settings
     settings = {
-        "number_mode": "hex",
+        "number_mode": "hex"
     }
 
     #   --------------------------------
@@ -123,18 +123,27 @@ class parser:
         opcode = raw_arguments[0]
         arguments.append(raw_arguments[0])
 
+        if opcode in self.commands:
+            command_length = len(self.commands[opcode]) + 1
+        else:
+            command_length = len(raw_arguments)
+
         n = 1
-        while(n < len(raw_arguments)):
+        while(n < command_length):
 
             try:
                 # n-1 indexed since the opcode isn't included in self.commands
                 argument_type = self.commands[opcode][n - 1]
             except IndexError:
-                print("Error: insufficient arguments")
+                print("Error: too many arguments")
                 argument_type = "ERR"
             except KeyError:
-                print("Unrecognized opcode")
+                print("Unrecognized Opcode")
                 argument_type = "ERR"
+            # protection against insufficient arguments
+            if(n >= len(raw_arguments)):
+                print("Error: too many arguments")
+                raw_arguments.append(0)
 
             # single argument type
             if(argument_type == "d"):
@@ -169,15 +178,18 @@ class parser:
                 argument_array = []
                 for element in argument_array_raw:
                     if(argument_type == "dd"):
-                        argument_array.append(self.to_int(raw_arguments[n]))
+                        argument_array.append(self.to_int(element))
                     elif(argument_type == "ss"):
-                        argument_array.append(raw_arguments[n])
+                        argument_array.append(element)
                     elif(argument_type == "ff"):
-                        argument_array.append(self.to_float(raw_arguments[n]))
+                        argument_array.append(self.to_float(element))
                     elif(argument_type == "ll"):
-                        argument_array.append(
-                            self.to_long(
-                                raw_arguments[n], raw_arguments[n + 1]))
+                        pass
+                        # unimplemented
+
+                # padd errored out arrays to make then sufficiently long
+                if(len(argument_array) <= 1):
+                    argument_array += [0, 0]
 
                 # finally, append the array to the arguments
                 arguments.append(argument_array)
