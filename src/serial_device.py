@@ -5,23 +5,26 @@ import serial
 from time import sleep
 
 
-# class governing serial interaction
+#   --------------------------------
+#
+#   Serial Device class
+#
+#   --------------------------------
 
-# methods:
-# __init__              - takes filepath and **kwargs containing
-#                       - baudrate= sets baudrate
-#                       - timeout= sets initial timeout for device detection
-#                       - encoding= serial encoding ("ascii" or "utf-8")
-# get_line              - gets line from serial output and strips newline
-# close                 - cleanly close serial interface
-# write                 - write string to serial interface
 class serial_device:
 
-    #   --------------------------------
-    #
-    #   Attributes (default)
-    #
-    #   --------------------------------
+    """
+    Serial Device class; governs serial interactions
+
+    Attributes:
+    settings : dict
+        settings for serial communication.
+
+    Created by __init__:
+    device : serial.Serial object
+        Serial device object
+    """
+
     settings = {
         "baudrate": 115200,
         "timeout": 60,
@@ -33,9 +36,18 @@ class serial_device:
     #   Initialization
     #
     #   --------------------------------
-
-    #   Find serial device.
     def __init__(self, path, **kwargs):
+
+        """
+        Initialize serial device.
+
+        Parameters
+        ----------
+        path : str
+            filepath of the desired serial device
+        kwargs : dict
+            merged with settings
+        """
 
         # update settings
         self.settings.update(kwargs)
@@ -51,7 +63,7 @@ class serial_device:
                 print("Device connected: " + path)
 
                 # read one line to avoid passing incomplete lines
-                self.device.readline().strip()
+                self.discard_line()
 
                 break
 
@@ -73,10 +85,20 @@ class serial_device:
 
     #   --------------------------------
     #
-    #   get launchpad uart output
+    #   get serial output
     #
     #   --------------------------------
     def get_line(self):
+
+        """
+        Get one line of serial data
+
+        Returns
+        -------
+        [str, bool]
+            [line read from serial, True if successful]
+        """
+
         try:
             return([self.device.readline().strip(), True])
         except (OSError, serial.serialutil.SerialException):
@@ -89,6 +111,11 @@ class serial_device:
     #
     #   --------------------------------
     def close(self):
+
+        """
+        Close the serial port cleanly
+        """
+
         self.device.close()
 
     #   --------------------------------
@@ -97,6 +124,11 @@ class serial_device:
     #
     #   --------------------------------
     def discard_line(self):
+
+        """
+        Read a line, and discard it in case a partial line is stored
+        """
+
         self.device.readline().strip()
 
     #   --------------------------------
@@ -105,4 +137,14 @@ class serial_device:
     #
     #   --------------------------------
     def write(self, line):
+
+        """
+        Write a line to serial.
+
+        Parameters
+        ----------
+        line : str
+            line to be written; must have its own newline character if needed
+        """
+
         self.device.write(line.encode(self.settings["encoding"]))

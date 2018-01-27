@@ -1,10 +1,27 @@
 # error_handler.py
 # error handling class; handles errors and error notifications
 
-import dict_merge
+from dict_merge import *
 
+
+#   --------------------------------
+#
+#   Error handler
+#
+#   --------------------------------
 
 class error_handler:
+
+    """
+    Error handler class; handles settings for error reporting
+
+    Attributes
+    ----------
+    settings : dict
+        settings["error_codes"] specifies whether errors should be silenced
+    error_code_definitions : dict
+        definitions for error names and descriptions
+    """
 
     settings = {
         "error_codes": {
@@ -55,6 +72,15 @@ class error_handler:
     #   --------------------------------
     def __init__(self, **kwargs):
 
+        """
+        Create an error handler.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Merged with settings.
+        """
+
         dict_merge(self.settings, kwargs)
 
     #   --------------------------------
@@ -63,6 +89,17 @@ class error_handler:
     #
     #   --------------------------------
     def raise_error(self, error_name, opcode):
+
+        """
+        Display an error.
+
+        Parameters
+        ----------
+        error_name : str
+            Error code name
+        opcode : str
+            Opcode that triggered the error.
+        """
 
         # process unrecognized opcode
         if(error_name not in self.settings["error_codes"]):

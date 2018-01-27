@@ -1,8 +1,6 @@
 # serial_vis.py
 # main class
 
-# todo: implement docstrings
-
 from buffer import *
 from default_vector_graphics import *
 from serial_device import *
@@ -11,14 +9,44 @@ from csv_log import *
 from dict_merge import *
 
 
-# main serial_vis class
+#   --------------------------------
+#
+#   Main Serial-Vis Class
+#
+#   --------------------------------
 class serial_vis:
 
-    #   --------------------------------
-    #
-    #   Attributes
-    #
-    #   --------------------------------
+    """
+    Main serial vis class; extend this class to use its API.
+
+    Attributes
+    ----------
+    user_settings : dict
+        Settings defined by the user. Empty; is overwritten by user extensions.
+    user_commands : dict
+        Commands defined by the user. Empty; is overwritten by user extensions.
+    graphics_class : class
+        Is set to default_vector_graphics by default; overwrite this in
+        extensions to add custom graphics commands.
+    is_live : bool
+        Track whether the current view is live
+    display_buffer_id : int
+        Current buffer being displayed, relative to the current view
+    settings : dict
+        Master settings
+
+    Created by __init__:
+    serial_device : serial_device object
+        Serial interface object.
+    serial_parser : serial_parser object
+        Serial command parser object.
+    csv_log : csv_log object
+        CSV log object
+    graphics_window : graphics_class
+        Vector graphics class to be used
+    buffer_db : buffer_db object
+        Frame buffer storage and tracking
+    """
 
     user_settings = {}
     user_commands = {}
@@ -37,6 +65,17 @@ class serial_vis:
     #
     #   --------------------------------
     def __init__(self, path, **kwargs):
+
+        """
+        Create a master serial_vis object
+
+        Parameters
+        ----------
+        path : str
+            Filepath to be passed on to serial_device
+        kwargs : dict
+            Merged with settings
+        """
 
         # update settings
         dict_merge(self.settings, self.user_settings)
@@ -62,6 +101,10 @@ class serial_vis:
     #
     #   --------------------------------
     def update(self):
+
+        """
+        Execute master program update.
+        """
 
         # process keyboard/mouse commands
         window_events = self.graphics_window.check_events()
@@ -122,6 +165,15 @@ class serial_vis:
     #   --------------------------------
     def process_events(self, events):
 
+        """
+        Process keyboard instructions.
+
+        Parameters
+        ----------
+        events : dict
+            Event list from keyboard
+        """
+
         # unpack events
         (events_hold, events_press) = events
 
@@ -153,6 +205,11 @@ class serial_vis:
     #
     #   --------------------------------
     def quit_sv(self):
+
+        """
+        Cleanly quit all sub-objects.
+        """
+
         # call clean close methods
         self.graphics_window.close_window()
         self.csv_log.close_file()
@@ -165,4 +222,9 @@ class serial_vis:
     #
     #   --------------------------------
     def process_user_events(self, events):
+
+        """
+        Placeholder class for user events
+        """
+
         pass

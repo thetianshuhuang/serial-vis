@@ -5,22 +5,28 @@ import struct
 from error_handler import *
 
 
-# serial parser class
+#   --------------------------------
+#
+#   Serial command parser
+#
+#   --------------------------------
 
-# methods:
-# __init__              - takes commands
-#                       - a dictionary containing command bindings
-# process_command       - fully processes a command
-#                       - from string into correctly typed array
-# parse_line            - separate string into arguments
-# process_args          - convert arguments into correct types
 class parser:
 
-    #   --------------------------------
-    #
-    #   Attributes
-    #
-    #   --------------------------------
+    """
+    Serial command parser class
+
+    Attributes
+    ----------
+    commands : dict
+        Format for registered commands
+    settings : dict
+        Settings for command parsing
+
+    Created by __init__:
+    error_handler : error_handler object
+        Centralized error handling
+    """
 
     # default command dictionary
     commands = {
@@ -70,6 +76,18 @@ class parser:
     #
     #   --------------------------------
     def __init__(self, commands, **kwargs):
+
+        """
+        Create a serial parser object
+
+        Parameters
+        ----------
+        commands : dict
+            User defined command formats; merged with commands.
+        kwargs : dict
+            Merged with settings
+        """
+
         self.commands.update(commands)
         self.settings.update(kwargs)
 
@@ -81,6 +99,21 @@ class parser:
     #
     #   --------------------------------
     def process_command(self, code_line):
+
+        """
+        Parse and process a line of code
+
+        Parameters
+        ----------
+        code_line : str
+            Raw instruction to be processed
+
+        Returns
+        -------
+        array
+            Processed instruction
+        """
+
         return self.process_args(self.parse_line(code_line))
 
     #   --------------------------------
@@ -89,6 +122,21 @@ class parser:
     #
     #   --------------------------------
     def parse_line(self, code_line):
+
+        """
+        Separate a line of code into its consituent arguments
+
+        Parameters
+        ----------
+        code_line : str
+            Raw line of code
+
+        Returns
+        -------
+        str[]
+            Array, where the first element is the opcode and each subsequent
+            element is an argument
+        """
 
         # intialize args as an empty array
         arguments = []
@@ -117,10 +165,24 @@ class parser:
 
     #   --------------------------------
     #
-    #   process arguments into an array
+    #   process arguments into an instruction
     #
     #   --------------------------------
     def process_args(self, raw_arguments):
+
+        """
+        Process separated arguments into the correct types
+
+        Parameters
+        ----------
+        raw_arguments : str[]
+            Arguments in a raw string form
+
+        Returns
+        -------
+        mixed array
+            Processed instruction
+        """
 
         arguments = []
         opcode = raw_arguments[0]
@@ -218,12 +280,28 @@ class parser:
     # If number_mode == "hex", run conversion routines in hexutil.py
 
     def to_int(self, string):
+
+        """
+        Convert to integer
+
+        Parameters
+        ----------
+        string : str
+            Input string to be converted
+
+        Returns
+        -------
+        int
+            Converted string
+        """
+
         if(self.settings["number_mode"] == "dec"):
             try:
                 return(int(string))
             except ValueError:
                 return(0)
             return(0)
+        # todo: add signed int support
         elif(self.settings["number_mode"] == "hex"):
             try:
                 return(int(string, 16))
@@ -232,6 +310,21 @@ class parser:
         return(0)
 
     def to_float(self, string):
+
+        """
+        Convert to float
+
+        Parameters
+        ----------
+        string : str
+            Input string to be converted
+
+        Returns
+        -------
+        float
+            Converted string
+        """
+
         if(self.settings["number_mode"] == "dec"):
             try:
                 return(float(string))

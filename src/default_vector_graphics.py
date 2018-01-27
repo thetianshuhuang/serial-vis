@@ -6,9 +6,21 @@ import math
 from vector_graphics_window import *
 
 
-# class adding default draw functions
+#   --------------------------------
+#
+#   Default vector graphics commands
+#
+#   --------------------------------
 
 class default_vector_graphics(vector_graphics_window):
+
+    """
+    Vector graphics class with default commands.
+
+    Attributes
+    ----------
+    All attributes inherited from vector_graphics_window
+    """
 
     #   --------------------------------
     #
@@ -16,6 +28,20 @@ class default_vector_graphics(vector_graphics_window):
     #
     #   --------------------------------
     def transform(self, coord):
+
+        """
+        Transform a coordinate based on the current scale and offset.
+
+        Parameters
+        ----------
+        coord : float[]
+            (x_coord, y_coord) to be transformed
+
+        Returns
+        -------
+        int[]
+            (x_coord, y_coord), both integers
+        """
         return(
             int(round(coord[0] * self.settings["scale"] +
                       self.settings["offset"][0], 0)),
@@ -27,6 +53,13 @@ class default_vector_graphics(vector_graphics_window):
     #   draw functions
     #
     #   --------------------------------
+
+    """
+    Draw functions are selected automatically by
+    update_screen in vector_graphics_window using their name, which must match
+    the name given in the command registry.
+    """
+
     def definecolor(self, instruction):
         if(len(instruction[2] >= 3)):
             self.settings["colors"].update({instruction[1]: instruction[2]})

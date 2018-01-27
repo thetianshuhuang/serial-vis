@@ -2,10 +2,16 @@
 # vector graphics base class
 
 import pygame
-import collections
 import time
 from error_handler import *
+from dict_merge import *
 
+
+#   --------------------------------
+#
+#   Vector graphics window
+#
+#   --------------------------------
 
 class vector_graphics_window:
 
@@ -22,6 +28,14 @@ class vector_graphics_window:
         previously registered events
     frame_times : float[]
         log of the past settings["fps_smooth_size"] frames.
+
+    Created by __init__:
+    screen : pygame.display
+        main pygame display
+    clock : pygame.clock
+        pygame timing class
+    error_handler : error_handler object
+        error handler class
     """
 
     settings = {
@@ -69,6 +83,7 @@ class vector_graphics_window:
         kwargs: dict
             passed on to settings
         """
+
         dict_merge(self.settings, kwargs)
 
         pygame.init()
@@ -261,31 +276,22 @@ class vector_graphics_window:
     #
     #   --------------------------------
     def get_color(self, colorname):
+
+        """
+        Safely get the color specified by colorname.
+
+        Parameters
+        ----------
+        colorname : str
+            Name of the desired color
+
+        Returns
+        -------
+        int[3]: (R,G,B)
+            Tuple specifing the color definition
+        """
+
         try:
             return(self.settings["colors"][colorname])
         except KeyError:
             return(self.settings["colors"]["black"])
-
-#   --------------------------------
-#
-#   dict_merge
-#
-#   --------------------------------
-
-#   written by https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
-def dict_merge(dct, merge_dct):
-    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead
-    of updating only top-level keys, dict_merge recurses down into dicts
-    nested to an arbitrary depth, updating keys. The ``merge_dct`` is
-    merged into ``dct``.
-    :param dct: dict onto which the merge is executed
-    :param merge_dct: dct merged into dct
-    :return: None
-    """
-    for k, v in merge_dct.iteritems():
-        if(k in dct and
-           isinstance(dct[k], dict) and
-           isinstance(merge_dct[k], collections.Mapping)):
-            dict_merge(dct[k], merge_dct[k])
-        else:
-            dct[k] = merge_dct[k]

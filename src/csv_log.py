@@ -4,24 +4,32 @@
 import time
 
 
-# csv logging class
-
-# methods:
-# __init__      - takes **kwargs with attributes
-#               - log_output_name, time_format
-# close_file    - cleanly close file
-# log_data      - log data in csv; auto-generates timestamp
-#               - input is in instruction format:
-#               - [opcode, [data]]
-#               - where opcode can be "log", "logstart", or "logend"
+#   --------------------------------
+#
+#   CSV logging class
+#
+#   --------------------------------
 
 class csv_log:
 
-    #   --------------------------------
-    #
-    #   Attributes
-    #
-    #   --------------------------------
+    """
+    CSV logging class
+
+    Attributes
+    ----------
+    settings : dict
+        CSV file settings. Documented in README.md.
+
+    Created by __init__:
+    logblock_in_progress : bool
+        Is a data block currently in progress?
+    logcache : mixed array
+        Cache of logged data in the current block (if it exists)
+    logcache_time : float
+        Start time of a log block
+    log_output_file : io file, write mode
+        CSV file
+    """
 
     settings = {
         "log_output_name": "serial_log.csv",
@@ -33,6 +41,15 @@ class csv_log:
     #
     #   --------------------------------
     def __init__(self, **kwargs):
+
+        """
+        Create CSV log file
+
+        Parameters
+        ----------
+        kwargs : dict
+            passed on to settings
+        """
 
         # update settings with kwargs
         self.settings.update(kwargs)
@@ -51,6 +68,11 @@ class csv_log:
     #
     #   --------------------------------
     def close_file(self):
+
+        """
+        Cleanly exit; close the log file
+        """
+
         self.log_output_file.close()
 
     #   --------------------------------
@@ -59,6 +81,15 @@ class csv_log:
     #
     #   --------------------------------
     def log_data(self, instruction):
+
+        """
+        Log one instruction line
+
+        Parameters
+        ----------
+        instruction : mixed array
+            instruction to be logged
+        """
 
         # logstart opcode: start a log block
         if(instruction[0] == "logstart"):
@@ -111,6 +142,15 @@ class csv_log:
     #
     #   --------------------------------
     def get_time(self):
+
+        """
+        Get the current epoch time, and format it accordingly
+
+        Returns
+        -------
+        str
+            Formatted time
+        """
 
         epoch_time = time.time()
 

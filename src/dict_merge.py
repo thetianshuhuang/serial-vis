@@ -1,3 +1,6 @@
+# dict_merge.py
+# function for merging two dictionaries recursively
+
 import collections
 
 
@@ -9,7 +12,8 @@ import collections
 
 #   written by https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
 def dict_merge(dct, merge_dct):
-    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead
+    """
+    Recursive dict merge. Inspired by :meth:``dict.update()``, instead
     of updating only top-level keys, dict_merge recurses down into dicts
     nested to an arbitrary depth, updating keys. The ``merge_dct`` is
     merged into ``dct``.

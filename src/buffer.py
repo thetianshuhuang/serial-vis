@@ -2,14 +2,24 @@
 # frame buffer storage class
 
 
-# structure containing buffer information
-
-# methods:
-# __init__              - create frame_buffer
-#                       - optional: id= sets the frame ID; -1 = unknown
-# add_instruction       - adds instruction to instruction list
+#   --------------------------------
+#
+#   Frame buffer
+#
+#   --------------------------------
 
 class frame_buffer:
+
+    """
+    Frame buffer storage class; create and maintain a single frame buffer
+
+    Attributes
+    ----------
+    frame_id : int
+        Frame ID of the stored frame. Is set to -1 if unknown.
+    instructions : instruction[]
+        Mixed arrays containing instructions in the buffer.
+    """
 
     #   --------------------------------
     #
@@ -17,6 +27,15 @@ class frame_buffer:
     #
     #   --------------------------------
     def __init__(self, **kwargs):
+
+        """
+        Create a frame_buffer instance
+
+        Parameters
+        ----------
+        kwargs: dict
+            frame_id=: set frame ID if known; otherwise defaults to -1
+        """
 
         # attributes
         self.frame_id = -1
@@ -32,17 +51,41 @@ class frame_buffer:
     #
     #   --------------------------------
     def add_instruction(self, instruction):
+
+        """
+        Add instruction to buffer instance
+
+        Parameters
+        ----------
+        instruction: mixed array
+            instruction to be added to the buffer.
+        """
+
         self.instructions += [instruction]
 
-# class containing a collection of frame buffers,
-# along with related methods
+
+#   --------------------------------
+#
+#   Buffer database
+#
+#   --------------------------------
+
 class buffer_db:
 
-    #   --------------------------------
-    #
-    #   Attributes
-    #
-    #   --------------------------------
+    """
+    Buffer database; frame buffer tracking and storage class
+
+    Attributes
+    ----------
+    settings : dict
+        Frame buffer settings
+    input_buffer : int
+        ID of the next buffer to be created
+    view_buffer : int
+        ID of the buffer that the current view is centered on
+    frame_buffers : dict
+        Frames currently being tracked, keyed by their frame ID
+    """
 
     settings = {"max_size_forward": 100,
                 "max_size_backward": 100}
@@ -58,6 +101,15 @@ class buffer_db:
     #   --------------------------------
     def __init__(self, **kwargs):
 
+        """
+        Initialize frame buffer database
+
+        Parameters
+        ----------
+        kwargs : dict
+            passed on to settings
+        """
+
         # update settings
         self.settings.update(kwargs)
 
@@ -66,9 +118,21 @@ class buffer_db:
     #   Register new buffer
     #
     #   --------------------------------
-
-    #   Adds a new frame_buffer object to the frame_buffers.
     def new_buffer(self, frame_buffer):
+
+        """
+        Register a new buffer to the database, and delete old ones.
+
+        Parameters
+        ----------
+        frame_buffer : instance of frame_buffer class
+            frame_buffer to be added to the database
+
+        Returns
+        -------
+        int
+            ID of the registered buffer
+        """
 
         # add new item if the current forward limit hasn't been exceeded
         # use the buffer ID as a key
@@ -97,10 +161,23 @@ class buffer_db:
     #   Get buffer at ID
     #
     #   --------------------------------
-
-    #   takes in a buffer ID (optional: relative=True)
-    #   returns ("id": absolute ID, "ops": frame_buffer)
     def get_buffer(self, index, **kwargs):
+
+        """
+        Get buffer at the input ID in relative or absolute mode
+
+        Parameters
+        ----------
+        index : int
+            frame ID in either relative or absolute mode
+        kwargs : dict
+            relative=True if relative
+
+        Returns
+        -------
+        frame_buffer
+            Frame buffer class; is empty if the requested buffer does not exist
+        """
 
         # build buffer index
         get_id = index
@@ -124,14 +201,21 @@ class buffer_db:
     #   Set current view
     #
     #   --------------------------------
-
-    #   sets the current view ID
-    #   kwargs: absolute= set buffer absolutely
-    #           relative= set buffer relative to input_buffer
     def set_current_view(self, **kwargs):
 
+        """
+        Set the current view ID (not necessarily the display ID).
+
+        Parameters
+        ----------
+        kwargs : dict
+            Options - absolute= to set view ID to that value
+                      relative= to set view ID to that value relative to input
+            Leave kwargs blank to set view_buffer to input_buffer - 1
+        """
+
         if "absolute" in kwargs:
-            self.view_buffer = kwargs["absolue"]
+            self.view_buffer = kwargs["absolute"]
         elif "relative" in kwargs:
             self.view_buffer = kwargs["relative"] + self.input_buffer
         else:
@@ -142,9 +226,16 @@ class buffer_db:
     #   Get current ID
     #
     #   --------------------------------
-
-    #   Returns (current displayed buffer, current input buffer)
     def get_buffer_info(self):
+
+        """
+        Get the current view buffer ID and input buffer ID.
+
+        Returns
+        -------
+        int[]
+            (view_buffer, input_buffer - 1)
+        """
 
         # self.input_buffer is the next key to be created
         # not the most recently created key
