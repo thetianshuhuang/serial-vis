@@ -1,0 +1,3 @@
+- fix coordinate system
+- set window name option
+- signed integer support (16, 32 bit sizes as well)

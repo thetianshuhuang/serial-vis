@@ -26,10 +26,11 @@ Commands should be written to the serial interface, and are read by the script.
 
 ### Control Commands:
 - draw: execute current draw buffer
-- log: log the following string. A label and value should be provided. A timestamp (epoch time) will be automatically inserted.
+- logs: log the following string. A label and value should be provided. A timestamp (epoch time) will be automatically inserted.
 ```
-log:label:datastring
+logs:label:datastring
 ```
+- logf: log the following float. Behaves exactly like logs, except a 32 or 64 bit hex IEEE float can be taken as input.
 - logstart, logend: start a block where data with the same label will be combined into one row. For example,
 ```
 logstart
@@ -140,6 +141,17 @@ textp:%s:%d,%d:%d:%s
 "number_mode": "hex"                    # numerical format for serial communication. "hex" or "dec".
 ```
 
+### Error handler:
+```
+"error_codes": {                        # True if the error should be displayed; False if silenced.
+    "tma": True,
+    "nea": True,
+    "uro": True,
+    "tts": True,
+    "unk": True
+}
+```
+
 ## API
 
 ### User Commands:
@@ -190,6 +202,7 @@ class my_serial_vis(serial_vis):
 - graphics_class: Graphics methods to be used.
 - is_live: Pause or play mode
 - display_buffer_id: Current frame being displayed
+- quit_sv: cleanly quit serial_vis and all dependencies
 
 #### serial_vis.serial_device:
 - str get_line(): read a line from the serial output. Returns the line without the newline character.
