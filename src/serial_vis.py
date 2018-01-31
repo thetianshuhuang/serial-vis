@@ -77,13 +77,15 @@ class serial_vis:
         self.settings.update(self.user_settings)
         self.settings.update(kwargs)
 
-        # create serial device, serial parser, log, frame buffer db,
-        # and graphics window
+        # create serial device, serial parser, log, frame buffer db
         self.serial_device = serial_device(self.settings)
         self.serial_parser = parser(self.user_commands, self.settings)
         self.csv_log = csv_log(self.settings)
-        self.graphics_window = self.graphics_class(self.settings)
-        self.buffer_db = buffer_db(self.settings)
+
+        # create graphics window
+        if(self.settings.enable_graphics):
+            self.graphics_window = self.graphics_class(self.settings)
+            self.buffer_db = buffer_db(self.settings)
 
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
@@ -102,10 +104,11 @@ class serial_vis:
         Execute master program update.
         """
 
-        # process keyboard/mouse commands
-        window_events = self.graphics_window.check_events()
-        self.process_events(window_events)
-        self.process_user_events(window_events)
+        if(self.enable_graphics):
+            # process keyboard/mouse commands
+            window_events = self.graphics_window.check_events()
+            self.process_events(window_events)
+            self.process_user_events(window_events)
 
         # get line
         line = self.serial_device.get_line()
@@ -122,7 +125,7 @@ class serial_vis:
         self.graphics_window.update_fps(instruction)
 
         # check for control instructions:
-        if(instruction[0]) == "draw":
+        if(instruction[0] == "draw" and self.settings.enable_graphics):
 
             # live => create new buffer
             # set the current view
@@ -153,10 +156,11 @@ class serial_vis:
         else:
             self.current_buffer.add_instruction(instruction)
 
-        # update buffer
-        self.graphics_window.update_screen(
-            self.buffer_db.get_buffer(
-                self.display_buffer_id, relative=True))
+        if(self.settings.enable_graphics):
+            # update buffer
+            self.graphics_window.update_screen(
+                self.buffer_db.get_buffer(
+                    self.display_buffer_id, relative=True))
 
     #   --------------------------------
     #
@@ -211,7 +215,8 @@ class serial_vis:
         """
 
         # call clean close methods
-        self.graphics_window.close_window()
+        if(self.settings.enable_graphics):
+            self.graphics_window.close_window()
         self.csv_log.close_file()
         self.serial_device.close()
         exit()

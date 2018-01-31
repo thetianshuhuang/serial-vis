@@ -22,6 +22,7 @@ class sv_settings:
 
     # main
     quit_on_disconnect = True
+    enable_graphics = True
 
     # serial_device
     path = ""

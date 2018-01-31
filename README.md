@@ -92,6 +92,12 @@ textp:%s:%d,%d:%d:%s
 
 ## Default Settings
 
+### Main:
+```
+"quit_on_disconnect": True,             # quit program when serial device disconnects
+"enable_graphics": True                 # enable graphics output; disable for logging-only applications
+```
+
 ### Serial:
 ```
 "baudrate": 115200,                     
