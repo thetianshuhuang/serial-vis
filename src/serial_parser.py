@@ -20,8 +20,6 @@ class parser:
     ----------
     commands : dict
         Format for registered commands
-    settings : dict
-        Settings for command parsing
 
     Created by __init__:
     error_handler : error_handler object
@@ -67,17 +65,12 @@ class parser:
         "textp": ["s", "dd", "d", "s"],
     }
 
-    # settings
-    settings = {
-        "number_mode": "hex"
-    }
-
     #   --------------------------------
     #
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, commands, **kwargs):
+    def __init__(self, commands, settings):
 
         """
         Create a serial parser object
@@ -86,14 +79,14 @@ class parser:
         ----------
         commands : dict
             User defined command formats; merged with commands.
-        kwargs : dict
-            Merged with settings
+        settings : sv_settings object
+            Object containing program settings
         """
 
         self.commands.update(commands)
-        self.settings.update(kwargs)
+        self.settings = settings
 
-        self.error_handler = error_handler(**kwargs)
+        self.error_handler = error_handler(settings)
 
     #   --------------------------------
     #
@@ -300,14 +293,13 @@ class parser:
             Converted string
         """
 
-        if(self.settings["number_mode"] == "dec"):
+        if(self.settings.number_mode == "dec"):
             try:
                 return(int(string))
             except ValueError:
                 return(0)
             return(0)
-        # todo: add signed int support
-        elif(self.settings["number_mode"] == "hex"):
+        elif(self.settings.number_mode == "hex"):
             try:
                 return(int(string, 16))
             except ValueError:
@@ -330,13 +322,13 @@ class parser:
             Converted string
         """
 
-        if(self.settings["number_mode"] == "dec"):
+        if(self.settings.number_mode == "dec"):
             try:
                 return(float(string))
             except ValueError:
                 return(0.0)
             return(0.0)
-        elif(self.settings["number_mode"] == "hex"):
+        elif(self.settings.number_mode == "hex"):
             try:
                 if(len(string) == 8):
                     return(struct.unpack('!f', string.decode("hex"))[0])

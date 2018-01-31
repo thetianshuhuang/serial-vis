@@ -7,6 +7,7 @@ from serial_device import *
 from serial_parser import *
 from csv_log import *
 from dict_merge import *
+from sv_settings import *
 
 
 #   --------------------------------
@@ -32,8 +33,6 @@ class serial_vis:
         Track whether the current view is live
     display_buffer_id : int
         Current buffer being displayed, relative to the current view
-    settings : dict
-        Master settings
 
     Created by __init__:
     serial_device : serial_device object
@@ -55,16 +54,12 @@ class serial_vis:
     is_live = True
     display_buffer_id = 0
 
-    settings = {
-        "quit_on_disconnect": True
-    }
-
     #   --------------------------------
     #
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, path, **kwargs):
+    def __init__(self, **kwargs):
 
         """
         Create a master serial_vis object
@@ -74,20 +69,21 @@ class serial_vis:
         path : str
             Filepath to be passed on to serial_device
         kwargs : dict
-            Merged with settings
+            Sent to settings object
         """
 
         # update settings
-        dict_merge(self.settings, self.user_settings)
-        dict_merge(self.settings, kwargs)
+        self.settings = sv_settings()
+        self.settings.update(self.user_settings)
+        self.settings.update(kwargs)
 
         # create serial device, serial parser, log, frame buffer db,
         # and graphics window
-        self.serial_device = serial_device(path, **self.settings)
-        self.serial_parser = parser(self.user_commands, **self.settings)
-        self.csv_log = csv_log(**self.settings)
-        self.graphics_window = self.graphics_class(**self.settings)
-        self.buffer_db = buffer_db(**self.settings)
+        self.serial_device = serial_device(self.settings)
+        self.serial_parser = parser(self.user_commands, self.settings)
+        self.csv_log = csv_log(self.settings)
+        self.graphics_window = self.graphics_class(self.settings)
+        self.buffer_db = buffer_db(self.settings)
 
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
@@ -116,7 +112,7 @@ class serial_vis:
 
         # check for device disconnect
         if(not line[1]):
-            if(self.settings["quit_on_disconnect"]):
+            if(self.settings.quit_on_disconnect):
                 self.quit_sv()
 
         # parse instruction

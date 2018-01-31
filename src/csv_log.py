@@ -17,8 +17,6 @@ class csv_log:
 
     Attributes
     ----------
-    settings : dict
-        CSV file settings. Documented in README.md.
 
     Created by __init__:
     logblock_in_progress : bool
@@ -31,28 +29,24 @@ class csv_log:
         CSV file
     """
 
-    settings = {
-        "log_output_name": "serial_log.csv",
-        "time_format": "epoch"}
-
     #   --------------------------------
     #
     #   initialization
     #
     #   --------------------------------
-    def __init__(self, **kwargs):
+    def __init__(self, settings):
 
         """
         Create CSV log file
 
         Parameters
         ----------
-        kwargs : dict
-            passed on to settings
+        settings : sv_settings object
+            Object containing program settings
         """
 
-        # update settings with kwargs
-        self.settings.update(kwargs)
+        # get settings
+        self.settings = settings
 
         # set cache
         self.logblock_in_progress = False
@@ -60,7 +54,7 @@ class csv_log:
         self.logcache_time = 0
 
         # open output file
-        self.log_output_file = open(self.settings["log_output_name"], 'w')
+        self.log_output_file = open(self.settings.log_output_name, 'w')
 
     #   --------------------------------
     #
@@ -154,7 +148,5 @@ class csv_log:
 
         epoch_time = time.time()
 
-        if(self.settings["time_format"] == "epoch"):
+        if(self.settings.time_format == "epoch"):
             return(str(epoch_time))
-
-        # todo: other time formats

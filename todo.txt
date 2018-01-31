@@ -1,3 +1,5 @@
-- fix coordinate system
-- set window name option
-- signed integer support (16, 32 bit sizes as well)
+- add support for direct byte sending
+- add support for other formats in get_time
+- fix events
+- update readme to reflect changes in settings
+- split readme into wiki

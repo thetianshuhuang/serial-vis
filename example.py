@@ -28,7 +28,7 @@ class my_serial_vis(serial_vis.serial_vis):
 
 # create object
 # **kwargs can also be used to update settings
-my_serial_device = my_serial_vis("/dev/ttyACM1", baudrate=115200)
+my_serial_device = my_serial_vis(path="/dev/ttyACM0", baudrate=115200)
 
 # that's it!
 while(1):

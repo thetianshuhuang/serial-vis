@@ -45,13 +45,13 @@ class default_vector_graphics(vector_graphics_window):
         return(
             int(
                 round(
-                    coord[0] * self.settings["scale"] +
-                    self.settings["offset"][0], 0)),
-            self.settings["window_size"][1] -
+                    coord[0] * self.settings.scale +
+                    self.settings.offset[0], 0)),
+            self.settings.window_size[1] -
             int(
                 round(
-                    coord[1] * self.settings["scale"] +
-                    self.settings["offset"][1], 0)))
+                    coord[1] * self.settings.scale +
+                    self.settings.offset[1], 0)))
 
     #   --------------------------------
     #
@@ -67,15 +67,15 @@ class default_vector_graphics(vector_graphics_window):
 
     def definecolor(self, instruction):
         if(len(instruction[2] >= 3)):
-            self.settings["colors"].update({instruction[1]: instruction[2]})
+            self.settings.colors.update({instruction[1]: instruction[2]})
         else:
             self.error_handler.raise_error("tts", instruction[0])
 
     def setscale(self, instruction):
-        self.settings["scale"] = instruction[1]
+        self.settings.scale = instruction[1]
 
     def setoffset(self, instruction):
-        self.settings["offset"] = instruction[1]
+        self.settings.offset = instruction[1]
 
     def drawline(self, instruction):
         pygame.draw.line(
@@ -83,7 +83,7 @@ class default_vector_graphics(vector_graphics_window):
             self.get_color(instruction[3]),
             self.transform(instruction[1]),
             self.transform(instruction[2]),
-            self.settings["line_width"])
+            self.settings.line_width)
 
     def drawlinep(self, instruction):
         pygame.draw.line(
@@ -91,20 +91,20 @@ class default_vector_graphics(vector_graphics_window):
             self.get_color(instruction[3]),
             instruction[1],
             instruction[2],
-            self.settings["line_width"])
+            self.settings.line_width)
 
     def drawcircle(self, instruction):
         # width greater than radius protection
-        radius = int(round(instruction[2] * self.settings["scale"]))
-        if(radius < self.settings["line_width"]):
-            radius = self.settings["line_width"] + 1
+        radius = int(round(instruction[2] * self.settings.scale))
+        if(radius < self.settings.line_width):
+            radius = self.settings.line_width + 1
 
         pygame.draw.circle(
             self.screen,
             self.get_color(instruction[3]),
             self.transform(instruction[1]),
             radius,
-            self.settings["line_width"])
+            self.settings.line_width)
 
     def drawray(self, instruction):
         pygame.draw.line(
@@ -113,11 +113,11 @@ class default_vector_graphics(vector_graphics_window):
             self.transform(instruction[1]),
             self.transform((instruction[1][0] + math.cos(instruction[2]),
                            instruction[1][1] + math.sin(instruction[2]))),
-            self.settings["line_width"])
+            self.settings.line_width)
 
     def text(self, instruction):
         # create font
-        textfont = pygame.font.SysFont(self.settings["font"], instruction[3])
+        textfont = pygame.font.SysFont(self.settings.font, instruction[3])
         # create surface
         textframe = textfont.render(
             instruction[1], False, self.colors[instruction[4]])

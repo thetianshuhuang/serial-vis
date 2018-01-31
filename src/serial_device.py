@@ -17,32 +17,20 @@ class serial_device:
     """
     Serial Device class; governs serial interactions
 
-    Attributes:
-    settings : dict
-        settings for serial communication.
+    Attributes
+    ----------
 
     Created by __init__:
     device : serial.Serial object
         Serial device object
     """
 
-    settings = {
-        "path": "",
-        "baudrate": 115200,
-        "seek_timeout": 60,
-        "rx_timeout": 0.1,
-        "tx_timeout": 0.1,
-        "encoding": "ascii",
-        "verify": 2,
-        "confirmation": True,
-    }
-
     #   --------------------------------
     #
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, path, **kwargs):
+    def __init__(self, settings):
 
         """
         Initialize serial device.
@@ -51,17 +39,15 @@ class serial_device:
         ----------
         path : str
             filepath of the desired serial device
-        kwargs : dict
-            merged with settings
+        settings : sv_settings object
+            Object containing program settings
         """
 
         # update settings
-        # path is forcibly updated separately
-        self.settings.update(kwargs)
-        self.settings.update({"path": path})
+        self.settings = settings
 
         # set up error handling
-        self.error_handler = error_handler(**kwargs)
+        self.error_handler = error_handler(settings)
 
         counter = 0
         timeout = False
@@ -70,11 +56,11 @@ class serial_device:
 
             try:
                 self.device = serial.Serial(
-                    path,
-                    self.settings["baudrate"],
-                    timeout=self.settings["rx_timeout"],
-                    writeTimeout=self.settings["tx_timeout"])
-                print("Device connected: " + path + "\n\n")
+                    self.settings.path,
+                    self.settings.baudrate,
+                    timeout=self.settings.rx_timeout,
+                    writeTimeout=self.settings.tx_timeout)
+                print("Device connected: " + self.settings.path + "\n\n")
 
                 # read one line to avoid passing incomplete lines
                 self.discard_line()
@@ -85,7 +71,7 @@ class serial_device:
                 # limit the error message to once every 2.5 seconds.
                 if(counter % 10 == 0):
                     print("Serial device " +
-                          path +
+                          self.settings.path +
                           " not found. Trying again.")
 
             # wait 250ms before trying again to avoid spamming the system
@@ -93,7 +79,7 @@ class serial_device:
             counter += 1
 
             # trigger timeout. Default is 60 seconds (300 attempts).
-            if(counter >= self.settings["seek_timeout"] * 4):
+            if(counter >= self.settings.seek_timeout * 4):
                 timeout = True
                 print("Operation timed out.")
 
@@ -124,18 +110,18 @@ class serial_device:
                 return(["", False])
 
         # verify checksum:
-        if(self.settings["verify"] > 0):
+        if(self.settings.verify > 0):
 
             (checksum_sent, raw_line[0]) = self.strip_checksum(
-                raw_line[0], self.settings["verify"])
+                raw_line[0], self.settings.verify)
 
             checksum_recieved = self.checksum(
-                raw_line[0], self.settings["verify"])
+                raw_line[0], self.settings.verify)
 
             # correct checksum -> proceed
             if(checksum_recieved == checksum_sent):
                 # provide confirmation if selected
-                if(self.settings["confirmation"]):
+                if(self.settings.confirmation):
                         self.write(b"\xFF")
 
                 return(raw_line)
@@ -150,7 +136,7 @@ class serial_device:
                     " recieved=" + hex(checksum_recieved))
 
                 # provide confirmation if selected
-                if(self.settings["confirmation"]):
+                if(self.settings.confirmation):
                     self.write(b"\xFF")
 
                 # return null instruction
@@ -270,7 +256,7 @@ class serial_device:
         """
 
         try:
-            self.device.write(line.encode(self.settings["encoding"]))
+            self.device.write(line.encode(self.settings.encoding))
         # line isn't ascii, then send the bits directly
         except UnicodeDecodeError:
             try:
@@ -278,4 +264,4 @@ class serial_device:
             # read buffer is full
             except serial.serialutil.SerialTimeoutException:
                 self.error_handler.raise_error(
-                    "wto", [], self.settings["path"])
+                    "wto", [], self.settings.path)

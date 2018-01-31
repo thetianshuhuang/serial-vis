@@ -1,8 +1,6 @@
 # error_handler.py
 # error handling class; handles errors and error notifications
 
-from dict_merge import *
-
 
 #   --------------------------------
 #
@@ -17,23 +15,9 @@ class error_handler:
 
     Attributes
     ----------
-    settings : dict
-        settings["error_codes"] specifies whether errors should be silenced
     error_code_definitions : dict
         definitions for error names and descriptions
     """
-
-    settings = {
-        "error_codes": {
-            "chk": True,
-            "tma": True,
-            "nea": True,
-            "uro": True,
-            "tts": True,
-            "unk": True,
-            "wto": True
-        }
-    }
 
     error_code_definitions = {
         "chk": (
@@ -81,18 +65,18 @@ class error_handler:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, **kwargs):
+    def __init__(self, settings):
 
         """
         Create an error handler.
 
         Parameters
         ----------
-        kwargs : dict
-            Merged with settings.
+        settings : sv_settings object
+            Object containing program settings
         """
 
-        dict_merge(self.settings, kwargs)
+        self.settings = settings
 
     #   --------------------------------
     #
@@ -113,11 +97,11 @@ class error_handler:
         """
 
         # process unrecognized opcode
-        if(error_name not in self.settings["error_codes"]):
+        if(error_name not in self.settings.error_codes):
             error_name = "unk"
 
         # check if the error is silenced
-        if(self.settings["error_codes"][error_name]):
+        if(self.settings.error_codes[error_name]):
             # print primary message
             print(self.error_code_definitions[error_name][0])
 

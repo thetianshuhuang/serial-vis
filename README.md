@@ -97,9 +97,10 @@ textp:%s:%d,%d:%d:%s
 "baudrate": 115200,                     
 "seek_timeout": 60,                     # time in seconds before serial detection gives up
 "rx_timeout": 0.1                       # time in seconds before serial readline times out 
-"tx-timeout": 0.1                       # time in seconds before serial write times out    
+"tx_timeout": 0.1                       # time in seconds before serial write times out    
 "encoding": "ascii",                    # serial communication protocol; "ascii" or "utf-8"
-"verify": 2                             # checksum size, in bytes (verify=0 if no checksum)
+"verify": 2,                            # checksum size, in bytes (verify=0 if no checksum)
+"confirmation": True                    # send confirmation
 ```
 
 ### Graphics window:
@@ -156,7 +157,7 @@ textp:%s:%d,%d:%d:%s
 }
 ```
 
-## API
+## API: Python
 
 ### User Commands:
 First, create a graphics class containing the commands:

@@ -20,14 +20,12 @@ class vector_graphics_window:
 
     Attributes
     ----------
-    settings : dict
-        Contains window settings. Documented in README.md
     current_buffer_id : int
         current buffer being displayed. -1 = error.
     events_previous : str[]
         previously registered events
     frame_times : float[]
-        log of the past settings["fps_smooth_size"] frames.
+        log of the past settings.fps_smooth_size frames.
 
     Created by __init__:
     screen : pygame.display
@@ -38,32 +36,6 @@ class vector_graphics_window:
         error handler class
     """
 
-    settings = {
-        "window_size": (800, 600),
-        "scale": 1.000,
-        "offset": (0, 0),
-        "frame_limit": 60,
-        "line_width": 2,
-        "font": "arial",
-        "show_frame_id": True,
-        "show_fps": True,
-        "fps_count_keyword": "draw",
-        "fps_smooth_size": 30,
-        "events": {
-            pygame.QUIT: "quit",
-            pygame.K_SPACE: "pause",
-            pygame.K_PERIOD: "fwd",
-            pygame.K_LEFTBRACKET: "fwdplus",
-            pygame.K_COMMA: "back",
-            pygame.K_RIGHTBRACKET: "backplus"
-        },
-        "colors": {
-            "black": (0, 0, 0),
-            "white": (255, 255, 255),
-            "background": (255, 255, 255)
-        },
-    }
-
     current_buffer_id = -1
     events_previous = {}
     frame_times = []
@@ -73,29 +45,30 @@ class vector_graphics_window:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, **kwargs):
+    def __init__(self, settings):
 
         """
         Create a pygame graphics window.
 
         Parameters
         ----------
-        kwargs: dict
-            passed on to settings
+        settings: sv_settings object
+            object containing settings to be used
         """
 
-        dict_merge(self.settings, kwargs)
+        self.settings = settings
 
         pygame.init()
         pygame.font.init()
-        self.screen = pygame.display.set_mode(self.settings["window_size"])
+        self.screen = pygame.display.set_mode(self.settings.window_size)
+        pygame.display.set_caption(self.settings.path)
         self.clock = pygame.time.Clock()
 
         # set up previous event states
-        for key in self.settings["events"]:
+        for key in self.settings.events:
             self.events_previous.update({key: False})
 
-        self.error_handler = error_handler(**kwargs)
+        self.error_handler = error_handler(settings)
 
     #   --------------------------------
     #
@@ -127,7 +100,7 @@ class vector_graphics_window:
             self.current_buffer_id = frame_buffer.frame_id
 
             # clear pygame buffer
-            self.screen.fill(self.settings["colors"]["background"])
+            self.screen.fill(self.settings.colors["background"])
 
             for instruction in frame_buffer.instructions:
 
@@ -142,16 +115,16 @@ class vector_graphics_window:
                         "onf", instruction, instruction[0])
 
             # show frame id and fps
-            if(self.settings["show_frame_id"]):
+            if(self.settings.show_frame_id):
                 self.show_frame_id()
-            if(self.settings["show_fps"]):
+            if(self.settings.show_fps):
                 self.show_fps()
 
             # display pygame buffer
             pygame.display.flip()
 
             # limit the fps
-            self.clock.tick(self.settings["frame_limit"])
+            self.clock.tick(self.settings.frame_limit)
 
             return(True)
 
@@ -169,13 +142,13 @@ class vector_graphics_window:
         # TODO: fix events
         current_events_hold = []
         current_events_press = []
-        for event_key in self.settings["events"]:
+        for event_key in self.settings.events:
             if event_key in pygame.event.get():
                 # key pressed -> is being held
-                current_events_hold += self.settings["events"][event_key]
+                current_events_hold += self.settings.events[event_key]
                 # previously key is not pressed -> begin keypresspas
                 if(not self.events_previous[event_key]):
-                    current_events_press += self.settings["events"][event_key]
+                    current_events_press += self.settings.events[event_key]
                 # set previous state
                 self.events_previous[event_key] = True
             else:
@@ -209,11 +182,11 @@ class vector_graphics_window:
         Display the frame ID at the top left.
         """
 
-        textfont = pygame.font.SysFont(self.settings["font"], 12)
+        textfont = pygame.font.SysFont(self.settings.font, 12)
         textframe = textfont.render(
             "ID=" + str(self.current_buffer_id),
             False,
-            self.settings["colors"]["black"])
+            self.settings.colors["black"])
         self.screen.blit(textframe, (10, 10))
 
     def show_fps(self):
@@ -222,12 +195,12 @@ class vector_graphics_window:
         Display the current fps at the bottom left.
         """
 
-        textfont = pygame.font.SysFont(self.settings["font"], 12)
+        textfont = pygame.font.SysFont(self.settings.font, 12)
         textframe = textfont.render(
             "fps=" + str(round(self.compute_fps(), 2)),
             False,
-            self.settings["colors"]["black"])
-        self.screen.blit(textframe, (10, self.settings["window_size"][1] - 22))
+            self.settings.colors["black"])
+        self.screen.blit(textframe, (10, self.settings.window_size[1] - 22))
 
     #   --------------------------------
     #
@@ -245,9 +218,9 @@ class vector_graphics_window:
             instruction to be checked
         """
 
-        if(instruction[0] == self.settings["fps_count_keyword"]):
+        if(instruction[0] == self.settings.fps_count_keyword):
             self.frame_times.append(time.time())
-            if(len(self.frame_times) > self.settings["fps_smooth_size"]):
+            if(len(self.frame_times) > self.settings.fps_smooth_size):
                 del self.frame_times[0]
 
     #   --------------------------------
@@ -264,7 +237,7 @@ class vector_graphics_window:
         Returns
         -------
         float
-            fps, smoothed over settings["frame_smooth_size"] frames
+            fps, smoothed over settings.frame_smooth_size frames
         """
         if(self.frame_times[-1] == self.frame_times[0]):
             return(0)
@@ -294,6 +267,6 @@ class vector_graphics_window:
         """
 
         try:
-            return(self.settings["colors"][colorname])
+            return(self.settings.colors[colorname])
         except KeyError:
-            return(self.settings["colors"]["black"])
+            return(self.settings.colors["black"])

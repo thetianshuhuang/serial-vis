@@ -77,8 +77,6 @@ class buffer_db:
 
     Attributes
     ----------
-    settings : dict
-        Frame buffer settings
     input_buffer : int
         ID of the next buffer to be created
     view_buffer : int
@@ -86,9 +84,6 @@ class buffer_db:
     frame_buffers : dict
         Frames currently being tracked, keyed by their frame ID
     """
-
-    settings = {"max_size_forward": 100,
-                "max_size_backward": 100}
 
     input_buffer = 0
     view_buffer = 0
@@ -99,19 +94,18 @@ class buffer_db:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, **kwargs):
+    def __init__(self, settings):
 
         """
         Initialize frame buffer database
 
         Parameters
         ----------
-        kwargs : dict
-            passed on to settings
+        settings : sv_settings object
+            object containing program settings
         """
 
-        # update settings
-        self.settings.update(kwargs)
+        self.settings = settings
 
     #   --------------------------------
     #
@@ -137,7 +131,7 @@ class buffer_db:
         # add new item if the current forward limit hasn't been exceeded
         # use the buffer ID as a key
         if(self.input_buffer <
-           self.view_buffer + self.settings["max_size_forward"]):
+           self.view_buffer + self.settings.max_size_forward):
             # assign a frame id if not already assigned.
             if(frame_buffer.frame_id == -1):
                 frame_buffer.frame_id = self.input_buffer
@@ -147,7 +141,7 @@ class buffer_db:
 
         # scan for old frame buffers and delete them
         for element in self.frame_buffers.keys():
-            if(element < self.view_buffer - self.settings["max_size_forward"]):
+            if(element < self.view_buffer - self.settings.max_size_forward):
                 del self.frame_buffers[element]
 
         # increment the current input buffer ID
@@ -185,10 +179,10 @@ class buffer_db:
             get_id += self.view_buffer
 
         # check for index out of bounds
-        if(get_id > self.view_buffer + self.settings["max_size_forward"]):
-            index = self.settings["max_size_forward"]
-        elif(get_id < self.view_buffer - self.settings["max_size_backward"]):
-            index = -self.settings["max_size_backward"]
+        if(get_id > self.view_buffer + self.settings.max_size_forward):
+            index = self.settings.max_size_forward
+        elif(get_id < self.view_buffer - self.settings.max_size_backward):
+            index = -self.settings.max_size_backward
 
         # fetch the actual buffer
         if(self.input_buffer == 0):
