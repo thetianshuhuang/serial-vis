@@ -1,8 +1,8 @@
 # serial_parser.py
 # serial command interpretation class
 
-import struct
 from error_handler import *
+from hexutil import *
 
 
 #   --------------------------------
@@ -210,14 +210,19 @@ class parser:
 
             # single argument type
             if(argument_type == "d"):
-                arguments.append(self.to_int(raw_arguments[n]))
+                arguments.append(
+                    to_int(raw_arguments[n], self.settings.number_mode))
             elif(argument_type == "s"):
                 arguments.append(raw_arguments[n])
             elif(argument_type == "f"):
-                arguments.append(self.to_float(raw_arguments[n]))
+                arguments.append(
+                    to_float(raw_arguments[n], self.settings.number_mode))
             elif(argument_type == "l"):
                 arguments.append(
-                    self.to_long(raw_arguments[n], raw_arguments[n + 1]))
+                    to_long(
+                        raw_arguments[n],
+                        raw_arguments[n + 1],
+                        self.settings.number_mode))
 
             # array argument type
             elif(len(argument_type) == 2):
@@ -241,11 +246,13 @@ class parser:
                 argument_array = []
                 for element in argument_array_raw:
                     if(argument_type == "dd"):
-                        argument_array.append(self.to_int(element))
+                        argument_array.append(
+                            to_int(element), self.settings.number_mode)
                     elif(argument_type == "ss"):
                         argument_array.append(element)
                     elif(argument_type == "ff"):
-                        argument_array.append(self.to_float(element))
+                        argument_array.append(
+                            to_float(element), self.settings.number_mode)
                     elif(argument_type == "ll"):
                         pass
                         # unimplemented
@@ -267,78 +274,3 @@ class parser:
             n += 1
 
         return(arguments)
-
-    #   --------------------------------
-    #
-    #   argument conversion routines
-    #
-    #   --------------------------------
-
-    # If number_mode == "dec", run normal python routines.
-    # If number_mode == "hex", run conversion routines in hexutil.py
-
-    def to_int(self, string):
-
-        """
-        Convert to integer
-
-        Parameters
-        ----------
-        string : str
-            Input string to be converted
-
-        Returns
-        -------
-        int
-            Converted string
-        """
-
-        if(self.settings.number_mode == "dec"):
-            try:
-                return(int(string))
-            except ValueError:
-                return(0)
-            return(0)
-        elif(self.settings.number_mode == "hex"):
-            try:
-                return(int(string, 16))
-            except ValueError:
-                return(0)
-        return(0)
-
-    def to_float(self, string):
-
-        """
-        Convert to float
-
-        Parameters
-        ----------
-        string : str
-            Input string to be converted
-
-        Returns
-        -------
-        float
-            Converted string
-        """
-
-        if(self.settings.number_mode == "dec"):
-            try:
-                return(float(string))
-            except ValueError:
-                return(0.0)
-            return(0.0)
-        elif(self.settings.number_mode == "hex"):
-            try:
-                if(len(string) == 8):
-                    return(struct.unpack('!f', string.decode("hex"))[0])
-                elif(len(string) == 16):
-                    return(struct.unpack('!d', string.decode("hex"))[0])
-            except TypeError:
-                return(0.0)
-        return(0)
-
-    # deprecated conversion for embedded systems that do not support long
-    # no longer used since hex conversion is now supported.
-    def to_long(self, big_string, small_string):
-        return(self.to_int(big_string) * 10000 + self.to_int(small_string))
