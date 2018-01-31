@@ -138,7 +138,8 @@ class vector_graphics_window:
                 # raise AttributeError
                 # if the requested instruction doesn't exist.
                 except AttributeError:
-                    self.error_handler.raise_error("onf", instruction)
+                    self.error_handler.raise_error(
+                        "onf", instruction, instruction[0])
 
             # show frame id and fps
             if(self.settings["show_frame_id"]):

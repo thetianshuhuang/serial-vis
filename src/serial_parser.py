@@ -202,14 +202,17 @@ class parser:
                 # n-1 indexed since the opcode isn't included in self.commands
                 argument_type = self.commands[opcode][n - 1]
             except IndexError:
-                self.error_handler.raise_error("tma", raw_arguments)
+                self.error_handler.raise_error(
+                    "tma", raw_arguments, raw_arguments[0])
                 argument_type = "ERR"
             except KeyError:
-                self.error_handler.raise_error("onr", raw_arguments)
+                self.error_handler.raise_error(
+                    "onr", raw_arguments, raw_arguments[0])
                 argument_type = "ERR"
             # protection against insufficient arguments
             if(n >= len(raw_arguments)):
-                self.error_handler.raise_error("nea", raw_arguments)
+                self.error_handler.raise_error(
+                    "nea", raw_arguments, raw_arguments[0])
                 raw_arguments.append(0)
 
             # single argument type

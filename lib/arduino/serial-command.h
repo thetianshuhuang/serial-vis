@@ -17,6 +17,7 @@ class commandHandler
     void printCommand(const char * input);
     void toHex(void * input, int outsiz, char * outstr);
     void printCheckSum();
+    uint8_t getReply();
 };
 
 #endif

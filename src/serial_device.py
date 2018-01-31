@@ -28,9 +28,12 @@ class serial_device:
 
     settings = {
         "baudrate": 115200,
-        "timeout": 60,
+        "seek_timeout": 60,
+        "rx_timeout": 0.1,
+        "tx_timeout": 0.1,
         "encoding": "ascii",
-        "verify": 2
+        "verify": 2,
+        "confirmation": True,
     }
 
     #   --------------------------------
@@ -64,7 +67,10 @@ class serial_device:
 
             try:
                 self.device = serial.Serial(
-                    path, self.settings["baudrate"], timeout=1)
+                    path,
+                    self.settings["baudrate"],
+                    timeout=self.settings["rx_timeout"],
+                    write_timeout=self.settings["tx_timeout"])
                 print("Device connected: " + path)
 
                 # read one line to avoid passing incomplete lines
@@ -84,7 +90,7 @@ class serial_device:
             counter += 1
 
             # trigger timeout. Default is 60 seconds (300 attempts).
-            if(counter >= self.settings["timeout"] * 4):
+            if(counter >= self.settings["seek_timeout"] * 4):
                 timeout = True
                 print("Operation timed out.")
 
@@ -112,38 +118,107 @@ class serial_device:
             return(["", False])
 
         # verify checksum:
+        if(self.settings["verify"] > 0):
 
-        # compute sent checksum
-        # generalized for arbitrary verify size
-        checksum_sent = -1
-        if(len(raw_line[0]) >= self.settings["verify"]):
+            (checksum_sent, raw_line[0]) = strip_checksum(
+                self, raw_line[0], seilf.settings["verify"])
 
-            # build checksum
-            checksum = raw_line[0][-self.settings["verify"]:]
-            try:
-                checksum_sent = int(checksum, 16)
-            except ValueError:
-                checksum_sent = -1
+            checksum_recieved = self.checksum(
+                raw_line[0], self.settings["verify"])
 
-            # remove checksum once done
-            raw_line[0] = raw_line[0][:-self.settings["verify"]]
+            # correct checksum -> proceed
+            if(checksum_recieved == checksum_sent):
+                # provide confirmation if selected
+                if(self.settings["confirmation"]):
+                    Serial.write(0xFF)
 
-        # compute recieved checksum
-        checksum_recieved = 0
-        for char in raw_line[0]:
-            checksum_recieved += ord(char)
-            checksum_recieved &= 0xFF
+                return(raw_line)
 
-        # correct checksum -> proceed
-        if(checksum_recieved == checksum_sent):
-            return(raw_line)
-        # incorrect checksum -> raise error, turn line into a null instruction
+            # incorrect checksum
+            else:
+                # raise error
+                self.error_handler.raise_error(
+                    "chk",
+                    "sent=" + hex(checksum_sent) +
+                    "recieved=" + hex(checksum_recieved), raw_line)
+
+                # provide confirmation if selected
+                if(self.settings["confirmation"]):
+                    Serial.write(0x00)
+
+                # return null instruction
+                return(["null", True])
+
+        # don't verify checksum
         else:
-            print("---------")
-            print(checksum_sent)
-            print(checksum_recieved)
-            self.error_handler.raise_error("chk", raw_line)
-            return(["null", True])
+            return(raw_line)
+
+    #   --------------------------------
+    #
+    #   calculate checksum
+    #
+    #   --------------------------------
+    def checksum(self, string, size):
+
+        """
+        Get a checksum with 4*size bits of string.
+
+        Arguments
+        ---------
+        string: str
+            String to calculate the checksum for
+        size: int
+            1/4 number of bits of the output
+
+        Returns
+        -------
+        int
+            last 4*size bits of the checksum
+        """
+
+        output = 0
+        for char in string:
+            output += ord(char)
+            output &= int("F" * size, 16)
+        return(output)
+
+    #   --------------------------------
+    #
+    #   strip checksum from the end of a string
+    #
+    #   --------------------------------
+    def strip_checksum(self, string, size):
+
+        """
+        Strip the last size characters from a string and interpret them as a
+        checksum.
+
+        Arguments
+        ---------
+        string: str
+            input string
+        size: int
+            number of characters stripped off the end
+
+        Returns
+        -------
+        [int, str]
+            checksum converted to int, string with checksum stripped off
+        """
+
+        output = -1
+        if(len(raw_line[0]) >= size):
+            # build checksum
+            checksum = string[-size:]
+            try:
+                output = int(checksum, 16)
+            except ValueError:
+                output = -1
+
+        # remove checksum once done
+        string = string[:-size]
+
+        return((output, string))
 
     #   --------------------------------
     #

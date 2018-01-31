@@ -38,7 +38,7 @@ class error_handler:
         "chk": (
             "Error: incorrect checksum",
             "The serial communication was either incorrectly transmitted or "
-            "incorrectly received."
+            "incorrectly received.\n checksums = &"
         ),
         "tma": (
             "Error: too many arguments",
@@ -94,7 +94,7 @@ class error_handler:
     #   Display error
     #
     #   --------------------------------
-    def raise_error(self, error_name, instruction):
+    def raise_error(self, error_name, instruction, message):
 
         """
         Display an error.
@@ -127,5 +127,5 @@ class error_handler:
                 # splice in opcode at the "&" character.
                 print(
                     self.error_code_definitions[error_name][1][:index] +
-                    instruction[0] +
+                    message +
                     self.error_code_definitions[error_name][1][index + 1:])

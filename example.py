@@ -2,6 +2,7 @@
 
 from src import serial_vis
 
+
 # user vector graphics
 # user commands go here
 class user_vector_graphics(serial_vis.default_vector_graphics):
@@ -27,7 +28,7 @@ class my_serial_vis(serial_vis.serial_vis):
 
 # create object
 # **kwargs can also be used to update settings
-my_serial_device = my_serial_vis("/dev/ttyACM0", baudrate=115200)
+my_serial_device = my_serial_vis("/dev/ttyACM1", baudrate=115200)
 
 # that's it!
 while(1):

@@ -95,7 +95,9 @@ textp:%s:%d,%d:%d:%s
 ### Serial:
 ```
 "baudrate": 115200,                     
-"timeout": 60,                          # time in seconds before serial detection gives up
+"seek_timeout": 60,                     # time in seconds before serial detection gives up
+"rx_timeout": 0.1                       # time in seconds before serial readline times out 
+"tx-timeout": 0.1                       # time in seconds before serial write times out    
 "encoding": "ascii",                    # serial communication protocol; "ascii" or "utf-8"
 "verify": 2                             # checksum size, in bytes (verify=0 if no checksum)
 ```

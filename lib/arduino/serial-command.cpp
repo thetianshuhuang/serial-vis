@@ -26,6 +26,27 @@ void commandHandler::printCheckSum()
     printCommand(checksumout);
 }
 
+// get reply
+// 0xFF: success
+// 0x00: failure
+// other codes tbd
+uint8_t commandHandler::getReply()
+{
+    long timeout = millis() + 100;
+    while(timeout > millis())
+    {
+        if(Serial.available())
+        {
+            if(Serial.read == 0x00)
+            {
+                return(0x00);
+            }
+        }
+    }
+    return(0xFF);
+
+}
+
 // tohex
 // supports up to 64 bit / 8 byte numbers
 // outputs hex in ascii

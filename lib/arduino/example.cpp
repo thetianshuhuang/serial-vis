@@ -16,13 +16,10 @@ int main() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   while(true){
-    Serial.print(Serial.availableForWrite());
-    //if(Serial.availableForWrite() < 10)
-    //{
-      sv.drawcircle(400, 300, counter, "black");
-      sv.draw();
-      counter += 1;
-    //}
+    sv.drawcircle(400, 300, counter, "black");
+    sv.draw();
+    counter += 1;
+    
     if(counter >= 200) {
       counter = 0;
     }
