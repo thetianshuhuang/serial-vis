@@ -43,6 +43,8 @@ class parser:
         "logend": [],
         # print to console
         "echo": ["s"],
+        # null argument
+        "null": [],
 
         # drawing commands:
         # define color: name, (r,g,b)
@@ -200,14 +202,14 @@ class parser:
                 # n-1 indexed since the opcode isn't included in self.commands
                 argument_type = self.commands[opcode][n - 1]
             except IndexError:
-                self.error_handler("tma", opcode)
+                self.error_handler.raise_error("tma", raw_arguments)
                 argument_type = "ERR"
             except KeyError:
-                self.error_handler("onr", opcode)
+                self.error_handler.raise_error("onr", raw_arguments)
                 argument_type = "ERR"
             # protection against insufficient arguments
             if(n >= len(raw_arguments)):
-                self.error_handler("nea", opcode)
+                self.error_handler.raise_error("nea", raw_arguments)
                 raw_arguments.append(0)
 
             # single argument type

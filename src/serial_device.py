@@ -3,6 +3,7 @@
 
 import serial
 from time import sleep
+from error_handler import *
 
 
 #   --------------------------------
@@ -28,7 +29,8 @@ class serial_device:
     settings = {
         "baudrate": 115200,
         "timeout": 60,
-        "encoding": "ascii"
+        "encoding": "ascii",
+        "verify": 2
     }
 
     #   --------------------------------
@@ -51,6 +53,9 @@ class serial_device:
 
         # update settings
         self.settings.update(kwargs)
+
+        # set up error handling
+        self.error_handler = error_handler(**kwargs)
 
         counter = 0
         timeout = False
@@ -99,11 +104,46 @@ class serial_device:
             [line read from serial, True if successful]
         """
 
+        # get line
         try:
-            return([self.device.readline().strip(), True])
+            raw_line = [self.device.readline().strip(), True]
         except (OSError, serial.serialutil.SerialException):
             print("Device disconnected.")
             return(["", False])
+
+        # verify checksum:
+
+        # compute sent checksum
+        # generalized for arbitrary verify size
+        checksum_sent = -1
+        if(len(raw_line[0]) >= self.settings["verify"]):
+
+            # build checksum
+            checksum = raw_line[0][-self.settings["verify"]:]
+            try:
+                checksum_sent = int(checksum, 16)
+            except ValueError:
+                checksum_sent = -1
+
+            # remove checksum once done
+            raw_line[0] = raw_line[0][:-self.settings["verify"]]
+
+        # compute recieved checksum
+        checksum_recieved = 0
+        for char in raw_line[0]:
+            checksum_recieved += ord(char)
+            checksum_recieved &= 0xFF
+
+        # correct checksum -> proceed
+        if(checksum_recieved == checksum_sent):
+            return(raw_line)
+        # incorrect checksum -> raise error, turn line into a null instruction
+        else:
+            print("---------")
+            print(checksum_sent)
+            print(checksum_recieved)
+            self.error_handler.raise_error("chk", raw_line)
+            return(["null", True])
 
     #   --------------------------------
     #

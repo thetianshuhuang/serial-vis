@@ -149,6 +149,10 @@ class serial_vis:
         elif(instruction[0] == "echo"):
             print(instruction[1])
 
+        # null instruction
+        elif(instruction[0] == "null"):
+            pass
+
         # otherwise, add it to current buffer
         else:
             self.current_buffer.add_instruction(instruction)

@@ -13,8 +13,10 @@ class commandHandler
   public:
     void command(int num_args, ...);
   private:
+  	long long checksum;
     void printCommand(const char * input);
-    char* toHex(void * input, int outsiz, char * outstr);
+    void toHex(void * input, int outsiz, char * outstr);
+    void printCheckSum();
 };
 
 #endif

@@ -25,6 +25,7 @@ class error_handler:
 
     settings = {
         "error_codes": {
+            "chk": True,
             "tma": True,
             "nea": True,
             "uro": True,
@@ -34,6 +35,11 @@ class error_handler:
     }
 
     error_code_definitions = {
+        "chk": (
+            "Error: incorrect checksum",
+            "The serial communication was either incorrectly transmitted or "
+            "incorrectly received."
+        ),
         "tma": (
             "Error: too many arguments",
             "The serial command has provided too many arguments for the given "
@@ -88,7 +94,7 @@ class error_handler:
     #   Display error
     #
     #   --------------------------------
-    def raise_error(self, error_name, opcode):
+    def raise_error(self, error_name, instruction):
 
         """
         Display an error.
@@ -110,13 +116,16 @@ class error_handler:
             # print primary message
             print(self.error_code_definitions[error_name][0])
 
+            # print command
+            print(instruction)
+
             # print description
-            index = self.error_code_definitions[error_name][0].find("&")
+            index = self.error_code_definitions[error_name][1].find("&")
             if(index == -1):
                 print(self.error_code_definitions[error_name][1])
             else:
                 # splice in opcode at the "&" character.
                 print(
-                    self.error_code_definitions[error_name][0][:index] +
-                    opcode +
+                    self.error_code_definitions[error_name][1][:index] +
+                    instruction[0] +
                     self.error_code_definitions[error_name][1][index + 1:])

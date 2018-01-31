@@ -49,6 +49,7 @@ to the output csv.
 ```
 echo:%s
 ```
+- null: a null function. Literally does nothing. This is used internally by serial-vis to silently pass errors; embedded systems can also use this to pass silent errors.
 
 ### Drawing Commands:
 - definecolor: define a color in RGB, with each value 0 to 255.
@@ -95,7 +96,8 @@ textp:%s:%d,%d:%d:%s
 ```
 "baudrate": 115200,                     
 "timeout": 60,                          # time in seconds before serial detection gives up
-"encoding": "ascii"                     # serial communication protocol; "ascii" or "utf-8"
+"encoding": "ascii",                    # serial communication protocol; "ascii" or "utf-8"
+"verify": 2                             # checksum size, in bytes (verify=0 if no checksum)
 ```
 
 ### Graphics window:
