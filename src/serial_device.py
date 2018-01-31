@@ -27,6 +27,7 @@ class serial_device:
     """
 
     settings = {
+        "path": "",
         "baudrate": 115200,
         "seek_timeout": 60,
         "rx_timeout": 0.1,
@@ -55,7 +56,9 @@ class serial_device:
         """
 
         # update settings
+        # path is forcibly updated separately
         self.settings.update(kwargs)
+        self.settings.update({"path": path})
 
         # set up error handling
         self.error_handler = error_handler(**kwargs)
@@ -70,8 +73,8 @@ class serial_device:
                     path,
                     self.settings["baudrate"],
                     timeout=self.settings["rx_timeout"],
-                    write_timeout=self.settings["tx_timeout"])
-                print("Device connected: " + path)
+                    writeTimeout=self.settings["tx_timeout"])
+                print("Device connected: " + path + "\n\n")
 
                 # read one line to avoid passing incomplete lines
                 self.discard_line()
@@ -110,18 +113,21 @@ class serial_device:
             [line read from serial, True if successful]
         """
 
-        # get line
-        try:
-            raw_line = [self.device.readline().strip(), True]
-        except (OSError, serial.serialutil.SerialException):
-            print("Device disconnected.")
-            return(["", False])
+        # while loop to reject empty lines
+        raw_line = ["", False]
+        while(raw_line[0] == ""):
+            # get line
+            try:
+                raw_line = [self.device.readline().strip(), True]
+            except (OSError, serial.serialutil.SerialException):
+                print("Device disconnected.")
+                return(["", False])
 
         # verify checksum:
         if(self.settings["verify"] > 0):
 
-            (checksum_sent, raw_line[0]) = strip_checksum(
-                self, raw_line[0], seilf.settings["verify"])
+            (checksum_sent, raw_line[0]) = self.strip_checksum(
+                raw_line[0], self.settings["verify"])
 
             checksum_recieved = self.checksum(
                 raw_line[0], self.settings["verify"])
@@ -130,7 +136,7 @@ class serial_device:
             if(checksum_recieved == checksum_sent):
                 # provide confirmation if selected
                 if(self.settings["confirmation"]):
-                    Serial.write(0xFF)
+                        self.write(b"\xFF")
 
                 return(raw_line)
 
@@ -139,12 +145,13 @@ class serial_device:
                 # raise error
                 self.error_handler.raise_error(
                     "chk",
+                    raw_line,
                     "sent=" + hex(checksum_sent) +
-                    "recieved=" + hex(checksum_recieved), raw_line)
+                    " recieved=" + hex(checksum_recieved))
 
                 # provide confirmation if selected
                 if(self.settings["confirmation"]):
-                    Serial.write(0x00)
+                    self.write(b"\xFF")
 
                 # return null instruction
                 return(["null", True])
@@ -207,7 +214,7 @@ class serial_device:
         """
 
         output = -1
-        if(len(raw_line[0]) >= size):
+        if(len(string) >= size):
             # build checksum
             checksum = string[-size:]
             try:
@@ -262,4 +269,13 @@ class serial_device:
             line to be written; must have its own newline character if needed
         """
 
-        self.device.write(line.encode(self.settings["encoding"]))
+        try:
+            self.device.write(line.encode(self.settings["encoding"]))
+        # line isn't ascii, then send the bits directly
+        except UnicodeDecodeError:
+            try:
+                self.device.write(line)
+            # read buffer is full
+            except serial.serialutil.SerialTimeoutException:
+                self.error_handler.raise_error(
+                    "wto", [], self.settings["path"])

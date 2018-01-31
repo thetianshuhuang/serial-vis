@@ -16,7 +16,9 @@ int main() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   while(true){
+    
     sv.drawcircle(400, 300, counter, "black");
+    
     sv.draw();
     counter += 1;
     

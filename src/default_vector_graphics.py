@@ -43,10 +43,15 @@ class default_vector_graphics(vector_graphics_window):
             (x_coord, y_coord), both integers
         """
         return(
-            int(round(coord[0] * self.settings["scale"] +
-                      self.settings["offset"][0], 0)),
-            int(round(coord[1] * self.settings["scale"] +
-                      self.settings["offset"][1], 0)))
+            int(
+                round(
+                    coord[0] * self.settings["scale"] +
+                    self.settings["offset"][0], 0)),
+            self.settings["window_size"][1] -
+            int(
+                round(
+                    coord[1] * self.settings["scale"] +
+                    self.settings["offset"][1], 0)))
 
     #   --------------------------------
     #

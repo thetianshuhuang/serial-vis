@@ -1,5 +1,7 @@
 // Generic Serial Command subroutines
 
+// TODO: add retry to commandHandler
+
 #include "Arduino.h"
 #include <stdarg.h>
 #include "serial-command.h"
@@ -32,18 +34,26 @@ void commandHandler::printCheckSum()
 // other codes tbd
 uint8_t commandHandler::getReply()
 {
-    long timeout = millis() + 100;
+    long timeout = millis() + 1000;
     while(timeout > millis())
     {
         if(Serial.available())
         {
-            if(Serial.read == 0x00)
+            if(Serial.read() == 0x00)
+            {
+                return(0x00);
+            }
+            else if(Serial.read() == 0xFF)
+            {
+                return(0xFF);
+            }
+            else
             {
                 return(0x00);
             }
         }
     }
-    return(0xFF);
+    return(0x0F);
 
 }
 
@@ -79,7 +89,7 @@ void commandHandler::toHex(void * input, int outsize, char* outstr) {
 // handler for printing out commands
 // format: commandHandler("opcode", command_format, args)
 // where command_format is something like "s[dd]f".
-void commandHandler::command(int num_args, ...)
+uint8_t commandHandler::command(int num_args, ...)
 {
     // reset checksum
     checksum = 0;
@@ -180,4 +190,6 @@ void commandHandler::command(int num_args, ...)
     va_end(arguments);
     printCheckSum();
     printCommand("\n");
+
+    return getReply();
 }

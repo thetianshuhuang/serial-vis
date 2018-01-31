@@ -9,80 +9,80 @@
 // control commands
 
 // draw buffer
-void serialVis::draw()
+uint8_t serialVis::draw()
 {
-	command(2, "draw", "");
+	return(command(2, "draw", ""));
 }
 
 // log commands
-void serialVis::logs(char * label, char * datastring)
+uint8_t serialVis::logs(char * label, char * datastring)
 {
-	command(4, "logs", "ss", label, datastring);
+	return(command(4, "logs", "ss", label, datastring));
 }
-void serialVis::logf(char * label, double datadouble)
+uint8_t serialVis::logf(char * label, double datadouble)
 {
-	command(4, "logf", "sF", label, datadouble);
+	return(command(4, "logf", "sF", label, datadouble));
 }
-void serialVis::logstart()
+uint8_t serialVis::logstart()
 {
-	command(2, "logstart", "");
+	return(command(2, "logstart", ""));
 }	
-void serialVis::logend()
+uint8_t serialVis::logend()
 {
-	command(2, "logend", "");
+	return(command(2, "logend", ""));
 }
 
 // echo
-void serialVis::echo(char * text)
+uint8_t serialVis::echo(char * text)
 {
-	command(3, "echo", "s", text);
+	return(command(3, "echo", "s", text));
 }
 
 
 // draw commands
 
 // definecolor
-void serialVis::definecolor(char * color, int r, int g, int b)
+uint8_t serialVis::definecolor(char * color, int r, int g, int b)
 {
-	command(6, "definecolor", "s[ddd]", color, r, g, b);
+	return(command(6, "definecolor", "s[ddd]", color, r, g, b));
 }
 
 // setscale
-void serialVis::setscale(float scale) {
-	command(3, "setscale", "f", scale);
+uint8_t serialVis::setscale(float scale) {
+	return(command(3, "setscale", "f", scale));
 }
 
 // setoffset
-void serialVis::setoffset(int x, int y) {
-	command(4, "setoffset", "[dd]", x, y);
+uint8_t serialVis::setoffset(int x, int y) {
+	return(command(4, "setoffset", "[dd]", x, y));
 }
 
 // drawline
-void serialVis::drawline(float x_1, float y_1, float x_2, float y_2, char* color) {
-	command(7, "drawline", "[ff][ff]s", x_1, y_1, x_2, y_2, color);
+uint8_t serialVis::drawline(float x_1, float y_1, float x_2, float y_2, char* color) {
+	return(command(7, "drawline", "[ff][ff]s", x_1, y_1, x_2, y_2, color));
 }
 
 // drawlinep
-void serialVis::drawlinep(int x_1, int y_1, int x_2, int y_2, char* color) {
-	command(7, "drawlinep", "[dd][dd]s", x_1, y_1, x_2, y_2, color);
+uint8_t serialVis::drawlinep(int x_1, int y_1, int x_2, int y_2, char* color) {
+	return(command(7, "drawlinep", "[dd][dd]s", x_1, y_1, x_2, y_2, color));
 }
 
 // drawcircle
-void serialVis::drawcircle(float x, float y, float r, char* color) {
-	command(6, "drawcircle", "[ff]fs", x, y, r, color);
+uint8_t serialVis::drawcircle(float x, float y, float r, char* color) {
+	return(command(6, "drawcircle", "[ff]fs", x, y, r, color));
 }
 
 // drawray
-void serialVis::drawray(float x, float y, float angle, float length, char* color) {
-	command(7, "drawray", "[ff]ffs", x, y, angle, length, color);
+uint8_t serialVis::drawray(float x, float y, float angle, float length, char* color) {
+	return(command(7, "drawray", "[ff]ffs", x, y, angle, length, color));
 }
 
 // text
-void serialVis::text(char* label, float x, float y, int size, char* color) {
-	command(7, "text", "s[ff]ds", label, x, y, size, color);
+uint8_t serialVis::text(char* label, float x, float y, int size, char* color) {
+	return(command(7, "text", "s[ff]ds", label, x, y, size, color));
 }
 
 // textp
-void serialVis::textp(char* label, int x, int y, int size, char* color) {
-	command(7, "textp", "s[dd]ds", label, x, y, size, color);
+uint8_t serialVis::textp(char* label, int x, int y, int size, char* color) {
+	return(command(7, "textp", "s[dd]ds", label, x, y, size, color));
 }

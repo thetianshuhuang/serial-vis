@@ -30,7 +30,8 @@ class error_handler:
             "nea": True,
             "uro": True,
             "tts": True,
-            "unk": True
+            "unk": True,
+            "wto": True
         }
     }
 
@@ -38,7 +39,7 @@ class error_handler:
         "chk": (
             "Error: incorrect checksum",
             "The serial communication was either incorrectly transmitted or "
-            "incorrectly received.\n checksums = &"
+            "incorrectly received.\nchecksums: &"
         ),
         "tma": (
             "Error: too many arguments",
@@ -68,6 +69,10 @@ class error_handler:
         "unk": (
             "Error: unrecognized error",
             "name = &"
+        ),
+        "wto": (
+            "Error: serial device sending not responding to verification",
+            "device = &"
         )
     }
 

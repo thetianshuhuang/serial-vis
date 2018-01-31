@@ -166,6 +166,7 @@ class vector_graphics_window:
         Returns a list of the names of current events.
         """
 
+        # TODO: fix events
         current_events_hold = []
         current_events_press = []
         for event_key in self.settings["events"]:
@@ -205,12 +206,12 @@ class vector_graphics_window:
     def show_frame_id(self):
 
         """
-        Display the frame ID at the bottom left.
+        Display the frame ID at the top left.
         """
 
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
-            str(self.current_buffer_id),
+            "ID=" + str(self.current_buffer_id),
             False,
             self.settings["colors"]["black"])
         self.screen.blit(textframe, (10, 10))
@@ -218,15 +219,15 @@ class vector_graphics_window:
     def show_fps(self):
 
         """
-        Display the current fps at the bottom.
+        Display the current fps at the bottom left.
         """
 
         textfont = pygame.font.SysFont(self.settings["font"], 12)
         textframe = textfont.render(
-            str(self.compute_fps()),
+            "fps=" + str(round(self.compute_fps(), 2)),
             False,
             self.settings["colors"]["black"])
-        self.screen.blit(textframe, (10, self.settings["window_size"][1] - 12))
+        self.screen.blit(textframe, (10, self.settings["window_size"][1] - 22))
 
     #   --------------------------------
     #
