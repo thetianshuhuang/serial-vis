@@ -111,8 +111,10 @@ class default_vector_graphics(vector_graphics_window):
             self.screen,
             self.get_color(instruction[4]),
             self.transform(instruction[1]),
-            self.transform((instruction[1][0] + math.cos(instruction[2]),
-                           instruction[1][1] + math.sin(instruction[2]))),
+            self.transform((instruction[1][0] +
+                            instruction[3] * math.cos(instruction[2]),
+                            instruction[1][1] +
+                            instruction[3] * math.sin(instruction[2]))),
             self.settings.line_width)
 
     def text(self, instruction):
@@ -120,7 +122,7 @@ class default_vector_graphics(vector_graphics_window):
         textfont = pygame.font.SysFont(self.settings.font, instruction[3])
         # create surface
         textframe = textfont.render(
-            instruction[1], False, self.colors[instruction[4]])
+            instruction[1], False, self.get_color(instruction[4]))
         # merge surface
         self.screen.blit(textframe, self.transform(instruction[2]))
 

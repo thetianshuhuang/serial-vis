@@ -78,7 +78,8 @@ class sv_settings:
         "uro": True,
         "tts": True,
         "unk": True,
-        "wto": True
+        "wto": True,
+        "onf": True
     }
 
     #   --------------------------------

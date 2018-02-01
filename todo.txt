@@ -1,5 +1,4 @@
 - add support for direct byte sending
 - add support for other formats in get_time
-- fix events
 - update readme to reflect changes in settings
 - split readme into wiki

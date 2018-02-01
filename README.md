@@ -68,7 +68,7 @@ setoffset:%d,%d
 ```
 drawline:%f,%f:%f,%f:%s
 ```
-- drawlinep: draw a line from one pixel location to another at the given color.
+- drawlinep: draw a line from one pixel location to another at the given color. Pixel coordinates are given by the origin at the top left, increasing x to the right, and increasing y down.
 ```
 drawlinep:%d,%d:%d,%d:%s
 ```
