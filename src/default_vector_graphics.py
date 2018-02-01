@@ -66,7 +66,7 @@ class default_vector_graphics(vector_graphics_window):
     """
 
     def definecolor(self, instruction):
-        if(len(instruction[2] >= 3)):
+        if(len(instruction[2]) >= 3):
             self.settings.colors.update({instruction[1]: instruction[2]})
         else:
             self.error_handler.raise_error("tts", instruction[0])

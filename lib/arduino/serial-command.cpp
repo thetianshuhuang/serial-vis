@@ -105,13 +105,12 @@ uint8_t commandHandler::command(int num_args, ...)
     char* format = va_arg(arguments, char*);
     int format_index = 0;
     char* current_separator = ":";
-
+    
     int i = 1;
 
     // main loop
     while(i < (num_args - 1))
     {
-
         // print separator between arguments
         if(format[format_index - 1] != '[' && format[format_index] != ']')
         {
@@ -121,11 +120,11 @@ uint8_t commandHandler::command(int num_args, ...)
         // check for formatting changes
         if(format[format_index] == '[')
         {
-            current_separator[0] = ',';
+            current_separator = ",";
         }
         else if(format[format_index] == ']')
         {
-            current_separator[0] = ':';
+            current_separator = ":";
         }
 
         // print commands

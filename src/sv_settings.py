@@ -68,6 +68,7 @@ class sv_settings:
     max_size_backward = 100
 
     # serial_parser
+    serial_mode = "ascii"
     number_mode = "hex"
 
     # error_handler

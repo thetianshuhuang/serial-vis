@@ -4,7 +4,7 @@
 from buffer import *
 from default_vector_graphics import *
 from serial_device import *
-from serial_parser import *
+from ascii_serial_parser import *
 from csv_log import *
 from dict_merge import *
 from sv_settings import *
@@ -79,7 +79,19 @@ class serial_vis:
 
         # create serial device, serial parser, log, frame buffer db
         self.serial_device = serial_device(self.settings)
-        self.serial_parser = parser(self.user_commands, self.settings)
+
+        # ascii transmission mode
+        # slower, but more human-readable
+        if(self.settings.serial_mode == "ascii"):
+            self.serial_parser = ascii_parser(
+                self.user_commands, self.settings)
+
+        # binary transmission mode
+        # 0% human readable
+        elif(self.settings.serial_mode == "bin"):
+            self.serial_parser = bin_parser(
+                self.user_commands, self.settings)
+
         self.csv_log = csv_log(self.settings)
 
         # create graphics window
@@ -191,24 +203,25 @@ class serial_vis:
             if(self.is_live):
                 self.display_buffer_id = 0
 
-        if "fwd" in events_press:
-            self.display_buffer_id += 1
+        # controls only enabled when not live
+        if not self.is_live:
+            if "fwd" in events_press:
+                self.display_buffer_id += 1
 
-        if "fwdplus" in events_press:
-            self.display_buffer_id += 10
+            if "fwdplus" in events_press:
+                self.display_buffer_id += 10
 
-        if "back" in events_press:
-            self.display_buffer_id += -1
+            if "back" in events_press:
+                self.display_buffer_id += -1
 
-        if "backplus" in events_press:
-            self.display_buffer_id += -10
+            if "backplus" in events_press:
+                self.display_buffer_id += -10
 
         # check for out of bounds
         if (self.display_buffer_id > self.settings.max_size_forward):
             self.display_buffer_id = self.settings.max_size_forward
 
-        if (self.display_buffer_id < -self.settings.max_size_backward or
-                self.display_buffer_id < 0):
+        if (self.display_buffer_id < -self.settings.max_size_backward):
             self.display_buffer_id = -self.settings.max_size_backward
 
     #   --------------------------------

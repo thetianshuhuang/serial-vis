@@ -193,7 +193,6 @@ class buffer_db:
             # catch KeyErrors due to jumping to the most recent frame
             # before the frame has been built
             except KeyError:
-                print(get_id)
                 return(frame_buffer(frame_id=-1))
 
     #   --------------------------------

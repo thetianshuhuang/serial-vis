@@ -7,14 +7,14 @@ from hexutil import *
 
 #   --------------------------------
 #
-#   Serial command parser
+#   ASCII Serial command parser
 #
 #   --------------------------------
 
-class parser:
+class ascii_parser:
 
     """
-    Serial command parser class
+    ASCII Serial command parser class
 
     Attributes
     ----------

@@ -2,3 +2,16 @@
 - add support for other formats in get_time
 - update readme to reflect changes in settings
 - split readme into wiki
+- add cleaner event support
+- add hud support to vector graphics
+- add beginning settings support
+- add verification
+
+Plan for bin transmission:
+
+|| size || opcode || arg_size | ---arg--- || ... || 0x00 | ---string--- | 0x00 || check ||
+0x00 = string / null
+0xFF = begin/end tuple
+
+ex.
+|| 0x0B || 0x07 || 0x00 | "colorstring" | 0x00 || 0x01 | 0xFF || 0x01 | 0x00 || 0x01 | 0xFF || check ||
