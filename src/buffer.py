@@ -130,7 +130,7 @@ class buffer_db:
 
         # add new item if the current forward limit hasn't been exceeded
         # use the buffer ID as a key
-        if(self.input_buffer <
+        if(self.input_buffer <=
            self.view_buffer + self.settings.max_size_forward):
             # assign a frame id if not already assigned.
             if(frame_buffer.frame_id == -1):
@@ -188,7 +188,13 @@ class buffer_db:
         if(self.input_buffer == 0):
             return(frame_buffer(frame_id=-1))
         else:
-            return(self.frame_buffers[get_id])
+            try:
+                return(self.frame_buffers[get_id])
+            # catch KeyErrors due to jumping to the most recent frame
+            # before the frame has been built
+            except KeyError:
+                print(get_id)
+                return(frame_buffer(frame_id=-1))
 
     #   --------------------------------
     #

@@ -104,7 +104,7 @@ class serial_vis:
         Execute master program update.
         """
 
-        if(self.enable_graphics):
+        if(self.settings.enable_graphics):
             # process keyboard/mouse commands
             window_events = self.graphics_window.check_events()
             self.process_events(window_events)
@@ -182,7 +182,7 @@ class serial_vis:
         (events_hold, events_press) = events
 
         # hold key events:
-        if pygame.QUIT in events_hold:
+        if pygame.QUIT in events_press:
             self.quit_sv()
 
         # press key events:
@@ -202,6 +202,14 @@ class serial_vis:
 
         if "backplus" in events_press:
             self.display_buffer_id += -10
+
+        # check for out of bounds
+        if (self.display_buffer_id > self.settings.max_size_forward):
+            self.display_buffer_id = self.settings.max_size_forward
+
+        if (self.display_buffer_id < -self.settings.max_size_backward or
+                self.display_buffer_id < 0):
+            self.display_buffer_id = -self.settings.max_size_backward
 
     #   --------------------------------
     #

@@ -49,9 +49,9 @@ class sv_settings:
         pygame.QUIT: "quit",
         pygame.K_SPACE: "pause",
         pygame.K_PERIOD: "fwd",
-        pygame.K_LEFTBRACKET: "fwdplus",
+        pygame.K_LEFTBRACKET: "backplus",
         pygame.K_COMMA: "back",
-        pygame.K_RIGHTBRACKET: "backplus"
+        pygame.K_RIGHTBRACKET: "fwdplus"
     }
     colors = {
         "black": (0, 0, 0),

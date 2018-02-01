@@ -247,12 +247,12 @@ class parser:
                 for element in argument_array_raw:
                     if(argument_type == "dd"):
                         argument_array.append(
-                            to_int(element), self.settings.number_mode)
+                            to_int(element, self.settings.number_mode))
                     elif(argument_type == "ss"):
                         argument_array.append(element)
                     elif(argument_type == "ff"):
                         argument_array.append(
-                            to_float(element), self.settings.number_mode)
+                            to_float(element, self.settings.number_mode))
                     elif(argument_type == "ll"):
                         pass
                         # unimplemented

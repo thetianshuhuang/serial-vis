@@ -22,8 +22,6 @@ class vector_graphics_window:
     ----------
     current_buffer_id : int
         current buffer being displayed. -1 = error.
-    events_previous : str[]
-        previously registered events
     frame_times : float[]
         log of the past settings.fps_smooth_size frames.
 
@@ -37,7 +35,6 @@ class vector_graphics_window:
     """
 
     current_buffer_id = -1
-    events_previous = {}
     frame_times = []
 
     #   --------------------------------
@@ -63,10 +60,6 @@ class vector_graphics_window:
         self.screen = pygame.display.set_mode(self.settings.window_size)
         pygame.display.set_caption(self.settings.path)
         self.clock = pygame.time.Clock()
-
-        # set up previous event states
-        for key in self.settings.events:
-            self.events_previous.update({key: False})
 
         self.error_handler = error_handler(settings)
 
@@ -139,23 +132,26 @@ class vector_graphics_window:
         Returns a list of the names of current events.
         """
 
-        # TODO: fix events
+        # get currently pressed keys
         current_events_hold = []
-        current_events_press = []
-        for event_key in self.settings.events:
-            if event_key in pygame.event.get():
-                # key pressed -> is being held
-                current_events_hold += self.settings.events[event_key]
-                # previously key is not pressed -> begin keypresspas
-                if(not self.events_previous[event_key]):
-                    current_events_press += self.settings.events[event_key]
-                # set previous state
-                self.events_previous[event_key] = True
-            else:
-                # set previous state
-                self.events_previous[event_key] = False
+        pressed_keys = pygame.key.get_pressed()
+        for event in self.settings.events:
+            if(pressed_keys[event]):
+                current_events_hold.append(
+                    self.settings.events[event])
 
-        return((current_events_hold, current_events_press))
+        # get just pressed keys
+        current_events_keydown = []
+        for current_event in pygame.event.get():
+            if(current_event.type == pygame.KEYDOWN and
+               current_event.key in self.settings.events):
+                current_events_keydown.append(
+                    self.settings.events[current_event.key])
+            if(current_event.type == pygame.QUIT):
+                current_events_keydown.append(
+                    self.settings.events[pygame.QUIT])
+
+        return((current_events_hold, current_events_keydown))
 
     #   --------------------------------
     #
