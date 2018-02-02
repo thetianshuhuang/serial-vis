@@ -1,7 +1,6 @@
 # serial_parser.py
 # serial command interpretation class
 
-from error_handler import *
 from hexutil import *
 
 
@@ -92,7 +91,7 @@ class bin_parser:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, commands, settings):
+    def __init__(self, commands, settings, error_handler):
 
         """
         Create a serial parser object
@@ -108,4 +107,25 @@ class bin_parser:
         self.commands.update(commands)
         self.settings = settings
 
-        self.error_handler = error_handler(settings)
+        self.error_handler = error_handler
+
+    #   --------------------------------
+    #
+    #   Process line
+    #
+    #   --------------------------------
+    def process_line(self, code_line):
+
+        """
+        Parse a line and convert to the appropriate format.
+
+        Parameters
+        ----------
+        code_line : byte[] / str
+            Appears to be a string, but is really a byte array.
+
+        Returns
+        -------
+        mixed array
+            Processed instruction
+        """

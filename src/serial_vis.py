@@ -2,12 +2,12 @@
 # main class
 
 from buffer import *
-from default_vector_graphics import *
-from serial_device import *
-from ascii_serial_parser import *
+from . import serial_lib as serial_lib
 from csv_log import *
 from dict_merge import *
 from sv_settings import *
+from default_vector_graphics import *
+import error_handler
 
 
 #   --------------------------------
@@ -77,33 +77,40 @@ class serial_vis:
         self.settings.update(self.user_settings)
         self.settings.update(kwargs)
 
-        # create serial device, serial parser, log, frame buffer db
-        self.serial_device = serial_device(self.settings)
+        # set up centralized error handling
+        self.error_handler = error_handler.error_handler(self.settings)
+
+        # create serial device and parser:
 
         # ascii transmission mode
         # slower, but more human-readable
         if(self.settings.serial_mode == "ascii"):
-            self.serial_parser = ascii_parser(
-                self.user_commands, self.settings)
+            self.serial_device = serial_lib.ascii_serial_device(
+                self.settings, self.error_handler)
+            self.serial_parser = serial_lib.ascii_parser(
+                self.user_commands, self.settings, self.error_handler)
 
         # binary transmission mode
         # 0% human readable
         elif(self.settings.serial_mode == "bin"):
-            self.serial_parser = bin_parser(
-                self.user_commands, self.settings)
+            self.serial_device = serial_lib.bin_serial_device(
+                self.settings, self.error_handler)
+            self.serial_parser = serial_lib.bin_serial_parser(
+                self.user_commands, self.settings, self.error_handler)
 
+        # create log
         self.csv_log = csv_log(self.settings)
 
         # create graphics window
         if(self.settings.enable_graphics):
-            self.graphics_window = self.graphics_class(self.settings)
-            self.buffer_db = buffer_db(self.settings)
+            self.graphics_window = self.graphics_class(
+                self.settings, self.error_handler)
+
+        # set up buffer db
+        self.buffer_db = buffer_db(self.settings)
 
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
-
-        # discard incomplete line
-        self.serial_device.discard_line()
 
     #   --------------------------------
     #

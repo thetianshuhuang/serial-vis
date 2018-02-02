@@ -2,8 +2,7 @@
 # serial device interaction class
 
 import serial
-from time import sleep
-from error_handler import *
+from base_serial_device import *
 
 
 #   --------------------------------
@@ -12,76 +11,12 @@ from error_handler import *
 #
 #   --------------------------------
 
-class serial_device:
+class ascii_serial_device(base_serial_device):
 
     """
-    Serial Device class; governs serial interactions
-
-    Attributes
-    ----------
-
-    Created by __init__:
-    device : serial.Serial object
-        Serial device object
+    ASCII serial device class
+    Contains subroutines for reading an ascii-formatted line
     """
-
-    #   --------------------------------
-    #
-    #   Initialization
-    #
-    #   --------------------------------
-    def __init__(self, settings):
-
-        """
-        Initialize serial device.
-
-        Parameters
-        ----------
-        path : str
-            filepath of the desired serial device
-        settings : sv_settings object
-            Object containing program settings
-        """
-
-        # update settings
-        self.settings = settings
-
-        # set up error handling
-        self.error_handler = error_handler(settings)
-
-        counter = 0
-        timeout = False
-        # open serial interface
-        while(not timeout):
-
-            try:
-                self.device = serial.Serial(
-                    self.settings.path,
-                    self.settings.baudrate,
-                    timeout=self.settings.rx_timeout,
-                    writeTimeout=self.settings.tx_timeout)
-                print("Device connected: " + self.settings.path + "\n\n")
-
-                # read one line to avoid passing incomplete lines
-                self.discard_line()
-
-                break
-
-            except serial.serialutil.SerialException:
-                # limit the error message to once every 2.5 seconds.
-                if(counter % 10 == 0):
-                    print("Serial device " +
-                          self.settings.path +
-                          " not found. Trying again.")
-
-            # wait 250ms before trying again to avoid spamming the system
-            sleep(0.25)
-            counter += 1
-
-            # trigger timeout. Default is 60 seconds (300 attempts).
-            if(counter >= self.settings.seek_timeout * 4):
-                timeout = True
-                print("Operation timed out.")
 
     #   --------------------------------
     #
@@ -122,7 +57,7 @@ class serial_device:
             if(checksum_recieved == checksum_sent):
                 # provide confirmation if selected
                 if(self.settings.confirmation):
-                        self.write(b"\xFF")
+                        self.write_raw(b"\xFF")
 
                 return(raw_line)
 
@@ -137,7 +72,7 @@ class serial_device:
 
                 # provide confirmation if selected
                 if(self.settings.confirmation):
-                    self.write(b"\xFF")
+                    self.write_raw(b"\xFF")
 
                 # return null instruction
                 return(["null", True])
@@ -212,56 +147,3 @@ class serial_device:
         string = string[:-size]
 
         return((output, string))
-
-    #   --------------------------------
-    #
-    #   close serial port cleanly
-    #
-    #   --------------------------------
-    def close(self):
-
-        """
-        Close the serial port cleanly
-        """
-
-        self.device.close()
-
-    #   --------------------------------
-    #
-    #   discard one line to avoid incomplete reading
-    #
-    #   --------------------------------
-    def discard_line(self):
-
-        """
-        Read a line, and discard it in case a partial line is stored
-        """
-
-        self.device.readline().strip()
-
-    #   --------------------------------
-    #
-    #   write to serial
-    #
-    #   --------------------------------
-    def write(self, line):
-
-        """
-        Write a line to serial.
-
-        Parameters
-        ----------
-        line : str
-            line to be written; must have its own newline character if needed
-        """
-
-        try:
-            self.device.write(line.encode(self.settings.encoding))
-        # line isn't ascii, then send the bits directly
-        except UnicodeDecodeError:
-            try:
-                self.device.write(line)
-            # read buffer is full
-            except serial.serialutil.SerialTimeoutException:
-                self.error_handler.raise_error(
-                    "wto", [], self.settings.path)

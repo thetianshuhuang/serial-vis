@@ -1,6 +1,8 @@
 # error_handler.py
 # error handling class; handles errors and error notifications
 
+import time
+
 
 #   --------------------------------
 #
@@ -15,9 +17,13 @@ class error_handler:
 
     Attributes
     ----------
+    error_id : int
+        ID of the current error
     error_code_definitions : dict
         definitions for error names and descriptions
     """
+
+    error_id = 0
 
     error_code_definitions = {
         "chk": (
@@ -57,6 +63,10 @@ class error_handler:
         "wto": (
             "Error: serial device sending not responding to verification",
             "device = &"
+        ),
+        "nas": (
+            "Error: attempted to encode string with non-ascii character",
+            "string = &"
         )
     }
 
@@ -96,12 +106,21 @@ class error_handler:
             Opcode that triggered the error.
         """
 
+        # update ID
+        self.error_id += 1
+
         # process unrecognized opcode
         if(error_name not in self.settings.error_codes):
             error_name = "unk"
 
         # check if the error is silenced
         if(self.settings.error_codes[error_name]):
+
+            # print error separator
+            err_info = ("[" + time.strftime("%H:%M:%S") +
+                        " ID=" + str(self.error_id) + "] ")
+            print(err_info + ("-" * (64 - len(err_info))))
+
             # print primary message
             print(self.error_code_definitions[error_name][0])
 

@@ -80,7 +80,8 @@ class sv_settings:
         "tts": True,
         "unk": True,
         "wto": True,
-        "onf": True
+        "onf": True,
+        "nas": True
     }
 
     #   --------------------------------

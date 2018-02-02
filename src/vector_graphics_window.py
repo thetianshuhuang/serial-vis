@@ -3,7 +3,6 @@
 
 import pygame
 import time
-from error_handler import *
 from dict_merge import *
 
 
@@ -42,7 +41,7 @@ class vector_graphics_window:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, settings):
+    def __init__(self, settings, error_handler):
 
         """
         Create a pygame graphics window.
@@ -61,7 +60,7 @@ class vector_graphics_window:
         pygame.display.set_caption(self.settings.path)
         self.clock = pygame.time.Clock()
 
-        self.error_handler = error_handler(settings)
+        self.error_handler = error_handler
 
     #   --------------------------------
     #

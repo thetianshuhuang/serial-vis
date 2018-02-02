@@ -1,7 +1,6 @@
 # serial_parser.py
 # serial command interpretation class
 
-from error_handler import *
 from hexutil import *
 
 
@@ -70,7 +69,7 @@ class ascii_parser:
     #   Initialization
     #
     #   --------------------------------
-    def __init__(self, commands, settings):
+    def __init__(self, commands, settings, error_handler):
 
         """
         Create a serial parser object
@@ -86,7 +85,7 @@ class ascii_parser:
         self.commands.update(commands)
         self.settings = settings
 
-        self.error_handler = error_handler(settings)
+        self.error_handler = error_handler
 
     #   --------------------------------
     #
