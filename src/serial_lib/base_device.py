@@ -11,7 +11,7 @@ from time import sleep
 #
 #   --------------------------------
 
-class base_serial_device:
+class base_device:
 
     """
     Base Serial Device class; governs serial interactions

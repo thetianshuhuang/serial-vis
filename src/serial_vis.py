@@ -2,7 +2,7 @@
 # main class
 
 from buffer import *
-from . import serial_lib as serial_lib
+from serial_lib import *
 from csv_log import *
 from dict_merge import *
 from sv_settings import *
@@ -85,17 +85,17 @@ class serial_vis:
         # ascii transmission mode
         # slower, but more human-readable
         if(self.settings.serial_mode == "ascii"):
-            self.serial_device = serial_lib.ascii_serial_device(
+            self.serial_device = ascii_device.ascii_device(
                 self.settings, self.error_handler)
-            self.serial_parser = serial_lib.ascii_parser(
+            self.serial_parser = ascii_parser.ascii_parser(
                 self.user_commands, self.settings, self.error_handler)
 
         # binary transmission mode
         # 0% human readable
         elif(self.settings.serial_mode == "bin"):
-            self.serial_device = serial_lib.bin_serial_device(
+            self.serial_device = bin_device.bin_device(
                 self.settings, self.error_handler)
-            self.serial_parser = serial_lib.bin_serial_parser(
+            self.serial_parser = bin_parser.bin_parser(
                 self.user_commands, self.settings, self.error_handler)
 
         # create log

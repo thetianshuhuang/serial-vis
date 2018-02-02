@@ -2,7 +2,7 @@
 # serial device interaction class
 
 import serial
-from base_serial_device import *
+from base_device import *
 
 
 #   --------------------------------
@@ -11,7 +11,7 @@ from base_serial_device import *
 #
 #   --------------------------------
 
-class ascii_serial_device(base_serial_device):
+class ascii_device(base_device):
 
     """
     ASCII serial device class
