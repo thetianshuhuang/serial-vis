@@ -3,7 +3,6 @@
 
 import pygame
 import time
-from dict_merge import *
 
 
 #   --------------------------------

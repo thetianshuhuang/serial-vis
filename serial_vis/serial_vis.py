@@ -1,12 +1,11 @@
 # serial_vis.py
 # main class
 
-from buffer import *
 import serial_lib
+import graphics_lib
 from csv_log import *
 from dict_merge import *
 from sv_settings import *
-from default_vector_graphics import *
 import error_handler
 
 
@@ -49,7 +48,7 @@ class serial_vis:
 
     user_settings = {}
     user_commands = {}
-    graphics_class = default_vector_graphics
+    graphics_class = graphics_lib.default_vector_graphics
 
     is_live = True
     display_buffer_id = 0
@@ -107,10 +106,10 @@ class serial_vis:
                 self.settings, self.error_handler)
 
         # set up buffer db
-        self.buffer_db = buffer_db(self.settings)
+        self.buffer_db = graphics_lib.buffer_db(self.settings)
 
         # set up initial frame buffer
-        self.current_buffer = frame_buffer()
+        self.current_buffer = graphics_lib.frame_buffer()
 
     #   --------------------------------
     #

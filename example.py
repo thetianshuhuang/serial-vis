@@ -1,18 +1,18 @@
 # example program using serial-vis.
 
-import src
+import serial_vis
 
 
 # user vector graphics
 # user commands go here
-class user_vector_graphics(src.default_vector_graphics):
+class user_vector_graphics(serial_vis.default_vector_graphics):
 
     def exampleusercommand(self, instruction):
         print("Example user command: " + instruction[1])
 
 
 # extend the serial_device class to add user definitions.
-class my_serial_vis(src.serial_vis):
+class my_serial_vis(serial_vis.serial_vis):
 
     # graphics command registration
     user_commands = {"exampleusercommand": "s"}

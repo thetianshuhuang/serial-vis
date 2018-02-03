@@ -1,7 +1,7 @@
 # minimal code to run serial-vis.
 
-from src import serial_vis
+import serial_vis
 
-serial_device = serial_vis.serial_vis(path="/dev/lm4f", baudrate=115200)
+serial_device = serial_vis.serial_vis(path="/dev/ttyACM0", baudrate=115200)
 while(1):
     serial_device.update()
