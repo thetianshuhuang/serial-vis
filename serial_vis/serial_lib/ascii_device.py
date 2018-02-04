@@ -1,6 +1,7 @@
 # serial_device.py
 # serial device interaction class
 
+import time
 import serial
 from base_device import *
 
@@ -26,6 +27,10 @@ class ascii_device(base_device):
     def get_line(self):
 
         """
+        # parse instruction
+        instruction = self.serial_parser.process_command(line[0])
+
+        # log command
         Get one line of serial data
 
         Returns
@@ -33,6 +38,9 @@ class ascii_device(base_device):
         [str, bool]
             [line read from serial, True if successful]
         """
+
+        # set up timeout
+        timeout_time = time.time() + 1000 * self.settings.rx_timeout
 
         # while loop to reject empty lines
         raw_line = ["", False]
@@ -43,6 +51,9 @@ class ascii_device(base_device):
             except (OSError, serial.serialutil.SerialException):
                 print("Device disconnected.")
                 return(["", False])
+            # timeout if the receive timeout has been reached
+            if(time.time() > timeout_time):
+                return(["null", True])
 
         # verify checksum:
         if(self.settings.verify > 0):

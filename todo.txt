@@ -9,7 +9,7 @@
 
 Plan for bin transmission:
 
-|| opcode || arg_size | ---arg--- || ... || 0x00 | ---string--- | 0x00 || check_size | check ||
+|| 0xFF [begin_transmission] || opcode || arg_size | ---arg--- || ... || 0x00 | ---string--- | 0x00 || check_size | check || 0xFF [EOT] ||
 Argument sizes are logarithmic:
 0x01 = uint8_t, byte,
 0x02 = uint16_t,
@@ -19,8 +19,5 @@ Argument sizes are logarithmic:
 
 Reserved arg_size characters:
 0x00 = string / null
-0xFF = begin/end tuple
-0x
-
-ex.
-|| 0x07 || 0x00 | "colorstring" | 0x00 || 0x01 | 0xFF || 0x01 | 0x00 || 0x01 | 0xFF || check || newline ||
+0xFE = begin/end tuple
+0xFF = Start / EOT

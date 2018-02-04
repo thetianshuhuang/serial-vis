@@ -4,7 +4,6 @@
 import serial_lib
 import graphics_lib
 from csv_log import *
-from dict_merge import *
 from sv_settings import *
 import error_handler
 
@@ -156,7 +155,7 @@ class serial_vis:
                 self.buffer_db.new_buffer(self.current_buffer)
 
             # create new frame buffer
-            self.current_buffer = frame_buffer()
+            self.current_buffer = graphics_lib.frame_buffer()
 
         # log instructions
         elif(instruction[0] in ["logs", "logf", "logstart", "logend"]):
