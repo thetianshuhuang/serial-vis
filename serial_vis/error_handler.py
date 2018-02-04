@@ -110,11 +110,12 @@ class error_handler:
         self.error_id += 1
 
         # process unrecognized opcode
-        if(error_name not in self.settings.error_codes):
+        if(error_name not in self.error_code_definitions):
             error_name = "unk"
 
         # check if the error is silenced
-        if(self.settings.error_codes[error_name]):
+        if(error_name in self.settings.error_codes and
+           self.settings.error_codes[error_name]):
 
             # print error separator
             err_info = ("[" + time.strftime("%H:%M:%S") +

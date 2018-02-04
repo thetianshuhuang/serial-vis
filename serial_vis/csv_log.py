@@ -150,3 +150,6 @@ class csv_log:
 
         if(self.settings.time_format == "epoch"):
             return(str(epoch_time))
+
+        if(self.settings.time_format == "hhmmss"):
+            return(time.strftime("%H:%M:%S"))

@@ -1,9 +1,7 @@
 - add support for direct byte sending
-- add support for other formats in get_time
 - split readme into wiki
 - completely REDO the wiki
 - add cleaner event support
-- add hud support to vector graphics
 - add beginning settings support
 - add verification
 

@@ -199,7 +199,7 @@ class serial_vis:
         (events_hold, events_press) = events
 
         # hold key events:
-        if pygame.QUIT in events_press:
+        if "quit" in events_press:
             self.quit_sv()
 
         # press key events:
@@ -239,6 +239,9 @@ class serial_vis:
         """
         Cleanly quit all sub-objects.
         """
+
+        # print message
+        print("\nClosing serial-vis ... \n")
 
         # call clean close methods
         if(self.settings.enable_graphics):

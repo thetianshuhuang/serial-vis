@@ -1,8 +1,7 @@
 # vector_graphics_window.py
 # vector graphics base class
 
-import pygame
-import time
+from base_graphics import *
 
 
 #   --------------------------------
@@ -11,55 +10,19 @@ import time
 #
 #   --------------------------------
 
-class vector_graphics_window:
+class vector_graphics_window(base_graphics):
 
     """
     Pygame window class; creates vector graphics rendering window
+    Extends base_graphics
 
     Attributes
     ----------
     current_buffer_id : int
         current buffer being displayed. -1 = error.
-    frame_times : float[]
-        log of the past settings.fps_smooth_size frames.
-
-    Created by __init__:
-    screen : pygame.display
-        main pygame display
-    clock : pygame.clock
-        pygame timing class
-    error_handler : error_handler object
-        error handler class
     """
 
     current_buffer_id = -1
-    frame_times = []
-
-    #   --------------------------------
-    #
-    #   Initialization
-    #
-    #   --------------------------------
-    def __init__(self, settings, error_handler):
-
-        """
-        Create a pygame graphics window.
-
-        Parameters
-        ----------
-        settings: sv_settings object
-            object containing settings to be used
-        """
-
-        self.settings = settings
-
-        pygame.init()
-        pygame.font.init()
-        self.screen = pygame.display.set_mode(self.settings.window_size)
-        pygame.display.set_caption(self.settings.path)
-        self.clock = pygame.time.Clock()
-
-        self.error_handler = error_handler
 
     #   --------------------------------
     #
@@ -111,6 +74,9 @@ class vector_graphics_window:
             if(self.settings.show_fps):
                 self.show_fps()
 
+            # show HUD
+            self.show_hud()
+
             # display pygame buffer
             pygame.display.flip()
 
@@ -118,52 +84,6 @@ class vector_graphics_window:
             self.clock.tick(self.settings.frame_limit)
 
             return(True)
-
-    #   --------------------------------
-    #
-    #   Check events; return list of events
-    #
-    #   --------------------------------
-    def check_events(self):
-
-        """
-        Returns a list of the names of current events.
-        """
-
-        # get currently pressed keys
-        current_events_hold = []
-        pressed_keys = pygame.key.get_pressed()
-        for event in self.settings.events:
-            if(pressed_keys[event]):
-                current_events_hold.append(
-                    self.settings.events[event])
-
-        # get just pressed keys
-        current_events_keydown = []
-        for current_event in pygame.event.get():
-            if(current_event.type == pygame.KEYDOWN and
-               current_event.key in self.settings.events):
-                current_events_keydown.append(
-                    self.settings.events[current_event.key])
-            if(current_event.type == pygame.QUIT):
-                current_events_keydown.append(
-                    self.settings.events[pygame.QUIT])
-
-        return((current_events_hold, current_events_keydown))
-
-    #   --------------------------------
-    #
-    #   Close window
-    #
-    #   --------------------------------
-    def close_window(self):
-
-        """
-        Cleanly closes the pygame window.
-        """
-
-        pygame.display.quit()
-        pygame.quit()
 
     #   --------------------------------
     #
@@ -198,46 +118,11 @@ class vector_graphics_window:
 
     #   --------------------------------
     #
-    #   Check for update to fps registry
+    #   dummy function for HUD support
     #
     #   --------------------------------
-    def update_fps(self, instruction):
-
-        """
-        Check whether the instruction triggers an fps update.
-
-        Parameters
-        ----------
-        instruction: array following instruction form
-            instruction to be checked
-        """
-
-        if(instruction[0] == self.settings.fps_count_keyword):
-            self.frame_times.append(time.time())
-            if(len(self.frame_times) > self.settings.fps_smooth_size):
-                del self.frame_times[0]
-
-    #   --------------------------------
-    #
-    #   Compute fps from the registry
-    #
-    #   --------------------------------
-
-    def compute_fps(self):
-
-        """
-        Returns the current fps.
-
-        Returns
-        -------
-        float
-            fps, smoothed over settings.frame_smooth_size frames
-        """
-        if(self.frame_times[-1] == self.frame_times[0]):
-            return(0)
-
-        return(len(self.frame_times) /
-               (self.frame_times[-1] - self.frame_times[0]))
+    def show_hud(self):
+        pass
 
     #   --------------------------------
     #
