@@ -56,6 +56,9 @@ class vector_graphics_window(base_graphics):
             # clear pygame buffer
             self.screen.fill(self.settings.colors["background"])
 
+            # show underlay
+            self.show_underlay()
+
             for instruction in frame_buffer.instructions:
 
                 # run through default draw functions
@@ -74,8 +77,8 @@ class vector_graphics_window(base_graphics):
             if(self.settings.show_fps):
                 self.show_fps()
 
-            # show HUD
-            self.show_hud()
+            # show overlay
+            self.show_overlay()
 
             # display pygame buffer
             pygame.display.flip()
@@ -118,10 +121,18 @@ class vector_graphics_window(base_graphics):
 
     #   --------------------------------
     #
-    #   dummy function for HUD support
+    #   dummy function for overlay support
     #
     #   --------------------------------
-    def show_hud(self):
+    def show_overlay(self):
+        pass
+
+    #   --------------------------------
+    #
+    #   dummy function for underlay support
+    #
+    #   --------------------------------
+    def show_underlay(self):
         pass
 
     #   --------------------------------
