@@ -126,7 +126,7 @@ class csv_log:
 
             writeline = (timestamp + "," +
                          instruction[1] + "," +
-                         instruction[2] + "\n")
+                         str(instruction[2]) + "\n")
 
             self.log_output_file.write(writeline)
 

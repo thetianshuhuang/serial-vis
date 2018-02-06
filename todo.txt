@@ -1,9 +1,12 @@
 - add support for direct byte sending
-- split readme into wiki
-- completely REDO the wiki
 - add cleaner event support
 - add beginning settings support
 - add verification
+- more diverse draw functions:
+	- rectangle
+	- triangle
+	- filled in option?
+	- thickness specifier in all functions?
 
 Plan for bin transmission:
 

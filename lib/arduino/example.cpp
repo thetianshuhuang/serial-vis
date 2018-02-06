@@ -1,10 +1,9 @@
 #include <Arduino.h>
 
-#include "serial-vis.h"
+#include "src/serial-vis.h"
 #include <stdlib.h>
 
 float counter;
-char outstr;
 serialVis sv;
 
 int main() {
@@ -12,8 +11,6 @@ int main() {
   init();
   Serial.begin(115200);
   counter = 0;
-
-  pinMode(LED_BUILTIN, OUTPUT);
 
   sv.setoffset(400,300);
   sv.setscale(2);
