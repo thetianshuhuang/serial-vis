@@ -10,15 +10,18 @@
 
 class commandHandler
 {
-  public:
-    uint8_t command(int num_args, ...);
-    int send_attempts;
-  private:
-  	long long checksum; 
-    void printCommand(const char * input);
-    void toHex(void * input, int outsiz, char * outstr);
-    void printCheckSum();
-    uint8_t getReply();
+    public:
+        commandHandler();
+        int timeout_us;
+        uint8_t command(int num_args, ...);
+        int send_attempts;
+        bool verify;
+    private:
+    	uint8_t checksum; 
+        void printCommand(const char * input);
+        void toHex(void * input, int outsiz, char * outstr);
+        void printCheckSum();
+        uint8_t getReply();
 };
 
 #endif

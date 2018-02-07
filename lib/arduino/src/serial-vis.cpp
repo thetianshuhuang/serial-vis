@@ -3,6 +3,12 @@
 #include "serial-vis.h"
 #include "serial-command.h"
 
+// Constructor
+serialVis::serialVis(int timeout)
+{
+	timeout_us = timeout;
+}
+
 // Function definitions at
 // github.com/thetianshuhuang/serial-vis
 

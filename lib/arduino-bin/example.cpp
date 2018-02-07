@@ -5,7 +5,7 @@
 
 float counter;
 char outstr;
-serialVis sv;
+serialVis sv(1000);
 
 int main() {
 

@@ -6,17 +6,26 @@
 #include <stdarg.h>
 #include "serial-command.h"
 
+// initializer
+commandHandler::commandHandler()
+{
+    timeout_us = 1000;
+}
+
 // print command
 void commandHandler::printCommand(const char* input)
 {
     Serial.print(input);
 
-    // Update checksum
-    int i = 0;
-    while(input[i] != '\0')
-    {
-        checksum += (uint8_t) input[i];
-        i += 1;
+    if(timeout_us > 0)
+    {  
+        // Update checksum
+        int i = 0;
+        while(input[i] != '\0')
+        {
+            checksum += (uint8_t) input[i];
+            i += 1;
+        }  
     }
 }
 
@@ -34,7 +43,7 @@ void commandHandler::printCheckSum()
 // other codes tbd
 uint8_t commandHandler::getReply()
 {
-    long timeout = millis() + 1000;
+    long timeout = millis() + timeout_us;
     while(timeout > millis())
     {
         if(Serial.available())
@@ -187,8 +196,15 @@ uint8_t commandHandler::command(int num_args, ...)
 
     // conclude function
     va_end(arguments);
-    printCheckSum();
-    printCommand("\n");
-
-    return getReply();
+    if(timeout_us > 0)
+    {
+        printCheckSum();
+        printCommand("\n");
+        return getReply();
+    }
+    else
+    {
+        printCommand("\n");
+        return 0xFF;
+    }
 }
