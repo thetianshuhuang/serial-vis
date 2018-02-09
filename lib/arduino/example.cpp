@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 float counter;
-serialVis sv(0);
+serialVis sv(1000);
 
 int main() {
 

@@ -37,7 +37,7 @@ def to_int(string, number_mode):
         return(0)
     elif(number_mode == "hex"):
         try:
-            datatype = {2: '!b', 4: '!h', 8: '!i', 16: '!q'}[number_mode]
+            datatype = {2: '!b', 4: '!h', 8: '!i', 16: '!q'}[len(string)]
             return(struct.unpack(datatype, string.decode("hex"))[0])
         except (ValueError, KeyError):
             return(0)
