@@ -157,6 +157,11 @@ class serial_vis:
             # create new frame buffer
             self.current_buffer = graphics_lib.frame_buffer()
 
+        # trigger instruction
+        elif(instruction[0] == "trigger"):
+            self.is_live = False
+            self.display_buffer_id = 0
+
         # log instructions
         elif(instruction[0] in ["logs", "logf", "logstart", "logend"]):
             self.csv_log.log_data(instruction)

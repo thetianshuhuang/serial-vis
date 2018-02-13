@@ -99,7 +99,8 @@ class vector_graphics_window(base_graphics):
         Display the frame ID at the top left.
         """
 
-        textfont = pygame.font.SysFont(self.settings.font, 12)
+        textfont = pygame.font.SysFont(
+            self.settings.font, self.settings.font_size)
         textframe = textfont.render(
             "ID=" + str(self.current_buffer_id),
             False,
@@ -112,12 +113,15 @@ class vector_graphics_window(base_graphics):
         Display the current fps at the bottom left.
         """
 
-        textfont = pygame.font.SysFont(self.settings.font, 12)
+        textfont = pygame.font.SysFont(
+            self.settings.font, self.settings.font_size)
         textframe = textfont.render(
             "fps=" + str(round(self.compute_fps(), 2)),
             False,
             self.settings.colors["black"])
-        self.screen.blit(textframe, (10, self.settings.window_size[1] - 22))
+        self.screen.blit(
+            textframe,
+            (10, self.settings.window_size[1] - 10 - self.settings.font_size))
 
     #   --------------------------------
     #

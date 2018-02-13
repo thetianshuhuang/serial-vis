@@ -30,6 +30,8 @@ class ascii_parser:
         # control commands:
         # draw
         "draw": [],
+        # trigger immediate pause
+        "trigger": [],
         # logs: label, datastring
         "logs": ["s", "s"],
         # logf: label, data (float)

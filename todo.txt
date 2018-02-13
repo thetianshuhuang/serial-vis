@@ -1,5 +1,6 @@
 - add cleaner event support
 - add beginning settings support
+- triggers
 - more diverse draw functions:
 	- rectangle
 	- triangle
