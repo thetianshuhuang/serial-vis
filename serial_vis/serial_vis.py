@@ -262,3 +262,14 @@ class serial_vis:
         """
 
         pass
+
+
+#   --------------------------------
+#
+#   Default run parameters
+#
+#   --------------------------------
+if __name__ == "__main__":
+    serial_device = serial_vis(path="/dev/ttyACM0", baudrate=115200)
+    while(1):
+        serial_device.update()

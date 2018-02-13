@@ -1,25 +1,23 @@
-- add support for direct byte sending
 - add cleaner event support
 - add beginning settings support
-- add verification
 - more diverse draw functions:
 	- rectangle
 	- triangle
 	- filled in option?
 	- thickness specifier in all functions?
 - save/load buffer to file
+- add support for direct byte sending:
+	Plan for bin transmission:
 
-Plan for bin transmission:
+	|| 0xFF [begin_transmission] || opcode || arg_size | ---arg--- || ... || 0x00 | ---string--- | 0x00 || check_size | check || 0xFF [EOT] ||
+	Argument sizes are logarithmic:
+	0x01 = uint8_t, byte,
+	0x02 = uint16_t,
+	0x03 = uint32_t, float,
+	0x04 = uint64_t, double, 
+	0x05 = uint128_t, quadruple (!), 
 
-|| 0xFF [begin_transmission] || opcode || arg_size | ---arg--- || ... || 0x00 | ---string--- | 0x00 || check_size | check || 0xFF [EOT] ||
-Argument sizes are logarithmic:
-0x01 = uint8_t, byte,
-0x02 = uint16_t,
-0x03 = uint32_t, float,
-0x04 = uint64_t, double, 
-0x05 = uint128_t, quadruple (!), 
-
-Reserved arg_size characters:
-0x00 = string / null
-0xFE = begin/end tuple
-0xFF = Start / EOT
+	Reserved arg_size characters:
+	0x00 = string / null
+	0xFE = begin/end tuple
+	0xFF = Start / EOT
