@@ -100,111 +100,124 @@ void commandHandler::toHex(void * input, int outsize, char* outstr) {
 // where command_format is something like "s[dd]f".
 uint8_t commandHandler::command(int num_args, ...)
 {
-    // reset checksum
-    checksum = 0;
-
-    // set up variable arguments
-    va_list arguments;
-    va_start(arguments, num_args);
-
-    // print out opcode
-    printCommand(va_arg(arguments, char*));
-
-    // set up formatting
-    char* format = va_arg(arguments, char*);
-    int format_index = 0;
-    char* current_separator = ":";
-    
-    int i = 1;
-
-    // main loop
-    while(i < (num_args - 1))
+    // run through untill 0xFF is recieved.
+    uint8_t current_code = 0x00;
+    uint8_t attempt = 0;
+    while(current_code != 0xFF)
     {
-        // print separator between arguments
-        if(format[format_index - 1] != '[' && format[format_index] != ']')
+        // reset checksum
+        checksum = 0;
+
+        // set up variable arguments
+        va_list arguments;
+        va_start(arguments, num_args);
+
+        // print out opcode
+        printCommand(va_arg(arguments, char*));
+
+        // set up formatting
+        char* format = va_arg(arguments, char*);
+        int format_index = 0;
+        char* current_separator = ":";
+        
+        int i = 1;
+
+        // main loop
+        while(i < (num_args - 1))
         {
-            printCommand(current_separator);
+            // print separator between arguments
+            if(format[format_index - 1] != '[' && format[format_index] != ']')
+            {
+                printCommand(current_separator);
+            }
+
+            // check for formatting changes
+            if(format[format_index] == '[')
+            {
+                current_separator = ",";
+            }
+            else if(format[format_index] == ']')
+            {
+                current_separator = ":";
+            }
+
+            // print commands
+
+            // string
+            else if(format[format_index] == 's')
+            {
+                printCommand(va_arg(arguments, char*));
+                i += 1;
+            }
+            // int
+            else if(format[format_index] == 'd')
+            {
+                char buffer[5];
+                long long rawint = va_arg(arguments, int);
+                toHex(&rawint, 2, buffer);
+                printCommand(buffer);
+                i += 1;
+            }
+            // long
+            else if(format[format_index] == 'l')
+            {
+                char buffer[9];
+                long long rawint = va_arg(arguments, long);
+                toHex(&rawint, 4, buffer);
+                printCommand(buffer);
+                i += 1;
+            }
+            // long long
+            else if(format[format_index] == 'L')
+            {
+                char buffer[17];
+                long long rawint = va_arg(arguments, long long);
+                toHex(&rawint, 8, buffer);
+                printCommand(buffer);
+                i += 1;
+            }
+            // float
+            else if(format[format_index] == 'f')
+            {
+                char buffer[9];
+                double rawfloat = va_arg(arguments, double);
+                toHex(&rawfloat, 4, buffer);
+                printCommand(buffer);
+                i += 1;
+            }
+            // double
+            else if(format[format_index] == 'F')
+            {
+                char buffer[17];
+                double rawfloat = va_arg(arguments, double);
+                toHex(&rawfloat, 8, buffer);
+                printCommand(buffer);
+                i += 1;
+            }
+
+            // increment index
+            format_index += 1;
         }
 
-        // check for formatting changes
-        if(format[format_index] == '[')
+        // conclude function
+        va_end(arguments);
+        if(timeout_us > 0)
         {
-            current_separator = ",";
+            printCheckSum();
+            printCommand("\n");
+            current_code = getReply();
         }
-        else if(format[format_index] == ']')
+        else
         {
-            current_separator = ":";
-        }
-
-        // print commands
-
-        // string
-        else if(format[format_index] == 's')
-        {
-            printCommand(va_arg(arguments, char*));
-            i += 1;
-        }
-        // int
-        else if(format[format_index] == 'd')
-        {
-            char buffer[5];
-            long long rawint = va_arg(arguments, int);
-            toHex(&rawint, 2, buffer);
-            printCommand(buffer);
-            i += 1;
-        }
-        // long
-        else if(format[format_index] == 'l')
-        {
-            char buffer[9];
-            long long rawint = va_arg(arguments, long);
-            toHex(&rawint, 4, buffer);
-            printCommand(buffer);
-            i += 1;
-        }
-        // long long
-        else if(format[format_index] == 'L')
-        {
-            char buffer[17];
-            long long rawint = va_arg(arguments, long long);
-            toHex(&rawint, 8, buffer);
-            printCommand(buffer);
-            i += 1;
-        }
-        // float
-        else if(format[format_index] == 'f')
-        {
-            char buffer[9];
-            double rawfloat = va_arg(arguments, double);
-            toHex(&rawfloat, 4, buffer);
-            printCommand(buffer);
-            i += 1;
-        }
-        // double
-        else if(format[format_index] == 'F')
-        {
-            char buffer[17];
-            double rawfloat = va_arg(arguments, double);
-            toHex(&rawfloat, 8, buffer);
-            printCommand(buffer);
-            i += 1;
+            printCommand("\n");
+            current_code = 0xFF;
         }
 
-        // increment index
-        format_index += 1;
+        attempt += 1;
     }
 
-    // conclude function
-    va_end(arguments);
-    if(timeout_us > 0)
-    {
-        printCheckSum();
-        printCommand("\n");
-        return getReply();
-    }
-    else
-    {
-        printCommand("\n");
-        return 0xFF;
-    }
+    // return the number of attempts taken to send the command
+    // is 1 if timeout_us == 0
+    return(attempt);
+
 }
