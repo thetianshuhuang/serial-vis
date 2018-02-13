@@ -61,4 +61,9 @@ class settings_template:
         """
 
         for key, value in settings.items():
-            setattr(self, key, value)
+            if(type(value) == dict):
+                print(getattr(self, key))
+                getattr(self, key).update(value)
+                print(getattr(self, key))
+            else:
+                setattr(self, key, value)

@@ -7,8 +7,7 @@ import serial_vis
 # user commands go here
 class user_vector_graphics(serial_vis.default_vector_graphics):
 
-    def exampleusercommand(self, instruction):
-        print("Example user command: " + instruction[1])
+    pass
 
 
 # extend the serial_device class to add user definitions.
