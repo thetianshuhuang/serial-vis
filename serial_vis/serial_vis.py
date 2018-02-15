@@ -76,30 +76,11 @@ class serial_vis:
         # set up centralized error handling
         self.error_handler = util_lib.error_handler(self.settings)
 
-        # __begin__remove -------------------------------------------
-
-        # create serial device and parser:
-
-        # ascii transmission mode
-        # slower, but more human-readable
-        if(self.settings.serial_mode == "ascii"):
-            self.serial_device = serial_lib.ascii_device(
-                self.settings, self.error_handler)
-            self.serial_parser = serial_lib.ascii_parser(
-                self.user_commands, self.settings, self.error_handler)
-
-        # binary transmission mode
-        # 0% human readable
-        elif(self.settings.serial_mode == "bin"):
-            self.serial_device = serial_lib.bin_device(
-                self.settings, self.error_handler)
-            self.serial_parser = serial_lib.bin_parser(
-                self.user_commands, self.settings, self.error_handler)
-
-        # __end__remove ----------------------------------------------
-
         # create log
         self.csv_log = util_lib.csv_log(self.settings)
+
+        # create threaded serial handler
+        self.serial_device = serial_lib.threaded_serial(self.settings)
 
         # create graphics window
         if(self.settings.enable_graphics):
@@ -129,16 +110,16 @@ class serial_vis:
             self.process_events(window_events)
             self.process_user_events(window_events)
 
-        # get line
-        line = self.serial_device.get_line()
+        # check for exit request
+        if(self.serial_device.exit_request):
+            self.quit_sv()
+        # refresh running flag
+        else:
+            self.serial_device.running = True
 
-        # check for device disconnect
-        if(not line[1]):
-            if(self.settings.quit_on_disconnect):
-                self.quit_sv()
-
-        # parse instruction
-        instruction = self.serial_parser.process_command(line[0])
+        # fetch instruction
+        if(len(self.serial_device.instruction_buffer) > 0):
+            instruction = self.serial_device.instruction_buffer[-1]
 
         # log command with window fps tracker
         self.graphics_window.update_fps(instruction)
