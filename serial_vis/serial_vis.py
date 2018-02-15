@@ -109,10 +109,12 @@ class serial_vis:
         # process keyboard/mouse commands
         if(self.settings.enable_graphics):
             if(self.command_mode):
-                if(self.command_line.update()):
-                    # self.command_mode = False
-                    # wip
-                    pass
+                line = self.command_line.update()
+                if(line[0]):
+                    self.command_mode = False
+                    if(line[1] == "quit"):
+                        self.quit_sv()
+                    # run command
                 command_line = self.command_line.get_text_object()
             else:
                 command_line = pygame.Surface((0, 0))

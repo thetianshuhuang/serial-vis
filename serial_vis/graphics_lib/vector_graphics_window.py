@@ -71,7 +71,11 @@ class vector_graphics_window(base_graphics):
 
         # add in command line state
         if(command_mode):
-            self.screen.blit(command_line, (400, 400))
+            self.screen.blit(
+                command_line,
+                (10,
+                 self.settings.window_size[1] -
+                 command_line.get_size()[1] - 10))
 
         # display pygame buffer
         pygame.display.flip()
@@ -96,7 +100,10 @@ class vector_graphics_window(base_graphics):
             "ID=" + str(self.current_buffer_id),
             False,
             self.settings.colors["black"])
-        self.screen.blit(textframe, (10, 10))
+        self.screen.blit(
+            textframe,
+            (self.settings.window_size[0] - 10 - textframe.get_size()[0],
+             10))
 
     def show_fps(self):
 
@@ -110,9 +117,7 @@ class vector_graphics_window(base_graphics):
             "fps=" + str(round(self.compute_fps(), 2)),
             False,
             self.settings.colors["black"])
-        self.screen.blit(
-            textframe,
-            (10, self.settings.window_size[1] - 10 - self.settings.font_size))
+        self.screen.blit(textframe, (10, 10))
 
     #   --------------------------------
     #

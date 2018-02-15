@@ -2,6 +2,7 @@
 # command line interface inside a pygame window
 
 import pygame
+import time
 from keyboard_keybinds import keyboard_keybinds
 
 
@@ -66,8 +67,8 @@ class command_line(keyboard_keybinds):
             Line contents
         """
 
+        keys_to_add = []
         str_to_add = ""
-        caps = self.is_capslock
 
         for event in pygame.event.get():
 
@@ -77,7 +78,18 @@ class command_line(keyboard_keybinds):
                 # backspace
                 if(event.key == pygame.K_BACKSPACE):
                     if(len(self.line_contents) > 0):
-                        self.line_contents = self.line_contents[:-1]
+                        self.line_contents = (
+                            self.line_contents[:self.current_index - 1] +
+                            self.line_contents[self.current_index:])
+                        if(self.current_index > 0):
+                            self.current_index -= 1
+
+                # delete
+                if(event.key == pygame.K_DELETE):
+                    if(len(self.line_contents) > 0):
+                        self.line_contents = (
+                            self.line_contents[:self.current_index - 1] +
+                            self.line_contents[self.current_index:])
 
                 # escape
                 elif(event.key == pygame.K_ESCAPE or
@@ -91,7 +103,7 @@ class command_line(keyboard_keybinds):
                     return((True), self.line_contents)
 
                 # left arrow
-                elif(event.type == pygame.K_LEFT):
+                elif(event.key == pygame.K_LEFT):
                     if(self.current_index > 0):
                         self.current_index -= 1
 
@@ -100,34 +112,37 @@ class command_line(keyboard_keybinds):
                     if(self.current_index < len(self.line_contents)):
                         self.current_index += 1
 
-                # shift
-                elif(event.key == pygame.K_RSHIFT or
-                     event.key == pygame.K_LSHIFT):
-                    caps = not caps
-
-                # capslock
-                elif(event.key == pygame.K_CAPSLOCK):
-                    self.is_capslock = not self.is_capslock
-
                 # append key to the string
                 elif event.key in self.keymap:
-                    str_to_add += self.keymap[event.key]
+                    keys_to_add.append(event.key)
                     self.current_index += 1
 
-        # make caps if applicable
-        if(caps):
-            str_to_add.upper()
+            # check for quit
+            if(event.type == pygame.QUIT):
+                return((True), "quit")
+
+        # handle capslock/shift
+        if(pygame.key.get_pressed()[pygame.K_CAPSLOCK]):
+            self.is_capslock = not self.is_capslock
+
+        caps = self.is_capslock
+
+        if(pygame.key.get_pressed()[pygame.K_RSHIFT] or
+           pygame.key.get_pressed()[pygame.K_LSHIFT]):
+            caps = not caps
+
+        for key in keys_to_add:
+            # make caps if applicable
+            if(caps):
+                str_to_add += self.keymap[key][1]
+            else:
+                str_to_add += self.keymap[key][0]
 
         # add in string at the cursor location
         self.line_contents = (
-            self.line_contents[:self.current_index] +
+            self.line_contents[:self.current_index - 1] +
             str_to_add +
-            self.line_contents[self.current_index:])
-
-        # blinking cursor, once every second
-        # blank out the current_index character
-        # if(time.time() % 1 < 0.5):
-        #     self.line_contents[self.current_index] = " "
+            self.line_contents[self.current_index - 1:])
 
         # return a not done string
         return((False, ""))
@@ -148,7 +163,17 @@ class command_line(keyboard_keybinds):
             Pygame surface object containing the command line text
         """
 
+        # blinking cursor, once every second
+        # blank out the current_index character
+        if(2 * time.time() % 1 < 0.3):
+            display_line = (
+                self.line_contents[:self.current_index - 1] +
+                " " +
+                self.line_contents[self.current_index:])
+        else:
+            display_line = self.line_contents
+
         textframe = self.font.render(
-            self.line_contents, False, self.settings.colors["black"])
+            display_line, False, self.settings.colors["black"])
 
         return(textframe)
