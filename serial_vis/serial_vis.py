@@ -3,9 +3,7 @@
 
 import serial_lib
 import graphics_lib
-from csv_log import *
-from sv_settings import *
-import error_handler
+import util_lib
 
 
 #   --------------------------------
@@ -71,12 +69,14 @@ class serial_vis:
         """
 
         # update settings
-        self.settings = sv_settings()
+        self.settings = util_lib.sv_settings()
         self.settings.update(self.user_settings)
         self.settings.update(kwargs)
 
         # set up centralized error handling
-        self.error_handler = error_handler.error_handler(self.settings)
+        self.error_handler = util_lib.error_handler(self.settings)
+
+        # __begin__remove -------------------------------------------
 
         # create serial device and parser:
 
@@ -96,8 +96,10 @@ class serial_vis:
             self.serial_parser = serial_lib.bin_parser(
                 self.user_commands, self.settings, self.error_handler)
 
+        # __end__remove ----------------------------------------------
+
         # create log
-        self.csv_log = csv_log(self.settings)
+        self.csv_log = util_lib.csv_log(self.settings)
 
         # create graphics window
         if(self.settings.enable_graphics):
