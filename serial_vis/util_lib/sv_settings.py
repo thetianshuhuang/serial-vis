@@ -41,12 +41,12 @@ class sv_settings(settings_template):
     offset = (0, 0)
     frame_limit = 60
     line_width = 2
-    font = "droidsansmono"
+    font = "freemono"
     show_frame_id = True
     show_fps = True
     fps_count_keyword = "draw"
     fps_smooth_size = 30
-    font_size = 12
+    font_size = 18
     events = {
         pygame.QUIT: "quit",
         pygame.K_SPACE: "pause",
@@ -54,7 +54,7 @@ class sv_settings(settings_template):
         pygame.K_LEFTBRACKET: "backplus",
         pygame.K_COMMA: "back",
         pygame.K_RIGHTBRACKET: "fwdplus",
-        pygame.K_ESCAPE: "cmd"
+        pygame.K_BACKQUOTE: "cmd"
     }
     colors = {
         "black": (0, 0, 0),

@@ -54,12 +54,15 @@ class base_device:
         while(not timeout):
 
             try:
+                # initialize device
                 self.device = serial.Serial(
                     self.settings.path,
                     self.settings.baudrate,
                     timeout=self.settings.rx_timeout,
                     writeTimeout=self.settings.tx_timeout)
-                print("Device connected: " + self.settings.path + "\n\n")
+                print("Device connected: " + self.settings.path + "\n")
+                # flush potentially incomplete commands from buffer
+                self.device.reset_input_buffer()
 
                 break
 

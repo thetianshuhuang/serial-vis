@@ -10,6 +10,7 @@ int main() {
 
   init();
   Serial.begin(115200);
+  Serial.flush();
   counter = 0;
 
   sv.setoffset(400,300);

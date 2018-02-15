@@ -2,7 +2,7 @@
 # command line interface inside a pygame window
 
 import pygame
-import time
+from keyboard_keybinds import keyboard_keybinds
 
 
 #   --------------------------------
@@ -10,14 +10,14 @@ import time
 #   Command line
 #
 #   --------------------------------
-class command_line:
+class command_line(keyboard_keybinds):
 
     """
     Command line class
 
     Attributes
     ----------
-    is_capslock
+    is_capslock : bool
         Toggles if capslock is enabled or disabled
     """
 
@@ -36,12 +36,13 @@ class command_line:
 
         Parameters
         ----------
-        settings
-            settings object
+        settings : settings object
+            settings object for serial vis
         """
 
         self.settings = settings
         self.cursor_pwm = 0
+        self.current_index = 0
 
         self.font = pygame.font.SysFont(
             self.settings.font, self.settings.font_size)
@@ -74,43 +75,44 @@ class command_line:
             if(event.type == pygame.KEYDOWN):
 
                 # backspace
-                if(event.type == pygame.K_BACKSPACE):
+                if(event.key == pygame.K_BACKSPACE):
                     if(len(self.line_contents) > 0):
                         self.line_contents = self.line_contents[:-1]
 
                 # escape
-                if(event.type == pygame.K_ESCAPE):
+                elif(event.key == pygame.K_ESCAPE or
+                     event.key == pygame.K_BACKQUOTE):
                     # return a blank line and exit command line mode
                     return((True), "")
 
                 # enter
-                if(event.type == pygame.K_RETURN):
+                elif(event.key == pygame.K_RETURN):
                     # return the line and exit command line mode
                     return((True), self.line_contents)
 
                 # left arrow
-                if(event.type == pygame.K_LEFT):
+                elif(event.type == pygame.K_LEFT):
                     if(self.current_index > 0):
                         self.current_index -= 1
 
                 # right arrow
-                if(event.type == pygame.K_RIGHT):
+                elif(event.key == pygame.K_RIGHT):
                     if(self.current_index < len(self.line_contents)):
                         self.current_index += 1
 
                 # shift
-                if(event.type == pygame.K_RSHIFT or
-                   event.type == pygame.K_LSHIFT):
+                elif(event.key == pygame.K_RSHIFT or
+                     event.key == pygame.K_LSHIFT):
                     caps = not caps
 
                 # capslock
-                if(event.type == pygame.K_CAPSLOCK):
+                elif(event.key == pygame.K_CAPSLOCK):
                     self.is_capslock = not self.is_capslock
 
-            # append key to the string
-            if event.type in self.keymap:
-                str_to_add += self.keymap[event.type]
-                self.current_index += 1
+                # append key to the string
+                elif event.key in self.keymap:
+                    str_to_add += self.keymap[event.key]
+                    self.current_index += 1
 
         # make caps if applicable
         if(caps):
@@ -124,8 +126,8 @@ class command_line:
 
         # blinking cursor, once every second
         # blank out the current_index character
-        if(time.time() % 1 < 0.5):
-            self.line_contents[self.current_index] = " "
+        # if(time.time() % 1 < 0.5):
+        #     self.line_contents[self.current_index] = " "
 
         # return a not done string
         return((False, ""))

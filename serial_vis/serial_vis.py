@@ -1,6 +1,8 @@
 # serial_vis.py
 # main class
 
+import time
+import pygame
 import serial_lib
 import graphics_lib
 import util_lib
@@ -46,6 +48,7 @@ class serial_vis:
     user_settings = {}
     user_commands = {}
     graphics_class = graphics_lib.default_vector_graphics
+    command_mode = False
 
     #   --------------------------------
     #
@@ -77,7 +80,11 @@ class serial_vis:
         self.csv_log = util_lib.csv_log(self.settings)
 
         # create threaded serial handler
-        self.serial_device = serial_lib.threaded_serial(self.settings)
+        self.serial_device = serial_lib.threaded_serial(
+            self.settings,
+            self.error_handler,
+            self.user_commands)
+        self.serial_device.start()
 
         # create graphics window
         if(self.settings.enable_graphics):
@@ -85,7 +92,8 @@ class serial_vis:
                 self.settings, self.error_handler)
 
         # initialize buffer manager
-        self.buffer_manager = graphics_lib.buffer_manager(self.settings)
+        self.buffer_manager = graphics_lib.buffer_manager(
+            self.settings, self.error_handler)
 
     #   --------------------------------
     #
@@ -98,46 +106,62 @@ class serial_vis:
         Execute master program update.
         """
 
+        # process keyboard/mouse commands
         if(self.settings.enable_graphics):
-            # process keyboard/mouse commands
-            window_events = self.graphics_window.check_events()
-            self.process_events(window_events)
-            self.process_user_events(window_events)
+            if(self.command_mode):
+                if(self.command_line.update()):
+                    # self.command_mode = False
+                    # wip
+                    pass
+                command_line = self.command_line.get_text_object()
+            else:
+                command_line = pygame.Surface((0, 0))
+                window_events = self.graphics_window.check_events()
+                self.process_events(window_events)
+                self.process_user_events(window_events)
 
         # check for exit request
         if(self.serial_device.exit_request):
             self.quit_sv()
-        # refresh running flag
+        # refresh thread timeout
         else:
-            self.serial_device.running = True
+            self.serial_device.thread_timeout = time.time() + 0.1
 
-        # fetch instruction
-        if(len(self.serial_device.instruction_buffer) > 0):
-            instruction = self.serial_device.instruction_buffer[-1]
+        # acquire thread lock -------------------------------------------------
+        self.serial_device.lock.acquire()
 
-        # log command with window fps tracker
-        self.graphics_window.update_fps(instruction)
+        # fetch instruction if it exists
+        while(len(self.serial_device.instruction_buffer) > 0):
+            instruction = self.serial_device.instruction_buffer.pop(0)
 
-        # log instructions
-        if(instruction[0] in ["logs", "logf", "logstart", "logend"]):
-            self.csv_log.log_data(instruction)
+            # log command with window fps tracker
+            self.graphics_window.update_fps(instruction)
 
-        # print instruction
-        elif(instruction[0] == "echo"):
-            print(instruction[1])
+            # log instructions
+            if(instruction[0] in ["logs", "logf", "logstart", "logend"]):
+                self.csv_log.log_data(instruction)
 
-        # null instruction
-        elif(instruction[0] == "null"):
-            pass
+            # print instruction
+            elif(instruction[0] == "echo"):
+                print(instruction[1])
 
-        # process draw-related instructions
-        else:
-            self.buffer_manager.update()
+            # null instruction
+            elif(instruction[0] == "null" or len(instruction) == 0):
+                pass
+
+            # process draw-related instructions
+            else:
+                self.buffer_manager.update(instruction)
+
+        self.serial_device.lock.release()
+        # release lock --------------------------------------------------------
 
         if(self.settings.enable_graphics):
             # update buffer
             self.graphics_window.update_screen(
-                self.buffer_manager.get_buffer())
+                self.buffer_manager.get_buffer(),
+                self.command_mode,
+                command_line)
 
     #   --------------------------------
     #
@@ -147,7 +171,7 @@ class serial_vis:
     def process_events(self, events):
 
         """
-        Process keyboard instructions.
+        Process keyboard instructions. Doesn't run in command mode
 
         Parameters
         ----------
@@ -162,8 +186,13 @@ class serial_vis:
         if "quit" in events_press:
             self.quit_sv()
 
+        if "cmd" in events_press:
+            self.command_mode = True
+            # create new command line
+            self.command_line = graphics_lib.command_line(self.settings)
+
         # check buffer related controls
-        self.buffer_manager.check_controls()
+        self.buffer_manager.check_controls(events)
 
     #   --------------------------------
     #
@@ -177,13 +206,14 @@ class serial_vis:
         """
 
         # print message
+
         print("\nClosing serial-vis ... \n")
 
         # call clean close methods
         if(self.settings.enable_graphics):
             self.graphics_window.close_window()
         self.csv_log.close_file()
-        self.serial_device.close()
+
         exit()
 
     #   --------------------------------

@@ -4,20 +4,49 @@
 from buffer import *
 
 
+#   --------------------------------
+#
+#   Serial-vis specific buffer manager
+#
+#   --------------------------------
 class buffer_manager:
 
     """
+    Serial-vis specific buffer management
+
+    Attributes
+    ----------
+    is_live : bool
+        Is the current display buffer live?
+    display_buffer_id : int
+        id of currently displayed buffer, relative to the current center buffer
+        (most recent, or where the stream was paused)
     """
 
     is_live = True
     display_buffer_id = 0
 
-    def __init__(self, settings):
+    def __init__(self, settings, error_handler):
+
         """
+        Create buffer manager
+
+        Parameters
+        ----------
+        settings : settings object
+            settings object for serial vis
+        error_handler : error_handler object
+            centralized error handler
         """
+
+        # set up settings
+        self.settings = settings
 
         # set up buffer db
         self.buffer_db = buffer_db(self.settings)
+
+        # set up error handler
+        self.error_handler = error_handler
 
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
@@ -25,6 +54,12 @@ class buffer_manager:
     def update(self, instruction):
 
         """
+        Update the current buffer.
+
+        Parameters
+        ----------
+        instruction : array
+            array containing the instruction to be processed
         """
 
         # check for control instructions:
@@ -41,7 +76,7 @@ class buffer_manager:
                 self.buffer_db.new_buffer(self.current_buffer)
 
             # create new frame buffer
-            self.current_buffer = graphics_lib.frame_buffer()
+            self.current_buffer = frame_buffer()
 
         # trigger instruction
         elif(instruction[0] == "trigger"):
@@ -55,6 +90,12 @@ class buffer_manager:
     def get_buffer(self):
 
         """
+        Get the currently selected buffer.
+
+        Returns
+        -------
+        buffer object
+            buffer object corresponding to the current buffer ID
         """
 
         return(
@@ -64,7 +105,16 @@ class buffer_manager:
     def check_controls(self, events):
 
         """
+        Check events to see if the current buffer or mode should be changed
+
+        Parameters
+        ----------
+        events : [events_hold, events_press]
+            processed event array containing the currently held keys and the
+            most recently pressed keys
         """
+
+        (events_hold, events_press) = events
 
         # press key events:
         if "pause" in events_press:

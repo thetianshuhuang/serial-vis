@@ -44,15 +44,17 @@ void commandHandler::printCheckSum()
 uint8_t commandHandler::getReply()
 {
     long timeout = millis() + timeout_us;
+    uint8_t reply;
     while(timeout > millis())
     {
         if(Serial.available())
         {
-            if(Serial.read() == 0x00)
+            reply = Serial.read();
+            if(reply == 0x00)
             {
                 return(0x00);
             }
-            else if(Serial.read() == 0xFF)
+            else if(reply == 0xFF)
             {
                 return(0xFF);
             }

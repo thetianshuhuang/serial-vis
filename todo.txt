@@ -1,4 +1,3 @@
-- move serial receipt and parsing to a dedicated thread
 - add cleaner event support
 - add beginning settings support
 - triggers

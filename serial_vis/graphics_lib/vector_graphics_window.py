@@ -29,7 +29,7 @@ class vector_graphics_window(base_graphics):
     #   Update screen
     #
     #   --------------------------------
-    def update_screen(self, frame_buffer):
+    def update_screen(self, frame_buffer, command_mode, command_line):
 
         """
         Update a screen with the given frame_buffer.
@@ -38,55 +38,46 @@ class vector_graphics_window(base_graphics):
         ----------
         frame_buffer: buffer.frame_buffer
             instruction buffer to be displayed
-
-        Returns
-        -------
-        Bool
-            True if the update operation redrew the screen; False otherwise
         """
 
-        # return false if unsuccessful.
-        if(frame_buffer.frame_id == self.current_buffer_id):
-            return(False)
+        self.current_buffer_id = frame_buffer.frame_id
 
-        # otherwise, draw the buffer
-        else:
-            self.current_buffer_id = frame_buffer.frame_id
+        # clear pygame buffer
+        self.screen.fill(self.settings.colors["background"])
 
-            # clear pygame buffer
-            self.screen.fill(self.settings.colors["background"])
+        # show underlay
+        self.show_underlay()
 
-            # show underlay
-            self.show_underlay()
+        for instruction in frame_buffer.instructions:
 
-            for instruction in frame_buffer.instructions:
+            # run through default draw functions
+            try:
+                draw_function = getattr(self, instruction[0])
+                draw_function(instruction)
+            # raise AttributeError
+            # if the requested instruction doesn't exist.
+            except AttributeError:
+                self.error_handler.raise_error(
+                    "onf", instruction, instruction[0])
 
-                # run through default draw functions
-                try:
-                    draw_function = getattr(self, instruction[0])
-                    draw_function(instruction)
-                # raise AttributeError
-                # if the requested instruction doesn't exist.
-                except AttributeError:
-                    self.error_handler.raise_error(
-                        "onf", instruction, instruction[0])
+        # show frame id and fps
+        if(self.settings.show_frame_id):
+            self.show_frame_id()
+        if(self.settings.show_fps):
+            self.show_fps()
 
-            # show frame id and fps
-            if(self.settings.show_frame_id):
-                self.show_frame_id()
-            if(self.settings.show_fps):
-                self.show_fps()
+        # show overlay
+        self.show_overlay()
 
-            # show overlay
-            self.show_overlay()
+        # add in command line state
+        if(command_mode):
+            self.screen.blit(command_line, (400, 400))
 
-            # display pygame buffer
-            pygame.display.flip()
+        # display pygame buffer
+        pygame.display.flip()
 
-            # limit the fps
-            self.clock.tick(self.settings.frame_limit)
-
-            return(True)
+        # limit the fps
+        self.clock.tick(self.settings.frame_limit)
 
     #   --------------------------------
     #

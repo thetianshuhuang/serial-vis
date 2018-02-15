@@ -52,7 +52,6 @@ class keyboard_keybinds:
         pygame.K_RIGHTBRACKET: "]",
         pygame.K_CARET: "^",
         pygame.K_UNDERSCORE: "_",
-        pygame.K_BACKQUOTE: "`",
         pygame.K_a: "a",
         pygame.K_b: "b",
         pygame.K_c: "c",

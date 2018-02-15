@@ -143,7 +143,8 @@ class base_graphics:
         float
             fps, smoothed over settings.frame_smooth_size frames
         """
-        if(self.frame_times[-1] == self.frame_times[0]):
+
+        if(len(self.frame_times) < 2):
             return(0)
 
         return(len(self.frame_times) /
