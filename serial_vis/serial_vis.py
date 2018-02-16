@@ -5,6 +5,7 @@ import time
 import pygame
 import serial_lib
 import graphics_lib
+import buffer_lib
 import util_lib
 
 
@@ -91,7 +92,7 @@ class serial_vis:
             self.settings, self.error_handler)
 
         # initialize buffer manager
-        self.buffer_manager = graphics_lib.buffer_manager(
+        self.buffer_manager = buffer_lib.buffer_manager(
             self.settings, self.error_handler)
 
     #   --------------------------------

@@ -61,6 +61,7 @@ class base_device:
                     timeout=self.settings.rx_timeout,
                     writeTimeout=self.settings.tx_timeout)
                 print("Device connected: " + self.settings.path + "\n")
+
                 # flush potentially incomplete commands from buffer
                 self.device.flushInput()
 

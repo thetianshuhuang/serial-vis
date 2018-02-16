@@ -85,6 +85,7 @@ class threaded_serial(threading.Thread):
         and clearing it periodically.
         """
 
+        # main loop
         while(self.thread_timeout > time.time()):
 
             # get line
