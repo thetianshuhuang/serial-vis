@@ -2,7 +2,7 @@
 # serial device interaction class
 
 import serial
-from time import sleep
+import time
 
 
 #   --------------------------------
@@ -48,39 +48,51 @@ class base_device:
         # set up error handling
         self.error_handler = error_handler
 
-        counter = 0
-        timeout = False
+        # message spam limiter
+        self.next_time = 0
+
+    #   --------------------------------
+    #
+    #   search for device connection
+    #
+    #   --------------------------------
+    def connect_device(self):
+
+        """
+        Attempt to connect a serial device.
+
+        Returns
+        -------
+        bool
+            Success (True) or failure (False).
+        """
+
         # open serial interface
-        while(not timeout):
+        try:
+            # initialize device
+            self.device = serial.Serial(
+                self.settings.path,
+                self.settings.baudrate,
+                timeout=self.settings.rx_timeout,
+                writeTimeout=self.settings.tx_timeout)
+            print("Device connected: " + self.settings.path + "\n")
+            # flush potentially incomplete commands from buffer
+            self.device.flushInput()
 
-            try:
-                # initialize device
-                self.device = serial.Serial(
-                    self.settings.path,
-                    self.settings.baudrate,
-                    timeout=self.settings.rx_timeout,
-                    writeTimeout=self.settings.tx_timeout)
-                print("Device connected: " + self.settings.path + "\n")
-                # flush potentially incomplete commands from buffer
-                self.device.flushInput()
+            # return success
+            return(True)
 
-                break
+        except serial.serialutil.SerialException:
+            # limit the error message to once every 2.5 seconds.
+            if(self.next_time < time.time()):
+                print("Serial device " +
+                      self.settings.path +
+                      " not found. Trying again.")
 
-            except serial.serialutil.SerialException:
-                # limit the error message to once every 2.5 seconds.
-                if(counter % 10 == 0):
-                    print("Serial device " +
-                          self.settings.path +
-                          " not found. Trying again.")
+                self.next_time = time.time() + 2.5
 
-            # wait 250ms before trying again to avoid spamming the system
-            sleep(0.25)
-            counter += 1
-
-            # trigger timeout. Default is 60 seconds (300 attempts).
-            if(counter >= self.settings.seek_timeout * 4):
-                timeout = True
-                print("Operation timed out.")
+            # return failure
+            return(False)
 
     #   --------------------------------
     #

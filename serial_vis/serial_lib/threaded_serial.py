@@ -29,6 +29,7 @@ class threaded_serial(threading.Thread):
 
     exit_request = False
     instruction_buffer = []
+    device_connected = False
 
     def __init__(self, settings, error_handler, user_commands):
 
@@ -85,21 +86,38 @@ class threaded_serial(threading.Thread):
         and clearing it periodically.
         """
 
+        timeout = time.time() + self.settings.seek_timeout
+
         while(self.thread_timeout > time.time()):
 
-            # get line
-            line = self.serial_device.get_line()
+            # no device connected; attempt to establish connection
+            if(not self.device_connected):
+                self.device_connected = self.serial_device.connect_device()
 
-            # parse instruction
-            instruction = self.serial_parser.process_command(line[0])
+                # wait 250ms before trying again to avoid spamming the system
+                time.sleep(0.25)
 
-            self.lock.acquire()
-            try:
-                self.instruction_buffer.append(instruction)
-            finally:
-                self.lock.release()
+                # trigger timeout. Default is 60 seconds (300 attempts).
+                if(time.time() > timeout):
+                    print("Operation timed out.")
+                    self.exit_request = True
 
-            if(not line[1]):
-                self.exit_request = False
+            # device is connected
+            else:
+                # get line
+                line = self.serial_device.get_line()
+
+                # parse instruction
+                instruction = self.serial_parser.process_command(line[0])
+
+                self.lock.acquire()
+                try:
+                    self.instruction_buffer.append(instruction)
+                finally:
+                    self.lock.release()
+
+                # exit request passed by the serial device; pass it on
+                if(not line[1]):
+                    self.exit_request = True
 
         self.done = True
