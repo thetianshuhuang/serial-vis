@@ -26,6 +26,11 @@ class buffer_manager:
     is_live = True
     display_buffer_id = 0
 
+    #   --------------------------------
+    #
+    #   Initialization
+    #
+    #   --------------------------------
     def __init__(self, settings, error_handler):
 
         """
@@ -51,6 +56,11 @@ class buffer_manager:
         # set up initial frame buffer
         self.current_buffer = frame_buffer()
 
+    #   --------------------------------
+    #
+    #   Update current buffer
+    #
+    #   --------------------------------
     def update(self, instruction):
 
         """
@@ -87,6 +97,11 @@ class buffer_manager:
         else:
             self.current_buffer.add_instruction(instruction)
 
+    #   --------------------------------
+    #
+    #   Get the currently selected buffer
+    #
+    #   --------------------------------
     def get_buffer(self):
 
         """
@@ -102,6 +117,11 @@ class buffer_manager:
             self.buffer_db.get_buffer(
                 self.display_buffer_id, relative=True))
 
+    #   --------------------------------
+    #
+    #   Check for buffer related controls
+    #
+    #   --------------------------------
     def check_controls(self, events):
 
         """

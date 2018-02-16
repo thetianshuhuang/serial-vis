@@ -114,7 +114,7 @@ class vector_graphics_window(base_graphics):
         textfont = pygame.font.SysFont(
             self.settings.font, self.settings.font_size)
         textframe = textfont.render(
-            "fps (draw | disp)=" + str(round(self.compute_fps(), 2)) +
+            "fps (draw|disp) = " + str(round(self.compute_fps(), 2)) +
             " | " + str(round(self.clock.get_fps(), 2)),
             False,
             self.settings.colors["black"])

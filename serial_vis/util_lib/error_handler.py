@@ -130,7 +130,8 @@ class error_handler:
             print(self.error_code_definitions[error_name][0])
 
             # print command
-            print(instruction)
+            if(instruction != [] and instruction != ""):
+                print(instruction)
 
             # print description
             index = self.error_code_definitions[error_name][1].find("&")
