@@ -2,7 +2,7 @@
 # serial device interaction class
 
 import serial
-from time import sleep
+import time
 
 
 #   --------------------------------
@@ -15,10 +15,8 @@ class base_device:
 
     """
     Base Serial Device class; governs serial interactions
-
     Attributes
     ----------
-
     Created by __init__:
     device : serial.Serial object
         Serial device object
@@ -33,7 +31,6 @@ class base_device:
 
         """
         Initialize serial device.
-
         Parameters
         ----------
         path : str
@@ -48,40 +45,50 @@ class base_device:
         # set up error handling
         self.error_handler = error_handler
 
-        counter = 0
-        timeout = False
+        # message spam limiter
+        self.next_time = 0
+
+    #   --------------------------------
+    #
+    #   search for device connection
+    #
+    #   --------------------------------
+    def connect_device(self):
+
+        """
+        Attempt to connect a serial device.
+        Returns
+        -------
+        bool
+            Success (True) or failure (False).
+        """
+
         # open serial interface
-        while(not timeout):
+        try:
+            # initialize device
+            self.device = serial.Serial(
+                self.settings.path,
+                self.settings.baudrate,
+                timeout=self.settings.rx_timeout,
+                writeTimeout=self.settings.tx_timeout)
+            print("Device connected: " + self.settings.path + "\n")
+            # flush potentially incomplete commands from buffer
+            self.device.flushInput()
 
-            try:
-                # initialize device
-                self.device = serial.Serial(
-                    self.settings.path,
-                    self.settings.baudrate,
-                    timeout=self.settings.rx_timeout,
-                    writeTimeout=self.settings.tx_timeout)
-                print("Device connected: " + self.settings.path + "\n")
+            # return success
+            return(True)
 
-                # flush potentially incomplete commands from buffer
-                self.device.flushInput()
+        except serial.serialutil.SerialException:
+            # limit the error message to once every 2.5 seconds.
+            if(self.next_time < time.time()):
+                print("Serial device " +
+                      self.settings.path +
+                      " not found. Trying again.")
 
-                break
+                self.next_time = time.time() + 2.5
 
-            except serial.serialutil.SerialException:
-                # limit the error message to once every 2.5 seconds.
-                if(counter % 10 == 0):
-                    print("Serial device " +
-                          self.settings.path +
-                          " not found. Trying again.")
-
-            # wait 250ms before trying again to avoid spamming the system
-            sleep(0.25)
-            counter += 1
-
-            # trigger timeout. Default is 60 seconds (300 attempts).
-            if(counter >= self.settings.seek_timeout * 4):
-                timeout = True
-                print("Operation timed out.")
+            # return failure
+            return(False)
 
     #   --------------------------------
     #
@@ -105,7 +112,6 @@ class base_device:
 
         """
         Write a line to serial.
-
         Parameters
         ----------
         line : str
@@ -126,7 +132,6 @@ class base_device:
 
         """
         Write a byte array (already formatted) to serial.
-
         Parameters
         ----------
         line : str / byte[]
