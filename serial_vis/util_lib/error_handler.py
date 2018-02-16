@@ -67,6 +67,10 @@ class error_handler:
         "nas": (
             "Error: attempted to encode string with non-ascii character",
             "string = &"
+        ),
+        "stx": (
+            "Error: invalid syntax",
+            "command = &"
         )
     }
 

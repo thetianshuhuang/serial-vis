@@ -62,7 +62,7 @@ class base_device:
                     writeTimeout=self.settings.tx_timeout)
                 print("Device connected: " + self.settings.path + "\n")
                 # flush potentially incomplete commands from buffer
-                self.device.reset_input_buffer()
+                self.device.flushInput()
 
                 break
 

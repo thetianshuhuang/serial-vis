@@ -87,9 +87,8 @@ class serial_vis:
         self.serial_device.start()
 
         # create graphics window
-        if(self.settings.enable_graphics):
-            self.graphics_window = self.graphics_class(
-                self.settings, self.error_handler)
+        self.graphics_window = self.graphics_class(
+            self.settings, self.error_handler)
 
         # initialize buffer manager
         self.buffer_manager = graphics_lib.buffer_manager(
@@ -107,20 +106,17 @@ class serial_vis:
         """
 
         # process keyboard/mouse commands
-        if(self.settings.enable_graphics):
-            if(self.command_mode):
-                line = self.command_line.update()
-                if(line[0]):
-                    self.command_mode = False
-                    if(line[1] == "quit"):
-                        self.quit_sv()
-                    # run command
-                command_line = self.command_line.get_text_object()
-            else:
-                command_line = pygame.Surface((0, 0))
-                window_events = self.graphics_window.check_events()
-                self.process_events(window_events)
-                self.process_user_events(window_events)
+        if(self.command_mode):
+            line = self.command_line.update()
+            if(line[0]):
+                self.command_mode = False
+                self.process_command(line[1])
+            command_line = self.command_line.get_text_object()
+        else:
+            command_line = pygame.Surface((0, 0))
+            window_events = self.graphics_window.check_events()
+            self.process_events(window_events)
+            self.process_user_events(window_events)
 
         # check for exit request
         if(self.serial_device.exit_request):
@@ -158,12 +154,11 @@ class serial_vis:
         self.serial_device.lock.release()
         # release lock --------------------------------------------------------
 
-        if(self.settings.enable_graphics):
-            # update buffer
-            self.graphics_window.update_screen(
-                self.buffer_manager.get_buffer(),
-                self.command_mode,
-                command_line)
+        # update buffer
+        self.graphics_window.update_screen(
+            self.buffer_manager.get_buffer(),
+            self.command_mode,
+            command_line)
 
     #   --------------------------------
     #
@@ -198,6 +193,57 @@ class serial_vis:
 
     #   --------------------------------
     #
+    #   process command line command
+    #
+    #   --------------------------------
+    def process_command(self, command):
+
+        """
+        Process command line instruction.
+
+        Parameters
+        ----------
+        command : str
+            Command line instruction
+        """
+
+        arguments = command.split(" ")
+
+        # pad arguments with null strings
+        for i in range(3 - len(arguments)):
+            arguments.append("")
+
+        # quit
+        if(arguments[0] == "quit"):
+            self.quit_sv()
+
+        # change setting
+        elif(arguments[0] == "set"):
+            try:
+                self.settings.update({arguments[1]: eval(arguments[2])})
+
+            # handle errors
+            except SyntaxError:
+                self.error_handler.raise_error("stx", [], command)
+            except Exception as e:
+                self.error_handler.raise_error("unk", [], str(e))
+
+        # execute arbitrary command
+        elif(arguments[0] == "exec"):
+            try:
+                eval(arguments[1])
+
+            # handle errors
+            except SyntaxError:
+                self.error_handler.raise_error("stx", [], command)
+            except Exception as e:
+                self.error_handler.raise_error("unk", [], str(e))
+
+        else:
+            self.error_handler.raise_error("stx", [], command)
+
+    #   --------------------------------
+    #
     #   quit
     #
     #   --------------------------------
@@ -212,8 +258,7 @@ class serial_vis:
         print("\nClosing serial-vis ... \n")
 
         # call clean close methods
-        if(self.settings.enable_graphics):
-            self.graphics_window.close_window()
+        self.graphics_window.close_window()
         self.csv_log.close_file()
 
         exit()

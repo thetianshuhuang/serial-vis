@@ -46,7 +46,7 @@ class sv_settings(settings_template):
     show_fps = True
     fps_count_keyword = "draw"
     fps_smooth_size = 30
-    font_size = 18
+    font_size = 15
     events = {
         pygame.QUIT: "quit",
         pygame.K_SPACE: "pause",
@@ -84,5 +84,6 @@ class sv_settings(settings_template):
         "unk": True,
         "wto": True,
         "onf": True,
-        "nas": True
+        "nas": True,
+        "stx": True,
     }
