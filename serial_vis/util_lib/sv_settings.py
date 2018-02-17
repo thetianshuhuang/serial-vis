@@ -18,7 +18,7 @@ class sv_settings(settings_template):
 
     Attributes
     ----------
-    Documented in README.md, under Default Settings.
+    Documented on the Settings wiki page.
     """
 
     # main

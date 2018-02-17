@@ -27,10 +27,6 @@ class ascii_device(base_device):
     def get_line(self):
 
         """
-        # parse instruction
-        instruction = self.serial_parser.process_command(line[0])
-
-        # log command
         Get one line of serial data
 
         Returns

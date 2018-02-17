@@ -69,6 +69,11 @@ class base_graphics:
 
         """
         Returns a list of the names of current events.
+
+        Returns
+        -------
+        (array, array)
+            List of (current keys being pressed, keys pressed during this cycle)
         """
 
         # get currently pressed keys

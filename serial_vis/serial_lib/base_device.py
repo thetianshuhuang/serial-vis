@@ -15,9 +15,16 @@ class base_device:
 
     """
     Base Serial Device class; governs serial interactions
+
     Attributes
     ----------
     Created by __init__:
+    settings : sv_settings object
+        Program settings
+    error_handler : error handler object
+        Centralized error handling
+
+    Created by connect_device:
     device : serial.Serial object
         Serial device object
     """

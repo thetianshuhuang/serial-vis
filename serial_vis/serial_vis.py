@@ -1,7 +1,6 @@
 # serial_vis.py
 # main class
 
-import time
 import pygame
 import serial_lib
 import graphics_lib
@@ -28,18 +27,20 @@ class serial_vis:
     graphics_class : class
         Is set to default_vector_graphics by default; overwrite this in
         extensions to add custom graphics commands.
-    is_live : bool
-        Track whether the current view is live
-    display_buffer_id : int
-        Current buffer being displayed, relative to the current view
+    command_mode : bool
+        Whether the program is currently in command mode or normal input mode
+        All key inputs are directed to the command line in command mode.
+    connect_device : bool
+        Is set to False if no device is connected, and no device connection
+        attempts should be made.
 
     Created by __init__:
-    serial_device : serial_device object
-        Serial interface object.
-    serial_parser : serial_parser object
-        Serial command parser object.
+    serial_device : threaded serial device object
+        Combines a serial device and parser into a secondary thread.
     csv_log : csv_log object
         CSV log object
+    error_handler : error handler object
+        Hosts centralized error handling
     graphics_window : graphics_class
         Vector graphics class to be used
     buffer_db : buffer_db object

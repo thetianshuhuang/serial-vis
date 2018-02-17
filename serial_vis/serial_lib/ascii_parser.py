@@ -23,6 +23,8 @@ class ascii_parser:
     Created by __init__:
     error_handler : error_handler object
         Centralized error handling
+    settings : sv_settings object
+        Program settings
     """
 
     # default command dictionary

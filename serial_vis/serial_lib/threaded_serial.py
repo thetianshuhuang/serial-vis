@@ -20,11 +20,20 @@ class threaded_serial(threading.Thread):
         Serial device requests a system exit
     instruction_buffer : array
         Buffer containing recieved instructions
+    device_connected : bool
+        Tracks whether a device is currently connected
+
     Created by __init__:
+    serial_device : serial device object
+        Serial device; either ascii_serial_device or bin_serial_device
+    serial_parser : serial parser object
+        Serial parser; either ascii_serial_parser or bin_serial_parser
     settings : settings
         Settings object
-    running : bool
-        Must be set to True once every cycle, or the thread terminates
+    done : bool
+        Exits main loop if set to True
+    lock : threading.Lock
+        Threading lock for accessing the main queue
     """
 
     exit_request = False
@@ -141,6 +150,15 @@ class threaded_serial(threading.Thread):
     #
     #   --------------------------------
     def main_alive(self):
+
+        """
+        Check if the main thread is alive. Should be used by all threads.
+
+        Returns
+        -------
+        bool
+            True if the main thread is alive; False otherwise
+        """
 
         # search for main thread is_alive state
         for thread in threading.enumerate():
