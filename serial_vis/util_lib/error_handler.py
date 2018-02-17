@@ -26,6 +26,8 @@ class error_handler:
     error_id = 0
 
     error_code_definitions = {
+
+        # Errors
         "chk": (
             "Error: incorrect checksum",
             "The serial communication was either incorrectly transmitted or "
@@ -71,6 +73,16 @@ class error_handler:
         "stx": (
             "Error: invalid syntax",
             "command = &"
+        ),
+
+        # Warnings
+        "cto": (
+            "Warning: operation timed out",
+            "Maximum connection attempts exceed for serial device &."
+        ),
+        "ddc": (
+            "Warning: device disconnected",
+            "The serial device & is no longer connected."
         )
     }
 

@@ -31,6 +31,11 @@ class threaded_serial(threading.Thread):
     instruction_buffer = []
     device_connected = False
 
+    #   --------------------------------
+    #
+    #   Initialization
+    #
+    #   --------------------------------
     def __init__(self, settings, error_handler, user_commands):
 
         """
@@ -53,7 +58,6 @@ class threaded_serial(threading.Thread):
         self.error_handler = error_handler
 
         # thread utility
-        self.thread_timeout = time.time() + 0.1
         self.lock = threading.Lock()
         self.done = False
 
@@ -75,6 +79,11 @@ class threaded_serial(threading.Thread):
             self.serial_parser = bin_parser(
                 self.user_commands, self.settings, self.error_handler)
 
+    #   --------------------------------
+    #
+    #   Run thread (called by threading module)
+    #
+    #   --------------------------------
     def run(self):
 
         """
@@ -89,19 +98,22 @@ class threaded_serial(threading.Thread):
         timeout = time.time() + self.settings.seek_timeout
 
         # main loop
-        while(self.thread_timeout > time.time()):
+        # runs when not done, and main thread is alive
+        while(not self.done and self.main_alive()):
 
             # no device connected; attempt to establish connection
             if(not self.device_connected):
                 self.device_connected = self.serial_device.connect_device()
 
-                # wait 250ms before trying again to avoid spamming the system
-                time.sleep(0.25)
+                # wait 100ms before trying again to avoid spamming the system
+                time.sleep(0.1)
 
-                # trigger timeout. Default is 60 seconds (300 attempts).
+                # trigger timeout. Default is 60 seconds.
                 if(time.time() > timeout):
-                    print("Operation timed out.")
+                    self.error_handler.raise_error(
+                        "cto", [], self.settings.path)
                     self.exit_request = True
+                    self.done = True
 
             # device is connected
             else:
@@ -121,4 +133,19 @@ class threaded_serial(threading.Thread):
                 if(not line[1]):
                     self.exit_request = True
 
-        self.done = True
+        self.serial_device.close()
+
+    #   --------------------------------
+    #
+    #   Check if main thread is alive
+    #
+    #   --------------------------------
+    def main_alive(self):
+
+        # search for main thread is_alive state
+        for thread in threading.enumerate():
+            if(thread.name == "MainThread"):
+                return(thread.is_alive())
+
+        # return not alive if the main thread can't be found
+        return(False)

@@ -49,7 +49,7 @@ class ascii_device(base_device):
             try:
                 raw_line = [self.device.readline().strip(), True]
             except (OSError, serial.serialutil.SerialException):
-                print("Device disconnected.")
+                self.error_handler.raise_error("ddc", [], self.settings.path)
                 return(["", False])
             # timeout if the receive timeout has been reached
             if(time.time() > timeout_time):

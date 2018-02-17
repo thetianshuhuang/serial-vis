@@ -50,6 +50,7 @@ class serial_vis:
     user_commands = {}
     graphics_class = graphics_lib.default_vector_graphics
     command_mode = False
+    connect_device = True
 
     #   --------------------------------
     #
@@ -80,12 +81,17 @@ class serial_vis:
         # create log
         self.csv_log = util_lib.csv_log(self.settings)
 
+        # disable device connection if a blank path is specified.
+        if(self.settings.path == ""):
+            self.connect_device = False
+
         # create threaded serial handler
-        self.serial_device = serial_lib.threaded_serial(
-            self.settings,
-            self.error_handler,
-            self.user_commands)
-        self.serial_device.start()
+        if(self.connect_device):
+            self.serial_device = serial_lib.threaded_serial(
+                self.settings,
+                self.error_handler,
+                self.user_commands)
+            self.serial_device.start()
 
         # create graphics window
         self.graphics_window = self.graphics_class(
@@ -119,14 +125,36 @@ class serial_vis:
             self.process_events(window_events)
             self.process_user_events(window_events)
 
+        # fetch serial device output if enabled
+        if(self.connect_device):
+            self.service_device()
+
+        # update buffer
+        self.graphics_window.update_screen(
+            self.buffer_manager.get_buffer(),
+            self.command_mode,
+            command_line)
+
+    #   --------------------------------
+    #
+    #   service serial device
+    #
+    #   --------------------------------
+    def service_device(self):
+
+        """
+        Service the serial device thread
+        """
+
         # check for exit request
         if(self.serial_device.exit_request):
-            self.quit_sv()
-        # refresh thread timeout
-        else:
-            self.serial_device.thread_timeout = time.time() + 0.1
+            if(self.settings.quit_on_disconnect):
+                self.quit_sv()
+            else:
+                self.connect_device = False
+                self.serial_device.done = True
 
-        # acquire thread lock -------------------------------------------------
+        # acquire thread lock ---------------------------------------------
         self.serial_device.lock.acquire()
 
         # fetch instruction if it exists
@@ -153,13 +181,7 @@ class serial_vis:
                 self.buffer_manager.update(instruction)
 
         self.serial_device.lock.release()
-        # release lock --------------------------------------------------------
-
-        # update buffer
-        self.graphics_window.update_screen(
-            self.buffer_manager.get_buffer(),
-            self.command_mode,
-            command_line)
+        # release lock ----------------------------------------------------
 
     #   --------------------------------
     #
@@ -218,6 +240,31 @@ class serial_vis:
         if(arguments[0] == "quit"):
             self.quit_sv()
 
+        # disconnect device
+        elif(arguments[0] == "disconnect"):
+            self.connect_device = False
+            self.serial_device.done = True
+
+        # connect device
+        elif(arguments[0] == "connect"):
+            # close existing device if it exists
+            if(self.connect_device):
+                self.serial_device.done = True
+
+            # update path with arguments[1] if it exists
+            if(arguments[1] != ""):
+                self.settings.path = arguments[1]
+
+            # create new serial device instance
+            self.serial_device = serial_lib.threaded_serial(
+                self.settings,
+                self.error_handler,
+                self.user_commands)
+            self.serial_device.start()
+
+            # register serial device
+            self.connect_device = True
+
         # change setting
         elif(arguments[0] == "set"):
             try:
@@ -261,6 +308,7 @@ class serial_vis:
         # call clean close methods
         self.graphics_window.close_window()
         self.csv_log.close_file()
+        self.serial_device.done = True
 
         exit()
 

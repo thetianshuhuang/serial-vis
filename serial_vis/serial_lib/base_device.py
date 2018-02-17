@@ -101,7 +101,8 @@ class base_device:
         Close the serial port cleanly
         """
 
-        self.device.close()
+        if(hasattr(self, "device")):
+            self.device.close()
 
     #   --------------------------------
     #

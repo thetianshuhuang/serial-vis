@@ -22,7 +22,7 @@ class sv_settings(settings_template):
     """
 
     # main
-    quit_on_disconnect = True
+    quit_on_disconnect = False
     enable_graphics = True
 
     # serial_device
@@ -86,4 +86,6 @@ class sv_settings(settings_template):
         "onf": True,
         "nas": True,
         "stx": True,
+        "cto": True,
+        "ddc": True
     }
