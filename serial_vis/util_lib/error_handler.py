@@ -2,6 +2,8 @@
 # error handling class; handles errors and error notifications
 
 import time
+import sys
+from t_color import color
 
 
 #   --------------------------------
@@ -136,10 +138,19 @@ class error_handler:
             # print error separator
             err_info = ("[" + time.strftime("%H:%M:%S") +
                         " ID=" + str(self.error_id) + "] ")
-            print(err_info + ("-" * (64 - len(err_info))))
+            print(
+                color.bold + color.bblue +
+                err_info +
+                ("-" * (64 - len(err_info))) +
+                color.end)
 
             # print primary message
+            if(self.error_code_definitions[error_name][0][0:5] == "Error"):
+                    sys.stdout.write(color.bred)
+            else:
+                    sys.stdout.write(color.byellow)
             print(self.error_code_definitions[error_name][0])
+            sys.stdout.write(color.end)
 
             # print command
             if(instruction != [] and instruction != ""):

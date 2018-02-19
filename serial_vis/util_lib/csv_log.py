@@ -54,7 +54,7 @@ class csv_log:
         self.logcache_time = 0
 
         # open output file
-        self.log_output_file = open(self.settings.log_output_name, 'w')
+        self.log_output_file = open(self.settings.log_output_name, 'a')
 
     #   --------------------------------
     #
