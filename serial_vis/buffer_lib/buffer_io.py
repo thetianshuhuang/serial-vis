@@ -11,6 +11,7 @@ def save(index, file, buffer_db, mode):
 
     """
     """
+    # todo: raise errors as appropriate
 
     # ensure that the mode is either 'a' (append) or 'w' (overwrite)
     if(mode not in ('a', 'w')):
@@ -21,15 +22,15 @@ def save(index, file, buffer_db, mode):
 
     # single frame save
     if(type(index) == int):
-        status = save_buffer(file, buffer_db.get_buffer(index))
+        status = save_buffer(savefile, buffer_db.get_buffer(index))
 
     # frame range save
     elif(type(index) == list and len(index) == 2):
         status = True
 
         # write each buffer
-        for i in range(list[0], list[1]):
-            status &= save_buffer(file, buffer_db.get_buffer(i))
+        for i in range(index[0], index[1]):
+            status &= save_buffer(savefile, buffer_db.get_buffer(i))
 
     # syntax error
     else:
@@ -57,9 +58,7 @@ def save_buffer(file, out_buffer):
 
         # write instructions
         for instruction in out_buffer.instructions:
-            file.write("\xff")
             file.write(str(instruction))
-
             # newline to mark the end of the instruction
             file.write("\n")
 

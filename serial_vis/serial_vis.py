@@ -234,7 +234,7 @@ class serial_vis:
         arguments = command.split(" ")
 
         # pad arguments with null strings
-        for i in range(3 - len(arguments)):
+        for i in range(4 - len(arguments)):
             arguments.append("")
 
         # quit
@@ -265,6 +265,23 @@ class serial_vis:
 
             # register serial device
             self.connect_device = True
+
+        # save buffer
+        elif(arguments[0] == "save"):
+
+            # if no output is specified, use the default
+            if(arguments[2] == ""):
+                arguments[2] = self.settings.default_save_name
+
+            # if no output mode is specified, use the default
+            if(arguments[3] == ""):
+                arguments[3] = self.settings.default_save_mode
+
+            # save buffers (executed through file manager)
+            self.buffer_manager.save(
+                eval(arguments[1]),
+                arguments[2],
+                arguments[3])
 
         # change setting
         elif(arguments[0] == "set"):

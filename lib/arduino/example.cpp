@@ -20,6 +20,7 @@ int main() {
   while(true){
     
     sv.drawcircle(0, 0, counter, "red");
+    sv.drawray(0, 0, counter, counter, "red");
     sv.draw();
     counter += 1;
     

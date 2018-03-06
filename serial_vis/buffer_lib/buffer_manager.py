@@ -2,6 +2,7 @@
 # serial_vis specific buffer management
 
 from buffer import *
+import buffer_io
 
 
 #   --------------------------------
@@ -162,3 +163,13 @@ class buffer_manager:
 
         if (self.display_buffer_id < -self.settings.max_size_backward):
             self.display_buffer_id = -self.settings.max_size_backward
+
+    #   --------------------------------
+    #
+    #   Save a selection of buffers
+    #
+    #   --------------------------------
+    def save(self, index, filename, mode):
+
+        # direct passthrough to buffer_io
+        buffer_io.save(index, filename, self.buffer_db, mode)
