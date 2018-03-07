@@ -134,7 +134,7 @@ class buffer_manager:
             relative change in index. If index=0, toggle live mode.
         """
 
-        if(index = 0):
+        if(index == 0):
             self.is_live = not self.is_live
             if(self.is_live):
                 self.display_buffer_id = 0
@@ -153,55 +153,6 @@ class buffer_manager:
 
             if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
                 self.display_buffer_id = -self.buffer_db.view_buffer
-
-    #   --------------------------------
-    #
-    #   Check for buffer related controls
-    #
-    #   --------------------------------
-    def check_controls(self, events):
-
-        """
-        Check events to see if the current buffer or mode should be changed
-
-        Parameters
-        ----------
-        events : [events_hold, events_press]
-            processed event array containing the currently held keys and the
-            most recently pressed keys
-        """
-
-        (events_hold, events_press) = events
-
-        # press key events:
-        if "pause" in events_press:
-            self.is_live = not self.is_live
-            if(self.is_live):
-                self.display_buffer_id = 0
-
-        # controls only enabled when not live
-        if not self.is_live:
-            if "fwd" in events_press:
-                self.display_buffer_id += 1
-
-            if "fwdplus" in events_press:
-                self.display_buffer_id += 10
-
-            if "back" in events_press:
-                self.display_buffer_id += -1
-
-            if "backplus" in events_press:
-                self.display_buffer_id += -10
-
-        # check for out of bounds
-        if (self.display_buffer_id > self.settings.max_size_forward):
-            self.display_buffer_id = self.settings.max_size_forward
-
-        if (self.display_buffer_id < -self.settings.max_size_backward):
-            self.display_buffer_id = -self.settings.max_size_backward
-
-        if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
-            self.display_buffer_id = -self.buffer_db.view_buffer
 
     #   --------------------------------
     #

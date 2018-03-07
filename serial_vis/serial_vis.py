@@ -123,9 +123,7 @@ class serial_vis(sv_command):
             command_line = self.command_line.get_text_object()
         else:
             command_line = pygame.Surface((0, 0))
-            window_events = self.graphics_window.check_events()
-            self.process_events(window_events)
-            self.process_user_events(window_events)
+            self.process_events(self.graphics_window.check_events())
 
         # fetch serial device output if enabled
         if(self.connect_device):
@@ -187,65 +185,6 @@ class serial_vis(sv_command):
 
     #   --------------------------------
     #
-    #   command bindings (default)
-    #
-    #   --------------------------------
-    def process_events(self, events):
-
-        """
-        Process keyboard instructions. Doesn't run in command mode
-
-        Parameters
-        ----------
-        events : dict
-            Event list from keyboard
-        """
-
-        # unpack events
-        (events_hold, events_press) = events
-
-        # hold key events:
-        if "quit" in events_press:
-            self._quit()
-
-        if "cmd" in events_press:
-            self.command_mode = True
-            # create new command line
-            self.command_line = graphics_lib.command_line(self.settings)
-
-        # check buffer related controls
-        self.buffer_manager.check_controls(events)
-
-    #   --------------------------------
-    #
-    #   process command line command
-    #
-    #   --------------------------------
-    def process_command(self, command):
-
-        """
-        Process command line instruction.
-
-        Parameters
-        ----------
-        command : str
-            Command line instruction
-        """
-
-        arguments = command.split(" ")
-
-        # pad arguments with null strings
-        for i in range(4 - len(arguments)):
-            arguments.append("")
-
-        try:
-            command_function = getattr(self, "_" + arguments[0])
-            command_function(arguments, command)
-        except AttributeError:
-            self._ELSE(arguments, command)
-
-    #   --------------------------------
-    #
     #   quit
     #
     #   --------------------------------
@@ -265,19 +204,6 @@ class serial_vis(sv_command):
         self.serial_device.done = True
 
         exit()
-
-    #   --------------------------------
-    #
-    #   command bindings (user, dummy function)
-    #
-    #   --------------------------------
-    def process_user_events(self, events):
-
-        """
-        Placeholder class for user events
-        """
-
-        pass
 
 
 #   --------------------------------

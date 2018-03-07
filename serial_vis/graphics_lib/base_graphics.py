@@ -72,30 +72,21 @@ class base_graphics:
 
         Returns
         -------
-        (array, array)
-            List of (current keys being pressed, keys pressed during this cycle)
+        array
+            List of triggered events as defined by settings.events
         """
 
-        # get currently pressed keys
-        current_events_hold = []
-        pressed_keys = pygame.key.get_pressed()
-        for event in self.settings.events:
-            if(pressed_keys[event]):
-                current_events_hold.append(
-                    self.settings.events[event])
-
-        # get just pressed keys
-        current_events_keydown = []
+        triggered_events = []
         for current_event in pygame.event.get():
             if(current_event.type == pygame.KEYDOWN and
                current_event.key in self.settings.events):
-                current_events_keydown.append(
+                triggered_events.append(
                     self.settings.events[current_event.key])
             if(current_event.type == pygame.QUIT):
-                current_events_keydown.append(
+                triggered_events.append(
                     self.settings.events[pygame.QUIT])
 
-        return((current_events_hold, current_events_keydown))
+        return(triggered_events)
 
     #   --------------------------------
     #

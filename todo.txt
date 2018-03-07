@@ -1,6 +1,4 @@
-- add cleaner event support
 - add beginning settings support
-- unify keyboard commands and command line
 - priority value for each setting
 - multi-device support:
 	- each device has a threaded_serial instance

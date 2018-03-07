@@ -48,13 +48,13 @@ class sv_settings(settings_template):
     fps_smooth_size = 30
     font_size = 15
     events = {
-        pygame.QUIT: "quit",
-        pygame.K_SPACE: "pause",
-        pygame.K_PERIOD: "fwd",
-        pygame.K_LEFTBRACKET: "backplus",
-        pygame.K_COMMA: "back",
-        pygame.K_RIGHTBRACKET: "fwdplus",
-        pygame.K_BACKQUOTE: "cmd"
+        pygame.QUIT: ("quit",),
+        pygame.K_SPACE: ("pause",),
+        pygame.K_PERIOD: ("view", 1),
+        pygame.K_LEFTBRACKET: ("view", -10),
+        pygame.K_COMMA: ("view", -1),
+        pygame.K_RIGHTBRACKET: ("view", 10),
+        pygame.K_BACKQUOTE: ("cmd",)
     }
     colors = {
         "black": (0, 0, 0),
