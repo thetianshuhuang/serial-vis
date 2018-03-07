@@ -6,6 +6,7 @@ import serial_lib
 import graphics_lib
 import buffer_lib
 import util_lib
+from sv_command import *
 
 
 #   --------------------------------
@@ -13,7 +14,7 @@ import util_lib
 #   Main Serial-Vis Class
 #
 #   --------------------------------
-class serial_vis:
+class serial_vis(sv_command):
 
     """
     Main serial vis class; extend this class to use its API.
@@ -205,7 +206,7 @@ class serial_vis:
 
         # hold key events:
         if "quit" in events_press:
-            self.quit_sv()
+            self._quit()
 
         if "cmd" in events_press:
             self.command_mode = True
@@ -237,76 +238,11 @@ class serial_vis:
         for i in range(4 - len(arguments)):
             arguments.append("")
 
-        # quit
-        if(arguments[0] == "quit"):
-            self.quit_sv()
-
-        # disconnect device
-        elif(arguments[0] == "disconnect"):
-            self.connect_device = False
-            self.serial_device.done = True
-
-        # connect device
-        elif(arguments[0] == "connect"):
-            # close existing device if it exists
-            if(self.connect_device):
-                self.serial_device.done = True
-
-            # update path with arguments[1] if it exists
-            if(arguments[1] != ""):
-                self.settings.path = arguments[1]
-
-            # create new serial device instance
-            self.serial_device = serial_lib.threaded_serial(
-                self.settings,
-                self.error_handler,
-                self.user_commands)
-            self.serial_device.start()
-
-            # register serial device
-            self.connect_device = True
-
-        # save buffer
-        elif(arguments[0] == "save"):
-
-            # if no output is specified, use the default
-            if(arguments[2] == ""):
-                arguments[2] = self.settings.default_save_name
-
-            # if no output mode is specified, use the default
-            if(arguments[3] == ""):
-                arguments[3] = self.settings.default_save_mode
-
-            # save buffers (executed through file manager)
-            self.buffer_manager.save(
-                eval(arguments[1]),
-                arguments[2],
-                arguments[3])
-
-        # change setting
-        elif(arguments[0] == "set"):
-            try:
-                self.settings.update({arguments[1]: eval(arguments[2])})
-
-            # handle errors
-            except SyntaxError:
-                self.error_handler.raise_error("stx", [], command)
-            except Exception as e:
-                self.error_handler.raise_error("unk", [], str(e))
-
-        # execute arbitrary command
-        elif(arguments[0] == "exec"):
-            try:
-                eval(arguments[1])
-
-            # handle errors
-            except SyntaxError:
-                self.error_handler.raise_error("stx", [], command)
-            except Exception as e:
-                self.error_handler.raise_error("unk", [], str(e))
-
-        else:
-            self.error_handler.raise_error("stx", [], command)
+        try:
+            command_function = getattr(self, "_" + arguments[0])
+            command_function(arguments, command)
+        except AttributeError:
+            self._ELSE(arguments, command)
 
     #   --------------------------------
     #

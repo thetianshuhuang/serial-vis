@@ -10,15 +10,36 @@
 def save(index, file, buffer_db, mode):
 
     """
+    Save a buffer or set of buffers to file.
+
+    parameters
+    ----------
+    index : int or int[2]
+        buffer ID(s) to write
+    file : str
+        filename to write to
+    buffer_db : buffer database object
+        buffer_db to pull buffers from
+    mode : str
+        "a" or "w", to append or overwrite
+
+    returns
+    -------
+    str
+        error code; empty if success
     """
-    # todo: raise errors as appropriate
 
     # ensure that the mode is either 'a' (append) or 'w' (overwrite)
     if(mode not in ('a', 'w')):
-        return(False)
+        return("stx")
 
     # open file
-    savefile = open(file, mode)
+    try:
+        savefile = open(file, mode)
+    except IOError:
+        return("ioe")
+    except Exception as e:
+        return(str(e))
 
     # single frame save
     if(type(index) == int):
@@ -26,15 +47,17 @@ def save(index, file, buffer_db, mode):
 
     # frame range save
     elif(type(index) == list and len(index) == 2):
-        status = True
+        status = ""
 
         # write each buffer
         for i in range(index[0], index[1]):
-            status &= save_buffer(savefile, buffer_db.get_buffer(i))
+            restatus = save_buffer(savefile, buffer_db.get_buffer(i))
+            if(restatus != ""):
+                status = restatus
 
     # syntax error
     else:
-        status = False
+        status = "stx"
 
     # close file
     savefile.close()
@@ -49,8 +72,24 @@ def save(index, file, buffer_db, mode):
 #   --------------------------------
 def save_buffer(file, out_buffer):
 
+    """
+    Write a buffer to the input file.
+
+    parameters
+    ----------
+    file : python file object
+        file to write to
+    out_buffer : buffer object
+        buffer to be written
+
+    returns
+    -------
+    str
+        error code; returns empty on success
+    """
+
     if(out_buffer.frame_id == -1):
-        return(False)
+        return("nub")
 
     else:
         # write buffer ID
@@ -65,7 +104,7 @@ def save_buffer(file, out_buffer):
         # write end tag
         file.write("end\n")
 
-        return(True)
+        return("")
 
 
 #   --------------------------------

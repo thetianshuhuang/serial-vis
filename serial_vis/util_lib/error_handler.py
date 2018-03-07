@@ -76,6 +76,10 @@ class error_handler:
             "Error: invalid syntax",
             "command = &"
         ),
+        "ioe": (
+            "Error: write error",
+            ""
+        ),
 
         # Warnings
         "cto": (
@@ -85,6 +89,10 @@ class error_handler:
         "ddc": (
             "Warning: device disconnected",
             "The serial device & is no longer connected."
+        ),
+        "nub": (
+            "Warning: attempted to write null buffer",
+            "Attempted to save null buffer to file. Check save index."
         )
     }
 

@@ -15,8 +15,7 @@
 	- triangle
 	- filled in option?
 	- thickness specifier in all functions?
-- save/load buffer to file:
-	- save <buffer range> <filename> <flag>
+- load buffer from file (save done)
 - add support for direct byte sending:
 	Plan for bin transmission:
 

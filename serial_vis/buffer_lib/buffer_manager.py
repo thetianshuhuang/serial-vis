@@ -120,6 +120,42 @@ class buffer_manager:
 
     #   --------------------------------
     #
+    #   Buffer controls
+    #
+    #   --------------------------------
+    def change_buffer(self, index):
+
+        """
+        Change the current buffer.
+
+        parameters
+        ----------
+        index : int
+            relative change in index. If index=0, toggle live mode.
+        """
+
+        if(index = 0):
+            self.is_live = not self.is_live
+            if(self.is_live):
+                self.display_buffer_id = 0
+
+        else:
+            # can only change buffer when not live
+            if not self.is_live:
+                self.display_buffer_id += index
+
+            # check for out of bounds
+            if (self.display_buffer_id > self.settings.max_size_forward):
+                self.display_buffer_id = self.settings.max_size_forward
+
+            if (self.display_buffer_id < -self.settings.max_size_backward):
+                self.display_buffer_id = -self.settings.max_size_backward
+
+            if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
+                self.display_buffer_id = -self.buffer_db.view_buffer
+
+    #   --------------------------------
+    #
     #   Check for buffer related controls
     #
     #   --------------------------------
@@ -174,5 +210,25 @@ class buffer_manager:
     #   --------------------------------
     def save(self, index, filename, mode):
 
+        """
+        Save a selection of buffers
+
+        parameters
+        ----------
+        index : int or int[2]
+            buffer ID(s) to write
+        filename : str
+            filename to open and write to
+        mode : str
+            "a" or "w", to append or overwrite
+        """
+
         # direct passthrough to buffer_io
-        buffer_io.save(index, filename, self.buffer_db, mode)
+        status = buffer_io.save(index, filename, self.buffer_db, mode)
+
+        # raise error if failed
+        if(status in ("ioe", "stx", "nub")):
+            self.error_handler.raise_error(status, [], "")
+
+        elif(status != ""):
+            self.error_handler.raise_error("unk", [], "")

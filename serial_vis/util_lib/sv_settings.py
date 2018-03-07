@@ -88,6 +88,8 @@ class sv_settings(settings_template):
         "onf": True,
         "nas": True,
         "stx": True,
+        "ioe": True,
         "cto": True,
-        "ddc": True
+        "ddc": True,
+        "nub": True,
     }
