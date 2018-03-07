@@ -69,6 +69,8 @@ class sv_settings(settings_template):
     # buffer_db
     max_size_forward = 100
     max_size_backward = 100
+    default_save = "frame.sv"
+    default_write = "a"
 
     # serial_parser
     serial_mode = "ascii"

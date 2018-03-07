@@ -2,6 +2,7 @@
 # serial_vis specific buffer management
 
 from buffer import *
+from buffer_io import *
 
 
 #   --------------------------------
@@ -162,3 +163,6 @@ class buffer_manager:
 
         if (self.display_buffer_id < -self.settings.max_size_backward):
             self.display_buffer_id = -self.settings.max_size_backward
+
+        if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
+            self.display_buffer_id = -self.buffer_db.view_buffer
