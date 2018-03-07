@@ -2,7 +2,7 @@
 # serial_vis specific buffer management
 
 from buffer import *
-from buffer_io import *
+import buffer_io
 
 
 #   --------------------------------
@@ -166,3 +166,13 @@ class buffer_manager:
 
         if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
             self.display_buffer_id = -self.buffer_db.view_buffer
+
+    #   --------------------------------
+    #
+    #   Save a selection of buffers
+    #
+    #   --------------------------------
+    def save(self, index, filename, mode):
+
+        # direct passthrough to buffer_io
+        buffer_io.save(index, filename, self.buffer_db, mode)
