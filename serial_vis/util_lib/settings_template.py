@@ -1,6 +1,8 @@
 # settings_template.py
 # generalized template for program settings
 
+import copy
+
 
 class settings_template:
 
@@ -62,6 +64,8 @@ class settings_template:
 
         for key, value in settings.items():
             if(type(value) == dict):
-                getattr(self, key).update(value)
+                destination = copy.deepcopy(getattr(self, key))
+                destination.update(value)
+                setattr(self, key, destination)
             else:
                 setattr(self, key, value)

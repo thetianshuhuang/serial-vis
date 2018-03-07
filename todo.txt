@@ -8,12 +8,14 @@
 	- connect command:
 		connect <filepath> <alias>
 		disconnect <alias>
+
 - more diverse draw functions:
 	- rectangle
 	- triangle
 	- filled in option?
 	- thickness specifier in all functions?
 - load buffer from file (save done)
+
 - add support for direct byte sending:
 	Plan for bin transmission:
 
