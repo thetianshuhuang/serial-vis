@@ -3,6 +3,7 @@
 
 import serial_lib
 import graphics_lib
+import util_lib
 
 
 #   --------------------------------
@@ -124,14 +125,17 @@ class sv_command:
         if(arguments[2] == ""):
             arguments[2] = "main"
 
-        # close existing device if it exists
-        if(arguments[2] in self.connect_device and
-           self.connect_device[arguments[2]]):
-            self.serial_device[arguments[2]].done = True
-        # otherwise, create a new entry
+        # close existing device if already open
+        if(arguments[2] in self.connect_device):
+            if(self.connect_device[arguments[2]]):
+                self.serial_device[arguments[2]].done = True
+
+        # if the device does not yet exist (isn't registered)
         else:
-            # todo: separate settings
-            self.settings.update({arguments[2]: self.settings["main"]})
+            # generate new settings
+            self.settings.update({arguments[2]: util_lib.sv_settings()})
+            self.settings[arguments[2]].update(self.user_settings)
+
             # declare serial advice as dict entry with None as value
             # None overwritten below
             self.serial_device.update({arguments[2]: None})

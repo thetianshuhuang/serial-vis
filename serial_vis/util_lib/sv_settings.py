@@ -23,6 +23,7 @@ class sv_settings(settings_template):
 
     # main
     name = "main"
+    caption = "Serial Visualization"
     quit_on_disconnect = False
     enable_graphics = True
 
@@ -48,6 +49,7 @@ class sv_settings(settings_template):
     fps_count_keyword = "draw"
     fps_smooth_size = 30
     font_size = 15
+    display_spacing = [10, 10, 10, 10, 10]
     events = {
         pygame.QUIT: ("quit",),
         pygame.K_SPACE: ("pause",),

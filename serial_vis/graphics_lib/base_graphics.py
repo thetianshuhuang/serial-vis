@@ -56,7 +56,7 @@ class base_graphics:
         pygame.font.init()
         self.screen = pygame.display.set_mode(
             self.settings["main"].window_size)
-        pygame.display.set_caption(self.settings["main"].path)
+        pygame.display.set_caption(self.settings["main"].caption)
         self.clock = pygame.time.Clock()
 
         self.error_handler = error_handler

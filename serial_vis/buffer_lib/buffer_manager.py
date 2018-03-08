@@ -78,6 +78,7 @@ class buffer_manager:
         # check for new target
         if target not in self.buffer_db:
             self.buffer_db.update({target: buffer_db(self.settings[target])})
+            self.display_buffer_id.update({target: 0})
 
         # check for control instructions:
         if(instruction[0] == "draw" and self.settings["main"].enable_graphics):
@@ -120,6 +121,12 @@ class buffer_manager:
             buffer object corresponding to the current buffer ID
         """
 
+        # return null buffer if the target device does not exist yet
+        if target not in self.buffer_db:
+            return(frame_buffer(frame_id=-1))
+        if target not in self.display_buffer_id:
+            return(frame_buffer(frame_id=-1))
+        # get target device buffer
         return(
             self.buffer_db[target].get_buffer(
                 self.display_buffer_id[target], relative=True))

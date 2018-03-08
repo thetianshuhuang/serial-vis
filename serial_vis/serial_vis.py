@@ -74,8 +74,8 @@ class serial_vis(sv_command):
 
         # update settings
         self.settings = {"main": util_lib.sv_settings()}
+        self.user_settings.update(kwargs)
         self.settings["main"].update(self.user_settings)
-        self.settings["main"].update(kwargs)
 
         # set up centralized error handling
         self.error_handler = util_lib.error_handler(self.settings["main"])
@@ -130,12 +130,17 @@ class serial_vis(sv_command):
             if(enabled):
                 self.service_device(device)
 
+        buffers_to_draw = {}
+        # update graphics for each device
+        for device in self.connect_device:
+            if(self.connect_device[device]):
+                buffers_to_draw.update({
+                    device: self.buffer_manager.get_buffer(device)})
         # update buffer
         self.graphics_window.update_screen(
-            self.buffer_manager.get_buffer("main"),
+            buffers_to_draw,
             self.command_mode,
-            command_line,
-            "main")
+            command_line)
 
     #   --------------------------------
     #

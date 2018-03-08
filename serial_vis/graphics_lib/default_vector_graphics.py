@@ -83,7 +83,7 @@ class default_vector_graphics(vector_graphics_window):
     def drawline(self, instruction, device):
         pygame.draw.line(
             self.screen,
-            self.get_color(instruction[3]),
+            self.get_color(instruction[3], device),
             self.transform(instruction[1], device),
             self.transform(instruction[2], device),
             self.settings[device].line_width)
@@ -91,7 +91,7 @@ class default_vector_graphics(vector_graphics_window):
     def drawlinep(self, instruction, device):
         pygame.draw.line(
             self.screen,
-            self.get_color(instruction[3]),
+            self.get_color(instruction[3], device),
             instruction[1],
             instruction[2],
             self.settings[device].line_width)
@@ -104,7 +104,7 @@ class default_vector_graphics(vector_graphics_window):
 
         pygame.draw.circle(
             self.screen,
-            self.get_color(instruction[3]),
+            self.get_color(instruction[3], device),
             self.transform(instruction[1], device),
             radius,
             self.settings[device].line_width)
@@ -112,7 +112,7 @@ class default_vector_graphics(vector_graphics_window):
     def drawray(self, instruction, device):
         pygame.draw.line(
             self.screen,
-            self.get_color(instruction[4]),
+            self.get_color(instruction[4], device),
             self.transform(instruction[1], device),
             self.transform((instruction[1][0] +
                             instruction[3] * math.cos(instruction[2]),
@@ -127,7 +127,7 @@ class default_vector_graphics(vector_graphics_window):
             self.settings[device].font, instruction[3])
         # create surface
         textframe = textfont.render(
-            instruction[1], False, self.get_color(instruction[4]))
+            instruction[1], False, self.get_color(instruction[4], device))
         # merge surface
         self.screen.blit(textframe, self.transform(instruction[2], device))
 
@@ -136,6 +136,6 @@ class default_vector_graphics(vector_graphics_window):
         textfont = pygame.font.SysFont(self.font, instruction[3])
         # create surface
         textframe = textfont.render(
-            instruction[1], False, self.colors[instruction[4]])
+            instruction[1], False, self.get_color(instruction[4], device))
         # merge surface
         self.screen.blit(textframe, instruction[2])
