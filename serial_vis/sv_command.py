@@ -106,8 +106,13 @@ class sv_command:
         Disconnect the current device.
         """
 
-        self.connect_device = False
-        self.serial_device["main"].done = True
+        # set to default if no parameter is passed
+        if(arguments[1] == ""):
+            arguments[1] = "main"
+
+        if(arguments[1] in self.connect_device):
+            self.connect_device[arguments[1]] = False
+            self.serial_device[arguments[1]].done = True
 
     def _connect(self, arguments, command):
 
@@ -115,23 +120,36 @@ class sv_command:
         Connect a new device
         """
 
+        # set default target to main
+        if(arguments[2] == ""):
+            arguments[2] = "main"
+
         # close existing device if it exists
-        if(self.connect_device):
-            self.serial_device["main"].done = True
+        if(arguments[2] in self.connect_device and
+           self.connect_device[arguments[2]]):
+            self.serial_device[arguments[2]].done = True
+        # otherwise, create a new entry
+        else:
+            # todo: separate settings
+            self.settings.update({arguments[2]: self.settings["main"]})
+            # declare serial advice as dict entry with None as value
+            # None overwritten below
+            self.serial_device.update({arguments[2]: None})
+            self.connect_device.update({arguments[2]: True})
 
         # update path with arguments[1] if it exists
         if(arguments[1] != ""):
-            self.settings["main"].path = arguments[1]
+            self.settings[arguments[2]].path = arguments[1]
 
         # create new serial device instance
-        self.serial_device["main"] = serial_lib.threaded_serial(
-            self.settings["main"],
+        self.serial_device[arguments[2]] = serial_lib.threaded_serial(
+            self.settings[arguments[2]],
             self.error_handler,
             self.user_commands)
-        self.serial_device["main"].start()
+        self.serial_device[arguments[2]].start()
 
         # register serial device
-        self.connect_device = True
+        self.connect_device[arguments[2]] = True
 
     def _save(self, arguments, command):
 
@@ -189,7 +207,7 @@ class sv_command:
         Toggle live mode
         """
 
-        self.buffer_manager.change_buffer(0)
+        self.buffer_manager.change_buffer(0, "main")
 
     def _view(self, arguments, command):
 
@@ -197,4 +215,4 @@ class sv_command:
         Change the current buffer
         """
 
-        self.buffer_manager.change_buffer(int(arguments[1]))
+        self.buffer_manager.change_buffer(int(float(arguments[1])), "main")

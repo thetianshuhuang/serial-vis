@@ -52,7 +52,7 @@ class serial_vis(sv_command):
     user_commands = {}
     graphics_class = graphics_lib.default_vector_graphics
     command_mode = False
-    connect_device = True
+    connect_device = {"main": True}
 
     #   --------------------------------
     #
@@ -85,10 +85,10 @@ class serial_vis(sv_command):
 
         # disable device connection if a blank path is specified.
         if(self.settings["main"].path == ""):
-            self.connect_device = False
+            self.connect_device["main"] = False
 
         # create threaded serial handler for the main instance
-        if(self.connect_device):
+        if(self.connect_device["main"]):
             self.serial_device = {"main": serial_lib.threaded_serial(
                 self.settings["main"],
                 self.error_handler,
@@ -101,7 +101,7 @@ class serial_vis(sv_command):
 
         # initialize buffer manager
         self.buffer_manager = buffer_lib.buffer_manager(
-            self.settings["main"], self.error_handler)
+            self.settings, self.error_handler)
 
     #   --------------------------------
     #
@@ -125,13 +125,14 @@ class serial_vis(sv_command):
             command_line = pygame.Surface((0, 0))
             self.process_events(self.graphics_window.check_events())
 
-        # fetch serial device output if enabled
-        if(self.connect_device):
-            self.service_device()
+        # fetch serial device output for each device if enabled
+        for device, enabled in self.connect_device.items():
+            if(enabled):
+                self.service_device(device)
 
         # update buffer
         self.graphics_window.update_screen(
-            self.buffer_manager.get_buffer(),
+            self.buffer_manager.get_buffer("main"),
             self.command_mode,
             command_line,
             "main")
@@ -141,20 +142,18 @@ class serial_vis(sv_command):
     #   service serial device
     #
     #   --------------------------------
-    def service_device(self):
+    def service_device(self, device_name):
 
         """
         Service the serial device thread
         """
-
-        device_name = "main"
 
         # check for exit request
         if(self.serial_device[device_name].exit_request):
             if(self.settings[device_name].quit_on_disconnect):
                 self.quit_sv()
             else:
-                self.connect_device = False
+                self.connect_device[device_name] = False
                 self.serial_device[device_name].done = True
 
         # acquire thread lock ---------------------------------------------
@@ -182,7 +181,7 @@ class serial_vis(sv_command):
 
             # process draw-related instructions
             else:
-                self.buffer_manager.update(instruction)
+                self.buffer_manager.update(device_name, instruction)
 
         self.serial_device[device_name].lock.release()
         # release lock ----------------------------------------------------

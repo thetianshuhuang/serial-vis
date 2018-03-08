@@ -25,7 +25,7 @@ class buffer_manager:
     """
 
     is_live = True
-    display_buffer_id = 0
+    display_buffer_id = {"main": 0}
 
     #   --------------------------------
     #
@@ -49,7 +49,7 @@ class buffer_manager:
         self.settings = settings
 
         # set up buffer db
-        self.buffer_db = buffer_db(self.settings)
+        self.buffer_db = {"main": buffer_db(self.settings["main"])}
 
         # set up error handler
         self.error_handler = error_handler
@@ -62,29 +62,35 @@ class buffer_manager:
     #   Update current buffer
     #
     #   --------------------------------
-    def update(self, instruction):
+    def update(self, target, instruction):
 
         """
         Update the current buffer.
 
         Parameters
         ----------
+        target : str
+            string naming the target buffer db
         instruction : array
             array containing the instruction to be processed
         """
 
+        # check for new target
+        if target not in self.buffer_db:
+            self.buffer_db.update({target: buffer_db(self.settings[target])})
+
         # check for control instructions:
-        if(instruction[0] == "draw" and self.settings.enable_graphics):
+        if(instruction[0] == "draw" and self.settings["main"].enable_graphics):
 
             # live => create new buffer
             # set the current view
             if(self.is_live):
-                self.buffer_db.new_buffer(self.current_buffer)
-                self.buffer_db.set_current_view()
+                self.buffer_db[target].new_buffer(self.current_buffer)
+                self.buffer_db[target].set_current_view()
             # not live => create new buffer
             # do not set current view
             else:
-                self.buffer_db.new_buffer(self.current_buffer)
+                self.buffer_db[target].new_buffer(self.current_buffer)
 
             # create new frame buffer
             self.current_buffer = frame_buffer()
@@ -92,7 +98,7 @@ class buffer_manager:
         # trigger instruction
         elif(instruction[0] == "trigger"):
             self.is_live = False
-            self.display_buffer_id = 0
+            self.display_buffer_id.update({target: 0})
 
         # otherwise, add it to current buffer
         else:
@@ -103,7 +109,7 @@ class buffer_manager:
     #   Get the currently selected buffer
     #
     #   --------------------------------
-    def get_buffer(self):
+    def get_buffer(self, target):
 
         """
         Get the currently selected buffer.
@@ -115,15 +121,15 @@ class buffer_manager:
         """
 
         return(
-            self.buffer_db.get_buffer(
-                self.display_buffer_id, relative=True))
+            self.buffer_db[target].get_buffer(
+                self.display_buffer_id[target], relative=True))
 
     #   --------------------------------
     #
     #   Buffer controls
     #
     #   --------------------------------
-    def change_buffer(self, index):
+    def change_buffer(self, index, target):
 
         """
         Change the current buffer.
@@ -137,22 +143,31 @@ class buffer_manager:
         if(index == 0):
             self.is_live = not self.is_live
             if(self.is_live):
-                self.display_buffer_id = 0
+                self.display_buffer_id[target] = 0
 
         else:
             # can only change buffer when not live
             if not self.is_live:
-                self.display_buffer_id += index
+                self.display_buffer_id[target] += index
 
             # check for out of bounds
-            if (self.display_buffer_id > self.settings.max_size_forward):
-                self.display_buffer_id = self.settings.max_size_forward
+            if(self.display_buffer_id[target] >
+               self.settings[target].max_size_forward):
 
-            if (self.display_buffer_id < -self.settings.max_size_backward):
-                self.display_buffer_id = -self.settings.max_size_backward
+                self.display_buffer_id[target] = (
+                    self.settings[target].max_size_forward)
 
-            if (self.buffer_db.view_buffer + self.display_buffer_id < 0):
-                self.display_buffer_id = -self.buffer_db.view_buffer
+            if(self.display_buffer_id[target] <
+               -self.settings[target].max_size_backward):
+
+                self.display_buffer_id[target] = (
+                    -self.settings[target].max_size_backward)
+
+            if(self.buffer_db[target].view_buffer +
+               self.display_buffer_id[target] < 0):
+
+                self.display_buffer_id[target] = (
+                    -self.buffer_db[target].view_buffer)
 
     #   --------------------------------
     #
@@ -175,7 +190,7 @@ class buffer_manager:
         """
 
         # direct passthrough to buffer_io
-        status = buffer_io.save(index, filename, self.buffer_db, mode)
+        status = buffer_io.save(index, filename, self.buffer_db["main"], mode)
 
         # raise error if failed
         if(status in ("ioe", "stx", "nub")):
