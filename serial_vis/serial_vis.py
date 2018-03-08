@@ -73,35 +73,35 @@ class serial_vis(sv_command):
         """
 
         # update settings
-        self.settings = util_lib.sv_settings()
-        self.settings.update(self.user_settings)
-        self.settings.update(kwargs)
+        self.settings = {"main": util_lib.sv_settings()}
+        self.settings["main"].update(self.user_settings)
+        self.settings["main"].update(kwargs)
 
         # set up centralized error handling
-        self.error_handler = util_lib.error_handler(self.settings)
+        self.error_handler = util_lib.error_handler(self.settings["main"])
 
         # create log
-        self.csv_log = util_lib.csv_log(self.settings)
+        self.csv_log = util_lib.csv_log(self.settings["main"])
 
         # disable device connection if a blank path is specified.
-        if(self.settings.path == ""):
+        if(self.settings["main"].path == ""):
             self.connect_device = False
 
-        # create threaded serial handler
+        # create threaded serial handler for the main instance
         if(self.connect_device):
             self.serial_device = serial_lib.threaded_serial(
-                self.settings,
+                self.settings["main"],
                 self.error_handler,
                 self.user_commands)
             self.serial_device.start()
 
-        # create graphics window
+        # create graphics window using main settings
         self.graphics_window = self.graphics_class(
             self.settings, self.error_handler)
 
         # initialize buffer manager
         self.buffer_manager = buffer_lib.buffer_manager(
-            self.settings, self.error_handler)
+            self.settings["main"], self.error_handler)
 
     #   --------------------------------
     #
@@ -148,7 +148,7 @@ class serial_vis(sv_command):
 
         # check for exit request
         if(self.serial_device.exit_request):
-            if(self.settings.quit_on_disconnect):
+            if(self.settings["main"].quit_on_disconnect):
                 self.quit_sv()
             else:
                 self.connect_device = False

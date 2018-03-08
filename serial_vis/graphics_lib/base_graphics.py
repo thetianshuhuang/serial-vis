@@ -54,8 +54,9 @@ class base_graphics:
 
         pygame.init()
         pygame.font.init()
-        self.screen = pygame.display.set_mode(self.settings.window_size)
-        pygame.display.set_caption(self.settings.path)
+        self.screen = pygame.display.set_mode(
+            self.settings["main"].window_size)
+        pygame.display.set_caption(self.settings["main"].path)
         self.clock = pygame.time.Clock()
 
         self.error_handler = error_handler
@@ -79,12 +80,12 @@ class base_graphics:
         triggered_events = []
         for current_event in pygame.event.get():
             if(current_event.type == pygame.KEYDOWN and
-               current_event.key in self.settings.events):
+               current_event.key in self.settings["main"].events):
                 triggered_events.append(
-                    self.settings.events[current_event.key])
+                    self.settings["main"].events[current_event.key])
             if(current_event.type == pygame.QUIT):
                 triggered_events.append(
-                    self.settings.events[pygame.QUIT])
+                    self.settings["main"].events[pygame.QUIT])
 
         return(triggered_events)
 
@@ -118,9 +119,9 @@ class base_graphics:
             instruction to be checked
         """
 
-        if(instruction[0] == self.settings.fps_count_keyword):
+        if(instruction[0] == self.settings["main"].fps_count_keyword):
             self.frame_times.append(time.time())
-            if(len(self.frame_times) > self.settings.fps_smooth_size):
+            if(len(self.frame_times) > self.settings["main"].fps_smooth_size):
                 del self.frame_times[0]
 
     #   --------------------------------

@@ -98,7 +98,7 @@ class sv_command:
 
         self.command_mode = True
         # create new command line
-        self.command_line = graphics_lib.command_line(self.settings)
+        self.command_line = graphics_lib.command_line(self.settings["main"])
 
     def _disconnect(self, arguments, command):
 
@@ -121,11 +121,11 @@ class sv_command:
 
         # update path with arguments[1] if it exists
         if(arguments[1] != ""):
-            self.settings.path = arguments[1]
+            self.settings["main"].path = arguments[1]
 
         # create new serial device instance
         self.serial_device = serial_lib.threaded_serial(
-            self.settings,
+            self.settings["main"],
             self.error_handler,
             self.user_commands)
         self.serial_device.start()
@@ -141,11 +141,11 @@ class sv_command:
 
         # if no output is specified, use the default
         if(arguments[2] == ""):
-            arguments[2] = self.settings.default_save_name
+            arguments[2] = self.settings["main"].default_save_name
 
         # if no output mode is specified, use the default
         if(arguments[3] == ""):
-            arguments[3] = self.settings.default_save_mode
+            arguments[3] = self.settings["main"].default_save_mode
 
         # save buffers (executed through file manager)
         self.buffer_manager.save(
@@ -160,7 +160,7 @@ class sv_command:
         """
 
         try:
-            self.settings.update({arguments[1]: eval(arguments[2])})
+            self.settings["main"].update({arguments[1]: eval(arguments[2])})
 
         # handle errors
         except SyntaxError:
@@ -197,4 +197,4 @@ class sv_command:
         Change the current buffer
         """
 
-        self.buffer_manager.change_buffer(arguments[1])
+        self.buffer_manager.change_buffer(int(arguments[1]))

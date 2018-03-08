@@ -22,6 +22,7 @@ class sv_settings(settings_template):
     """
 
     # main
+    name = "main"
     quit_on_disconnect = False
     enable_graphics = True
 

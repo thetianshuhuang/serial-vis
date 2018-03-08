@@ -1,6 +1,8 @@
 # buffer.py
 # frame buffer storage class
 
+import time
+
 
 #   --------------------------------
 #
@@ -17,6 +19,8 @@ class frame_buffer:
     ----------
     frame_id : int
         Frame ID of the stored frame. Is set to -1 if unknown.
+    timestamp : float
+        time that the buffer was created
     instructions : instruction[]
         Mixed arrays containing instructions in the buffer.
     """
@@ -39,6 +43,7 @@ class frame_buffer:
 
         # attributes
         self.frame_id = -1
+        self.timestamp = time.time()
         self.instructions = []
 
         # add frame_id attribute if provided

@@ -1,6 +1,7 @@
 # vector_graphics_window.py
 # vector graphics base class
 
+import time
 from base_graphics import *
 
 
@@ -43,7 +44,7 @@ class vector_graphics_window(base_graphics):
         self.current_buffer_id = frame_buffer.frame_id
 
         # clear pygame buffer
-        self.screen.fill(self.settings.colors["background"])
+        self.screen.fill(self.settings["main"].colors["background"])
 
         # show underlay
         self.show_underlay()
@@ -61,9 +62,9 @@ class vector_graphics_window(base_graphics):
                     "onf", instruction, instruction[0])
 
         # show frame id and fps
-        if(self.settings.show_frame_id):
-            self.show_frame_id()
-        if(self.settings.show_fps):
+        if(self.settings["main"].show_frame_id):
+            self.show_frame_id(frame_buffer.timestamp)
+        if(self.settings["main"].show_fps):
             self.show_fps()
 
         # show overlay
@@ -74,35 +75,44 @@ class vector_graphics_window(base_graphics):
             self.screen.blit(
                 command_line,
                 (10,
-                 self.settings.window_size[1] -
+                 self.settings["main"].window_size[1] -
                  command_line.get_size()[1] - 10))
 
         # display pygame buffer
         pygame.display.flip()
 
         # limit the fps
-        self.clock.tick(self.settings.frame_limit)
+        self.clock.tick(self.settings["main"].frame_limit)
 
     #   --------------------------------
     #
     #   Display fps and frame id
     #
     #   --------------------------------
-    def show_frame_id(self):
+    def show_frame_id(self, timestamp):
 
         """
         Display the frame ID at the top left.
         """
 
+        timef = time.localtime(timestamp)
+        timel = (str(timef.tm_hour), str(timef.tm_min), str(timef.tm_sec))
+        for value in timel:
+            if(len(value) == 1):
+                value = "0" + value
+        timestr = timel[0] + ":" + timel[1] + ":" + timel[2]
+
         textfont = pygame.font.SysFont(
-            self.settings.font, self.settings.font_size)
+            self.settings["main"].font, self.settings["main"].font_size)
         textframe = textfont.render(
-            "ID=" + str(self.current_buffer_id),
+            "ID=" + str(self.current_buffer_id) + " | " + timestr,
             False,
-            self.settings.colors["black"])
+            self.settings["main"].colors["black"])
         self.screen.blit(
             textframe,
-            (self.settings.window_size[0] - 10 - textframe.get_size()[0],
+            (self.settings["main"].window_size[0] -
+                10 -
+                textframe.get_size()[0],
              10))
 
     def show_fps(self):
@@ -112,12 +122,12 @@ class vector_graphics_window(base_graphics):
         """
 
         textfont = pygame.font.SysFont(
-            self.settings.font, self.settings.font_size)
+            self.settings["main"].font, self.settings["main"].font_size)
         textframe = textfont.render(
             "fps (draw|disp) = " + str(round(self.compute_fps(), 2)) +
             " | " + str(round(self.clock.get_fps(), 2)),
             False,
-            self.settings.colors["black"])
+            self.settings["main"].colors["black"])
         self.screen.blit(textframe, (10, 10))
 
     #   --------------------------------
@@ -158,6 +168,6 @@ class vector_graphics_window(base_graphics):
         """
 
         try:
-            return(self.settings.colors[colorname])
+            return(self.settings["main"].colors[colorname])
         except KeyError:
-            return(self.settings.colors["black"])
+            return(self.settings["main"].colors["black"])
