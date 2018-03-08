@@ -30,7 +30,7 @@ class base_graphics:
         error handler class
     """
 
-    frame_times = []
+    frame_times = {}
 
     #   --------------------------------
     #
@@ -108,7 +108,7 @@ class base_graphics:
     #   Check for update to fps registry
     #
     #   --------------------------------
-    def update_fps(self, instruction):
+    def update_fps(self, instruction, device_name):
 
         """
         Check whether the instruction triggers an fps update.
@@ -119,10 +119,16 @@ class base_graphics:
             instruction to be checked
         """
 
-        if(instruction[0] == self.settings["main"].fps_count_keyword):
-            self.frame_times.append(time.time())
-            if(len(self.frame_times) > self.settings["main"].fps_smooth_size):
-                del self.frame_times[0]
+        # initialize frame times for new device
+        if device_name not in self.frame_times:
+            self.frame_times.update({device_name: []})
+
+        # update frame times
+        if(instruction[0] == self.settings[device_name].fps_count_keyword):
+            self.frame_times[device_name].append(time.time())
+            if(len(self.frame_times[device_name]) >
+               self.settings[device_name].fps_smooth_size):
+                del self.frame_times[device_name][0]
 
     #   --------------------------------
     #
@@ -130,7 +136,7 @@ class base_graphics:
     #
     #   --------------------------------
 
-    def compute_fps(self):
+    def compute_fps(self, device):
 
         """
         Returns the current fps.
@@ -141,8 +147,11 @@ class base_graphics:
             fps, smoothed over settings.frame_smooth_size frames
         """
 
-        if(len(self.frame_times) < 2):
+        if(device not in self.frame_times):
             return(0)
 
-        return(len(self.frame_times) /
-               (self.frame_times[-1] - self.frame_times[0]))
+        elif(len(self.frame_times[device]) < 2):
+            return(0)
+
+        return(len(self.frame_times[device]) /
+               (self.frame_times[device][-1] - self.frame_times[device][0]))

@@ -107,7 +107,7 @@ class vector_graphics_window(base_graphics):
             timestr = timel[0] + ":" + timel[1] + ":" + timel[2]
 
             # get fps
-            fps = str(round(self.compute_fps(), 2))
+            fps = str(round(self.compute_fps(device), 2))
 
             # build information array
             info.append([

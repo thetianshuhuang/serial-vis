@@ -181,8 +181,13 @@ class sv_command:
         Change settings
         """
 
+        # default to main settings
+        if(arguments[3] == ""):
+            arguments[3] = "main"
+
         try:
-            self.settings["main"].update({arguments[1]: eval(arguments[2])})
+            self.settings[arguments[3]].update(
+                {arguments[1]: eval(arguments[2])})
 
         # handle errors
         except SyntaxError:
@@ -211,7 +216,10 @@ class sv_command:
         Toggle live mode
         """
 
-        self.buffer_manager.change_buffer(0, "main")
+        # toggle live mode for each connected device
+        for device in self.connect_device:
+            if(self.connect_device[device]):
+                self.buffer_manager.change_buffer(0, device)
 
     def _view(self, arguments, command):
 

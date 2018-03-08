@@ -170,7 +170,7 @@ class serial_vis(sv_command):
                 instruction_buffer.pop(0)
 
             # log command with window fps tracker
-            self.graphics_window.update_fps(instruction)
+            self.graphics_window.update_fps(instruction, device_name)
 
             # log instructions
             if(instruction[0] in ["logs", "logf", "logstart", "logend"]):
