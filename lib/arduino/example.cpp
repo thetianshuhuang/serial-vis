@@ -10,7 +10,6 @@ int main() {
 
   init();
   Serial.begin(115200);
-  Serial.flush();
   counter = 0;
 
   sv.setoffset(400,300);
@@ -18,7 +17,8 @@ int main() {
   sv.definecolor("red", 255, 0, 0);
 
   while(true){
-    
+
+    Serial.flush();
     sv.drawcircle(0, 0, counter, "red");
     sv.drawray(0, 0, counter, counter, "red");
     sv.draw();

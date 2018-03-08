@@ -79,7 +79,7 @@ class ascii_device(base_device):
 
                 # provide confirmation if selected
                 if(self.settings.confirmation):
-                    self.write_raw(b"\xFF")
+                    self.write_raw(b"\x00")
 
                 # return null instruction
                 return(["null", True])

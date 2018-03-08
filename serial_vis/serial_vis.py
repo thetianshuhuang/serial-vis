@@ -89,11 +89,11 @@ class serial_vis(sv_command):
 
         # create threaded serial handler for the main instance
         if(self.connect_device):
-            self.serial_device = serial_lib.threaded_serial(
+            self.serial_device = {"main": serial_lib.threaded_serial(
                 self.settings["main"],
                 self.error_handler,
-                self.user_commands)
-            self.serial_device.start()
+                self.user_commands)}
+            self.serial_device["main"].start()
 
         # create graphics window using main settings
         self.graphics_window = self.graphics_class(
@@ -133,7 +133,8 @@ class serial_vis(sv_command):
         self.graphics_window.update_screen(
             self.buffer_manager.get_buffer(),
             self.command_mode,
-            command_line)
+            command_line,
+            "main")
 
     #   --------------------------------
     #
@@ -146,20 +147,23 @@ class serial_vis(sv_command):
         Service the serial device thread
         """
 
+        device_name = "main"
+
         # check for exit request
-        if(self.serial_device.exit_request):
-            if(self.settings["main"].quit_on_disconnect):
+        if(self.serial_device[device_name].exit_request):
+            if(self.settings[device_name].quit_on_disconnect):
                 self.quit_sv()
             else:
                 self.connect_device = False
-                self.serial_device.done = True
+                self.serial_device[device_name].done = True
 
         # acquire thread lock ---------------------------------------------
-        self.serial_device.lock.acquire()
+        self.serial_device[device_name].lock.acquire()
 
         # fetch instruction if it exists
-        while(len(self.serial_device.instruction_buffer) > 0):
-            instruction = self.serial_device.instruction_buffer.pop(0)
+        while(len(self.serial_device[device_name].instruction_buffer) > 0):
+            instruction = self.serial_device[device_name].\
+                instruction_buffer.pop(0)
 
             # log command with window fps tracker
             self.graphics_window.update_fps(instruction)
@@ -180,7 +184,7 @@ class serial_vis(sv_command):
             else:
                 self.buffer_manager.update(instruction)
 
-        self.serial_device.lock.release()
+        self.serial_device[device_name].lock.release()
         # release lock ----------------------------------------------------
 
     #   --------------------------------
@@ -201,7 +205,7 @@ class serial_vis(sv_command):
         # call clean close methods
         self.graphics_window.close_window()
         self.csv_log.close_file()
-        self.serial_device.done = True
+        self.serial_device["main"].done = True
 
         exit()
 

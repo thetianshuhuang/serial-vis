@@ -27,7 +27,7 @@ class default_vector_graphics(vector_graphics_window):
     #   utility functions
     #
     #   --------------------------------
-    def transform(self, coord):
+    def transform(self, coord, device):
 
         """
         Transform a coordinate based on the current scale and offset.
@@ -36,6 +36,8 @@ class default_vector_graphics(vector_graphics_window):
         ----------
         coord : float[]
             (x_coord, y_coord) to be transformed
+        device : str
+            name of device to use settings from
 
         Returns
         -------
@@ -45,13 +47,13 @@ class default_vector_graphics(vector_graphics_window):
         return(
             int(
                 round(
-                    coord[0] * self.settings["main"].scale +
-                    self.settings["main"].offset[0], 0)),
-            self.settings["main"].window_size[1] -
+                    coord[0] * self.settings[device].scale +
+                    self.settings[device].offset[0], 0)),
+            self.settings[device].window_size[1] -
             int(
                 round(
-                    coord[1] * self.settings["main"].scale +
-                    self.settings["main"].offset[1], 0)))
+                    coord[1] * self.settings[device].scale +
+                    self.settings[device].offset[1], 0)))
 
     #   --------------------------------
     #
@@ -65,70 +67,71 @@ class default_vector_graphics(vector_graphics_window):
     the name given in the command registry.
     """
 
-    def definecolor(self, instruction):
+    def definecolor(self, instruction, device):
         if(len(instruction[2]) >= 3):
-            self.settings["main"].attr_merge(
+            self.settings[device].attr_merge(
                 {"colors": {instruction[1]: instruction[2]}})
         else:
             self.error_handler.raise_error("tts", instruction[0])
 
-    def setscale(self, instruction):
-        self.settings["main"].scale = instruction[1]
+    def setscale(self, instruction, device):
+        self.settings[device].scale = instruction[1]
 
-    def setoffset(self, instruction):
-        self.settings["main"].offset = instruction[1]
+    def setoffset(self, instruction, device):
+        self.settings[device].offset = instruction[1]
 
-    def drawline(self, instruction):
+    def drawline(self, instruction, device):
         pygame.draw.line(
             self.screen,
             self.get_color(instruction[3]),
-            self.transform(instruction[1]),
-            self.transform(instruction[2]),
-            self.settings["main"].line_width)
+            self.transform(instruction[1], device),
+            self.transform(instruction[2], device),
+            self.settings[device].line_width)
 
-    def drawlinep(self, instruction):
+    def drawlinep(self, instruction, device):
         pygame.draw.line(
             self.screen,
             self.get_color(instruction[3]),
             instruction[1],
             instruction[2],
-            self.settings["main"].line_width)
+            self.settings[device].line_width)
 
-    def drawcircle(self, instruction):
+    def drawcircle(self, instruction, device):
         # width greater than radius protection
-        radius = int(round(instruction[2] * self.settings["main"].scale))
-        if(radius < self.settings["main"].line_width):
-            radius = self.settings["main"].line_width + 1
+        radius = int(round(instruction[2] * self.settings[device].scale))
+        if(radius < self.settings[device].line_width):
+            radius = self.settings[device].line_width + 1
 
         pygame.draw.circle(
             self.screen,
             self.get_color(instruction[3]),
-            self.transform(instruction[1]),
+            self.transform(instruction[1], device),
             radius,
-            self.settings["main"].line_width)
+            self.settings[device].line_width)
 
-    def drawray(self, instruction):
+    def drawray(self, instruction, device):
         pygame.draw.line(
             self.screen,
             self.get_color(instruction[4]),
-            self.transform(instruction[1]),
+            self.transform(instruction[1], device),
             self.transform((instruction[1][0] +
                             instruction[3] * math.cos(instruction[2]),
                             instruction[1][1] +
-                            instruction[3] * math.sin(instruction[2]))),
-            self.settings["main"].line_width)
+                            instruction[3] * math.sin(instruction[2])),
+                           device),
+            self.settings[device].line_width)
 
-    def text(self, instruction):
+    def text(self, instruction, device):
         # create font
         textfont = pygame.font.SysFont(
-            self.settings["main"].font, instruction[3])
+            self.settings[device].font, instruction[3])
         # create surface
         textframe = textfont.render(
             instruction[1], False, self.get_color(instruction[4]))
         # merge surface
-        self.screen.blit(textframe, self.transform(instruction[2]))
+        self.screen.blit(textframe, self.transform(instruction[2], device))
 
-    def textp(self, instruction):
+    def textp(self, instruction, device):
         # create font
         textfont = pygame.font.SysFont(self.font, instruction[3])
         # create surface

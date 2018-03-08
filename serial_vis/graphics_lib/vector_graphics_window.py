@@ -30,7 +30,10 @@ class vector_graphics_window(base_graphics):
     #   Update screen
     #
     #   --------------------------------
-    def update_screen(self, frame_buffer, command_mode, command_line):
+    def update_screen(
+            self, frame_buffer,
+            command_mode, command_line,
+            target_device):
 
         """
         Update a screen with the given frame_buffer.
@@ -54,7 +57,7 @@ class vector_graphics_window(base_graphics):
             # run through default draw functions
             try:
                 draw_function = getattr(self, instruction[0])
-                draw_function(instruction)
+                draw_function(instruction, target_device)
             # raise AttributeError
             # if the requested instruction doesn't exist.
             except AttributeError:

@@ -71,7 +71,6 @@ class threaded_serial(threading.Thread):
         self.done = False
 
         # create serial device and parser:
-
         # ascii transmission mode
         # slower, but more human-readable
         if(self.settings.serial_mode == "ascii"):

@@ -107,7 +107,7 @@ class sv_command:
         """
 
         self.connect_device = False
-        self.serial_device.done = True
+        self.serial_device["main"].done = True
 
     def _connect(self, arguments, command):
 
@@ -117,18 +117,18 @@ class sv_command:
 
         # close existing device if it exists
         if(self.connect_device):
-            self.serial_device.done = True
+            self.serial_device["main"].done = True
 
         # update path with arguments[1] if it exists
         if(arguments[1] != ""):
             self.settings["main"].path = arguments[1]
 
         # create new serial device instance
-        self.serial_device = serial_lib.threaded_serial(
+        self.serial_device["main"] = serial_lib.threaded_serial(
             self.settings["main"],
             self.error_handler,
             self.user_commands)
-        self.serial_device.start()
+        self.serial_device["main"].start()
 
         # register serial device
         self.connect_device = True
