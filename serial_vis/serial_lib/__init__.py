@@ -11,9 +11,9 @@ __all__ = [
 ]
 
 # imports to provide a friendly namespace
-from ascii_device import ascii_device
-from ascii_parser import ascii_parser
+from .ascii_device import ascii_device
+from .ascii_parser import ascii_parser
 # from bin_device import bin_device
-from bin_parser import bin_parser
-from base_device import base_device
-from threaded_serial import threaded_serial
+from .bin_parser import bin_parser
+from .base_device import base_device
+from .threaded_serial import threaded_serial

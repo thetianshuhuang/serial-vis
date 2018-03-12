@@ -1,9 +1,9 @@
 # sv_command.py
 # centralized command handling
 
-import serial_lib
-import graphics_lib
-import util_lib
+from . import serial_lib
+from . import graphics_lib
+from . import util_lib
 
 
 #   --------------------------------

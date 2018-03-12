@@ -3,7 +3,7 @@
 
 import pygame
 import time
-from keyboard_keybinds import keyboard_keybinds
+from .keyboard_keybinds import keyboard_keybinds
 
 
 #   --------------------------------

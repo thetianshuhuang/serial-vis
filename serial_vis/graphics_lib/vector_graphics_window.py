@@ -2,7 +2,7 @@
 # vector graphics base class
 
 import time
-from base_graphics import *
+from .base_graphics import *
 
 
 #   --------------------------------

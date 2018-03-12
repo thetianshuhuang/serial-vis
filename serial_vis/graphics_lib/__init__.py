@@ -7,6 +7,6 @@ __all__ = [
 ]
 
 # imports for a friendly namespace
-from default_vector_graphics import default_vector_graphics
-from vector_graphics_window import vector_graphics_window
-from command_line import command_line
+from .default_vector_graphics import default_vector_graphics
+from .vector_graphics_window import vector_graphics_window
+from .command_line import command_line

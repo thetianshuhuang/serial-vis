@@ -3,7 +3,7 @@
 
 import time
 import sys
-from t_color import color
+from .t_color import color
 
 
 #   --------------------------------

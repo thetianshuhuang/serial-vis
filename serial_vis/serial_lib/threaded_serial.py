@@ -3,10 +3,10 @@
 
 import threading
 import time
-from ascii_device import ascii_device
-from ascii_parser import ascii_parser
-from bin_device import bin_device
-from bin_parser import bin_parser
+from .ascii_device import ascii_device
+from .ascii_parser import ascii_parser
+from .bin_device import bin_device
+from .bin_parser import bin_parser
 
 
 class threaded_serial(threading.Thread):

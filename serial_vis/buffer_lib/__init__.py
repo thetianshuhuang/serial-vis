@@ -6,6 +6,6 @@ __all__ = [
 ]
 
 # imports for a friendly namespace
-from buffer import frame_buffer
-from buffer import buffer_db
-from buffer_manager import buffer_manager
+from .buffer import frame_buffer
+from .buffer import buffer_db
+from .buffer_manager import buffer_manager

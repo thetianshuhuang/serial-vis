@@ -3,7 +3,7 @@
 
 import time
 import serial
-from base_device import *
+from .base_device import *
 
 
 #   --------------------------------

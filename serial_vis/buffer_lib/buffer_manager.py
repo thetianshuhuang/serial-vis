@@ -1,8 +1,8 @@
 # buffer_manager.py
 # serial_vis specific buffer management
 
-from buffer import *
-import buffer_io
+from .buffer import *
+from . import buffer_io
 
 
 #   --------------------------------

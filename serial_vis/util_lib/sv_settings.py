@@ -2,7 +2,7 @@
 # settings storage class
 
 import pygame
-from settings_template import *
+from .settings_template import *
 
 
 #   --------------------------------

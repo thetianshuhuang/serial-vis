@@ -1,7 +1,7 @@
 # serial_parser.py
 # serial command interpretation class
 
-from hexutil import *
+from .hexutil import *
 
 
 #   --------------------------------

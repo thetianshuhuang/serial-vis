@@ -4,5 +4,5 @@ __all__ = [
     "graphics_lib"
 ]
 
-from serial_vis import serial_vis
-from graphics_lib import default_vector_graphics
+from .serial_vis import serial_vis
+from .graphics_lib import default_vector_graphics

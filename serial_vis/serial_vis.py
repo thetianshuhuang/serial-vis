@@ -2,11 +2,11 @@
 # main class
 
 import pygame
-import serial_lib
-import graphics_lib
-import buffer_lib
-import util_lib
-from sv_command import *
+from . import serial_lib
+from . import graphics_lib
+from . import buffer_lib
+from . import util_lib
+from .sv_command import *
 
 
 #   --------------------------------
